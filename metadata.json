@@ -1,0 +1,8 @@
+{
+  "name": "Remix Jelajah Ekosistem",
+  "description": "Media pembelajaran interaktif IPAS Kelas V SD bertema pengenalan ekosistem, komponen biotik, dan komponen abiotik.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
