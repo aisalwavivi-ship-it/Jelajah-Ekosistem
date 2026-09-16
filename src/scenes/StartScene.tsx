@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Play, HelpCircle, Compass, Sparkles, BookOpen, Map, Footprints } from 'lucide-react';
+import { Play, HelpCircle, Compass, Sparkles, BookOpen, Map, Footprints, History, RotateCcw, Award } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 
@@ -14,6 +14,11 @@ interface StartSceneProps {
   onOpenHelp?: () => void;
   onGoToMaterial?: () => void;
   onGoToMap?: () => void;
+  onOpenHistory?: () => void;
+  onRequestReset?: () => void;
+  activeAttemptNumber?: number;
+  activeCompletedCount?: number;
+  activeStatus?: 'active' | 'completed';
 }
 
 export const StartScene: React.FC<StartSceneProps> = ({
@@ -26,6 +31,11 @@ export const StartScene: React.FC<StartSceneProps> = ({
   onOpenHelp,
   onGoToMaterial,
   onGoToMap,
+  onOpenHistory,
+  onRequestReset,
+  activeAttemptNumber = 1,
+  activeCompletedCount = 0,
+  activeStatus = 'active',
 }) => {
   const [localName, setLocalName] = useState(initialStudentName || playerName || '');
 
@@ -117,6 +127,20 @@ export const StartScene: React.FC<StartSceneProps> = ({
           </div>
         </div>
 
+        {/* Session Badge Indicator */}
+        <div className="flex items-center justify-center gap-2 text-xs">
+          <span className="px-3 py-1 bg-amber-100/90 text-amber-950 font-extrabold rounded-full border border-amber-300">
+            Percobaan {activeAttemptNumber}
+          </span>
+          <span className="px-3 py-1 bg-emerald-100/90 text-emerald-950 font-bold rounded-full border border-emerald-300">
+            {activeStatus === 'completed'
+              ? '✅ Selesai (8/8 Misi)'
+              : activeCompletedCount > 0
+              ? `Sedang Berjalan (${activeCompletedCount}/8 Misi)`
+              : 'Sesi Baru (0/8 Misi)'}
+          </span>
+        </div>
+
         {/* Primary Action Button: MULAI PETUALANGAN */}
         <div className="space-y-2 pt-1">
           <motion.button
@@ -127,11 +151,50 @@ export const StartScene: React.FC<StartSceneProps> = ({
             className="w-full py-3.5 sm:py-4 px-6 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-display font-black text-base sm:text-lg rounded-2xl shadow-lg shadow-emerald-800/25 border-2 border-emerald-400/50 flex items-center justify-center gap-2.5 transition cursor-pointer"
           >
             <Play className="w-5 h-5 fill-current" />
-            <span>MULAI PETUALANGAN</span>
+            <span>
+              {activeStatus === 'completed'
+                ? `MULAI SESI BARU (PERCOBAAN ${activeAttemptNumber + 1})`
+                : activeCompletedCount > 0
+                ? `LANJUTKAN PETUALANGAN (${activeCompletedCount}/8 MISI)`
+                : 'MULAI PETUALANGAN'}
+            </span>
           </motion.button>
 
+          {/* Quick Actions for History and Reset */}
+          <div className="flex items-center justify-center gap-2">
+            {onOpenHistory && (
+              <button
+                id="btn-start-history"
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  onOpenHistory();
+                }}
+                className="flex-1 py-2 px-3 bg-amber-100 hover:bg-amber-200 text-amber-950 font-display font-bold text-xs rounded-xl border border-amber-300 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+              >
+                <History className="w-3.5 h-3.5 text-amber-700" />
+                <span>Riwayat Pengerjaan</span>
+              </button>
+            )}
+
+            {onRequestReset && activeCompletedCount > 0 && (
+              <button
+                id="btn-start-restart"
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  onRequestReset();
+                }}
+                className="py-2 px-3 bg-stone-100 hover:bg-rose-50 text-stone-700 hover:text-rose-900 font-display font-bold text-xs rounded-xl border border-stone-300 shadow-xs flex items-center justify-center gap-1.5 transition active:scale-95 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-stone-600" />
+                <span>Mulai Lagi</span>
+              </button>
+            )}
+          </div>
+
           {/* Secondary Quick Navigation Buttons */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 pt-1">
             {onGoToMaterial && (
               <button
                 id="btn-start-material"

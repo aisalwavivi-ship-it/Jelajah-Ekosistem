@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge } from 'lucide-react';
+import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge, History } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { QUIZ_QUESTIONS, BADGE_CRITERIA } from '../data/missions';
 import { sound } from '../utils/audio';
@@ -13,6 +13,9 @@ interface QuizSceneProps {
   onGoToMap: () => void;
   onRestartAll: () => void;
   totalGameStars: number;
+  onOpenHistory?: () => void;
+  onRequestNewSession?: () => void;
+  activeAttemptNumber?: number;
 }
 
 export const QuizScene: React.FC<QuizSceneProps> = ({
@@ -21,6 +24,9 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
   onGoToMap,
   onRestartAll,
   totalGameStars,
+  onOpenHistory,
+  onRequestNewSession,
+  activeAttemptNumber = 1,
 }) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
@@ -419,7 +425,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
               </p>
             </div>
 
-            {/* Action Buttons: Certificate, Retake, Map */}
+            {/* Action Buttons: Certificate, History, New Session, Retake, Map */}
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
                 id="btn-view-certificate"
@@ -428,18 +434,46 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                   triggerCertificateConfetti();
                   onOpenCertificate();
                 }}
-                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 text-stone-950 font-display font-black rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
+                className="px-5 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 text-stone-950 font-display font-black rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95"
               >
                 <FileBadge className="w-4 h-4" />
-                <span>Lihat & Unduh Sertifikat 📜</span>
+                <span>Lihat Sertifikat 📜</span>
               </button>
+
+              {onOpenHistory && (
+                <button
+                  id="btn-quiz-view-history"
+                  onClick={() => {
+                    sound.playClick();
+                    onOpenHistory();
+                  }}
+                  className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-amber-950 font-display font-bold rounded-2xl text-xs sm:text-sm border border-amber-300 shadow-xs flex items-center gap-2 transition cursor-pointer active:scale-95"
+                >
+                  <History className="w-4 h-4 text-amber-700" />
+                  <span>Riwayat Pengerjaan 📚</span>
+                </button>
+              )}
+
+              {onRequestNewSession && (
+                <button
+                  id="btn-quiz-start-new-session"
+                  onClick={() => {
+                    sound.playClick();
+                    onRequestNewSession();
+                  }}
+                  className="px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-display font-bold rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>Mulai Sesi Baru (Percobaan {activeAttemptNumber + 1})</span>
+                </button>
+              )}
 
               <button
                 id="btn-retake-quiz"
                 onClick={handleRetakeQuiz}
-                className="px-5 py-3 bg-white hover:bg-stone-50 border-2 border-stone-300 text-stone-800 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
+                className="px-4 py-3 bg-white hover:bg-stone-50 border-2 border-stone-300 text-stone-800 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 <span>Ulangi Kuis</span>
               </button>
 
@@ -448,10 +482,10 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                   sound.playClick();
                   onGoToMap();
                 }}
-                className="px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
+                className="px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
               >
-                <Map className="w-4 h-4" />
-                <span>Buka Peta Petualangan</span>
+                <Map className="w-3.5 h-3.5 text-emerald-700" />
+                <span>Peta Jalan</span>
               </button>
             </div>
           </motion.div>
@@ -464,7 +498,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
               sound.playClick();
               onGoToMap();
             }}
-            className="px-4 py-2 bg-white hover:bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-xs"
+            className="px-4 py-2 bg-white hover:bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <Map className="w-3.5 h-3.5" />
             <span>Peta Petualangan</span>
@@ -473,11 +507,15 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
           <button
             onClick={() => {
               sound.playClick();
-              onRestartAll();
+              if (onRequestNewSession) {
+                onRequestNewSession();
+              } else {
+                onRestartAll();
+              }
             }}
-            className="text-xs text-stone-500 hover:text-stone-800 underline"
+            className="text-xs text-stone-500 hover:text-stone-800 underline cursor-pointer"
           >
-            Mulai Dari Awal Gerbang Sekolah
+            Mulai Sesi Baru dari M1
           </button>
         </div>
       </div>

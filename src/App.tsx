@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AppScene, MissionId, GameState, MissionJournalEntry } from './types';
+import { AppScene, MissionId, GameState, MissionJournalEntry, SessionRecord } from './types';
 import { sound } from './utils/audio';
 import { tts } from './utils/tts';
 import { ambientMusic } from './utils/ambientMusic';
@@ -21,6 +21,8 @@ import { HowToPlayModal } from './components/HowToPlayModal';
 import { CertificateModal } from './components/CertificateModal';
 import { ExplorerJournal } from './components/ExplorerJournal';
 import { DailyCheckInModal } from './components/DailyCheckInModal';
+import { ConfirmResetModal } from './components/ConfirmResetModal';
+import { WorkHistoryModal } from './components/WorkHistoryModal';
 import { DynamicWeatherBackground } from './components/DynamicWeatherBackground';
 import { WeatherType, WeatherMode, resolveActiveWeather } from './utils/weather';
 
@@ -38,7 +40,17 @@ import { Mission8MindMap } from './scenes/Mission8MindMap';
 import { QuizScene } from './scenes/QuizScene';
 import { MaterialScene } from './scenes/MaterialScene';
 
-const STORAGE_KEY = 'jelajah_ekosistem_state_v2';
+const STORAGE_KEY = 'jelajah_ekosistem_state_v3';
+const STORAGE_HISTORY_KEY = 'jelajah_ekosistem_history_v3';
+const LEGACY_STORAGE_KEY = 'jelajah_ekosistem_state_v2';
+
+export interface ActiveSessionMeta {
+  attemptNumber: number;
+  startedAt: string;
+  completedAt?: string;
+  status: 'active' | 'completed';
+  missionStars: Record<number, number>;
+}
 
 interface AppGameState {
   studentName: string;
@@ -51,7 +63,16 @@ interface AppGameState {
   journalEntries: MissionJournalEntry[];
   lastCheckInDate?: string;
   checkInStreak?: number;
+  activeSession: ActiveSessionMeta;
+  history: SessionRecord[];
 }
+
+const INITIAL_ACTIVE_SESSION: ActiveSessionMeta = {
+  attemptNumber: 1,
+  startedAt: new Date().toISOString(),
+  status: 'active',
+  missionStars: {},
+};
 
 const INITIAL_GAME_STATE: AppGameState = {
   studentName: 'Penjelajah Muda',
@@ -73,6 +94,8 @@ const INITIAL_GAME_STATE: AppGameState = {
   journalEntries: [],
   lastCheckInDate: undefined,
   checkInStreak: 1,
+  activeSession: INITIAL_ACTIVE_SESSION,
+  history: [],
 };
 
 export default function App() {
@@ -81,6 +104,10 @@ export default function App() {
   const [isCertificateOpen, setIsCertificateOpen] = useState<boolean>(false);
   const [isJournalOpen, setIsJournalOpen] = useState<boolean>(false);
   const [isDailyCheckInOpen, setIsDailyCheckInOpen] = useState<boolean>(false);
+  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState<boolean>(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
+  const [selectedHistoryCertificate, setSelectedHistoryCertificate] = useState<SessionRecord | null>(null);
+
   const [weatherMode, setWeatherMode] = useState<WeatherMode>('auto-time');
   const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
 
@@ -92,49 +119,96 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  // Load initial state from localStorage if present
+  // Load initial state from localStorage if present with graceful migration
   const [gameState, setGameState] = useState<AppGameState>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed && parsed.completedMissions) {
-          // Gracefully backfill journal entries if user had completed missions before journal was added
-          let entries: MissionJournalEntry[] = Array.isArray(parsed.journalEntries)
-            ? parsed.journalEntries
-            : [];
+      // 1. Try to load v3 state
+      const savedV3 = localStorage.getItem(STORAGE_KEY);
+      const savedHistory = localStorage.getItem(STORAGE_HISTORY_KEY);
+      let parsedHistory: SessionRecord[] = [];
+      if (savedHistory) {
+        try {
+          const ph = JSON.parse(savedHistory);
+          if (Array.isArray(ph)) parsedHistory = ph;
+        } catch {
+          // ignore
+        }
+      }
 
-          if (entries.length === 0) {
-            const backfilled: MissionJournalEntry[] = [];
-            for (let i = 1; i <= 8; i++) {
-              const id = i as MissionId;
-              if (parsed.completedMissions[id]) {
-                const meta = MISSIONS_DATA.find((m) => m.id === id);
-                const details = MISSION_JOURNAL_DETAILS[id];
-                if (meta) {
-                  backfilled.push({
-                    id: `journal-init-${id}`,
-                    missionId: id,
-                    title: meta.title,
-                    subtitle: meta.subtitle,
-                    location: meta.location,
-                    icon: meta.icon,
-                    starsEarned: meta.points,
-                    completedAt: new Date(Date.now() - (9 - id) * 15 * 60 * 1000).toISOString(),
-                    summary: details?.summary || meta.description,
-                    categoryTag: details?.categoryTag || 'ekosistem',
-                  });
-                }
-              }
-            }
-            entries = backfilled;
-          }
+      if (savedV3) {
+        const parsed = JSON.parse(savedV3);
+        if (parsed && parsed.completedMissions) {
+          const finalHistory = Array.isArray(parsed.history) && parsed.history.length > 0
+            ? parsed.history
+            : parsedHistory;
+
+          const activeSess: ActiveSessionMeta = parsed.activeSession || {
+            attemptNumber: 1,
+            startedAt: new Date().toISOString(),
+            status: parsed.quizScore !== null ? 'completed' : 'active',
+            missionStars: {},
+          };
 
           return {
             ...INITIAL_GAME_STATE,
             ...parsed,
             isMusicPlaying: false,
-            journalEntries: entries,
+            activeSession: activeSess,
+            history: finalHistory,
+          };
+        }
+      }
+
+      // 2. Backward compatibility fallback from v2
+      const savedV2 = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (savedV2) {
+        const legacy = JSON.parse(savedV2);
+        if (legacy && legacy.completedMissions) {
+          const completedCount = Object.values(legacy.completedMissions).filter(Boolean).length;
+          const isFinished = completedCount >= 8 && legacy.quizScore !== null;
+          const userBadge = BADGES.find((b) => (legacy.quizScore ?? 100) >= b.minScore) || BADGES[BADGES.length - 1];
+
+          let legacyHistory: SessionRecord[] = [];
+          if (isFinished) {
+            legacyHistory.push({
+              id: `session-legacy-1`,
+              attemptNumber: 1,
+              studentName: legacy.studentName || 'Penjelajah Muda',
+              startedAt: new Date(Date.now() - 3600000).toISOString(),
+              completedAt: new Date().toISOString(),
+              status: 'completed',
+              completedMissionsCount: 8,
+              completedMissions: { ...legacy.completedMissions },
+              progressPercent: 100,
+              stars: legacy.stars || 120,
+              missionScores: {},
+              quizScore: legacy.quizScore,
+              badgeTitle: userBadge.title,
+              badgeIcon: userBadge.icon,
+            });
+          }
+
+          const initialSession: ActiveSessionMeta = {
+            attemptNumber: isFinished ? 1 : 1,
+            startedAt: new Date().toISOString(),
+            completedAt: isFinished ? new Date().toISOString() : undefined,
+            status: isFinished ? 'completed' : 'active',
+            missionStars: {},
+          };
+
+          return {
+            ...INITIAL_GAME_STATE,
+            studentName: legacy.studentName || 'Penjelajah Muda',
+            completedMissions: legacy.completedMissions || INITIAL_GAME_STATE.completedMissions,
+            stars: legacy.stars || 0,
+            badges: legacy.badges || [],
+            quizScore: legacy.quizScore,
+            journalEntries: legacy.journalEntries || [],
+            lastCheckInDate: legacy.lastCheckInDate,
+            checkInStreak: legacy.checkInStreak || 1,
+            activeSession: initialSession,
+            history: legacyHistory,
+            isMusicPlaying: false,
           };
         }
       }
@@ -144,10 +218,11 @@ export default function App() {
     return INITIAL_GAME_STATE;
   });
 
-  // Sync state to localStorage whenever it changes
+  // Sync state to localStorage whenever it changes (without clear)
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+      localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(gameState.history));
     } catch (e) {
       console.warn('Could not save state to localStorage', e);
     }
@@ -245,6 +320,10 @@ export default function App() {
       const isAlreadyCompleted = prev.completedMissions[missionId];
       const newCompleted = { ...prev.completedMissions, [missionId]: true };
       const updatedStars = isAlreadyCompleted ? prev.stars : prev.stars + earnedStars;
+      const updatedMissionStars = {
+        ...prev.activeSession.missionStars,
+        [missionId]: Math.max(prev.activeSession.missionStars[missionId] || 0, earnedStars),
+      };
 
       // Update or record journal entry with timestamp and stars earned
       const existingIndex = prev.journalEntries.findIndex((e) => e.missionId === missionId);
@@ -278,6 +357,10 @@ export default function App() {
         completedMissions: newCompleted,
         stars: updatedStars,
         journalEntries: updatedJournal,
+        activeSession: {
+          ...prev.activeSession,
+          missionStars: updatedMissionStars,
+        },
       };
     });
   };
@@ -326,17 +409,139 @@ export default function App() {
     // Grand finale celebration confetti
     triggerQuizFinishConfetti();
 
-    setGameState((prev) => ({
-      ...prev,
-      quizScore: finalScore,
-    }));
+    setGameState((prev) => {
+      const completedCount = Object.values(prev.completedMissions).filter(Boolean).length;
+      const nowStr = new Date().toISOString();
+      const userBadge = BADGES.find((b) => finalScore >= b.minScore) || BADGES[BADGES.length - 1];
+
+      // Create session record for history archive
+      const finishedSessionRecord: SessionRecord = {
+        id: `session-${prev.activeSession.attemptNumber}-${Date.now()}`,
+        attemptNumber: prev.activeSession.attemptNumber,
+        studentName: prev.studentName,
+        startedAt: prev.activeSession.startedAt,
+        completedAt: nowStr,
+        status: 'completed',
+        completedMissionsCount: completedCount,
+        completedMissions: { ...prev.completedMissions },
+        progressPercent: Math.round((completedCount / 8) * 100),
+        stars: prev.stars,
+        missionScores: { ...prev.activeSession.missionStars },
+        quizScore: finalScore,
+        badgeTitle: userBadge.title,
+        badgeIcon: userBadge.icon,
+      };
+
+      const existingIndex = prev.history.findIndex(
+        (h) => h.attemptNumber === prev.activeSession.attemptNumber
+      );
+      let newHistory: SessionRecord[];
+      if (existingIndex >= 0) {
+        newHistory = [...prev.history];
+        newHistory[existingIndex] = finishedSessionRecord;
+      } else {
+        newHistory = [finishedSessionRecord, ...prev.history];
+      }
+
+      return {
+        ...prev,
+        quizScore: finalScore,
+        activeSession: {
+          ...prev.activeSession,
+          status: 'completed',
+          completedAt: nowStr,
+        },
+        history: newHistory,
+      };
+    });
+  };
+
+  // Request restart / new session with confirmation dialog
+  const handleRequestReset = () => {
+    sound.playClick();
+    setIsConfirmResetOpen(true);
+  };
+
+  // Start new active session without clearing history
+  const handleConfirmStartNewSession = () => {
+    sound.playClick();
+    ambientMusic.stop();
+
+    setGameState((prev) => {
+      let updatedHistory = [...prev.history];
+      const completedCount = Object.values(prev.completedMissions).filter(Boolean).length;
+
+      // If current session had progress and isn't archived yet, archive it
+      const alreadySaved = updatedHistory.some(
+        (h) => h.attemptNumber === prev.activeSession.attemptNumber
+      );
+      if (!alreadySaved && (completedCount > 0 || prev.quizScore !== null)) {
+        const userBadge = BADGES.find((b) => (prev.quizScore ?? 70) >= b.minScore) || BADGES[BADGES.length - 1];
+        const isDone = completedCount >= 8 && prev.quizScore !== null;
+        const archivedRecord: SessionRecord = {
+          id: `session-${prev.activeSession.attemptNumber}-${Date.now()}`,
+          attemptNumber: prev.activeSession.attemptNumber,
+          studentName: prev.studentName,
+          startedAt: prev.activeSession.startedAt,
+          completedAt: prev.activeSession.completedAt || (isDone ? new Date().toISOString() : undefined),
+          status: isDone ? 'completed' : 'in-progress',
+          completedMissionsCount: completedCount,
+          completedMissions: { ...prev.completedMissions },
+          progressPercent: Math.round((completedCount / 8) * 100),
+          stars: prev.stars,
+          missionScores: { ...prev.activeSession.missionStars },
+          quizScore: prev.quizScore,
+          badgeTitle: userBadge.title,
+          badgeIcon: userBadge.icon,
+        };
+        updatedHistory = [archivedRecord, ...updatedHistory];
+      }
+
+      // Determine next attempt number (incrementing)
+      const maxAttemptInHistory = updatedHistory.reduce((max, h) => Math.max(max, h.attemptNumber), 0);
+      const nextAttempt = Math.max(prev.activeSession.attemptNumber, maxAttemptInHistory) + 1;
+
+      return {
+        ...prev,
+        completedMissions: {
+          1: false,
+          2: false,
+          3: false,
+          4: false,
+          5: false,
+          6: false,
+          7: false,
+          8: false,
+        },
+        stars: 0,
+        quizScore: null,
+        journalEntries: [],
+        activeSession: {
+          attemptNumber: nextAttempt,
+          startedAt: new Date().toISOString(),
+          status: 'active',
+          missionStars: {},
+        },
+        history: updatedHistory,
+      };
+    });
+
+    setIsConfirmResetOpen(false);
+    setIsHistoryOpen(false);
+    setIsCertificateOpen(false);
+    setSelectedHistoryCertificate(null);
+    setLastCompletedMissionId(null);
+    navigateWithWalkingTrail('mission-1', currentScene);
   };
 
   const handleRestartAll = () => {
-    sound.playClick();
-    ambientMusic.stop();
-    setGameState(INITIAL_GAME_STATE);
-    setCurrentScene('start');
+    handleRequestReset();
+  };
+
+  const handleViewCertificateForSession = (session: SessionRecord) => {
+    setSelectedHistoryCertificate(session);
+    setIsHistoryOpen(false);
+    setIsCertificateOpen(true);
   };
 
   const completedCount = Object.values(gameState.completedMissions).filter(Boolean).length;
@@ -447,6 +652,12 @@ export default function App() {
           sound.playClick();
           setIsJournalOpen(true);
         }}
+        onOpenHistory={() => {
+          sound.playClick();
+          setIsHistoryOpen(true);
+        }}
+        onRequestReset={handleRequestReset}
+        activeAttemptNumber={gameState.activeSession.attemptNumber}
         onOpenDailyCheckIn={() => {
           sound.playClick();
           setIsDailyCheckInOpen(true);
@@ -532,6 +743,14 @@ export default function App() {
                   sound.playClick();
                   setIsHelpOpen(true);
                 }}
+                onOpenHistory={() => {
+                  sound.playClick();
+                  setIsHistoryOpen(true);
+                }}
+                onRequestReset={handleRequestReset}
+                activeAttemptNumber={gameState.activeSession.attemptNumber}
+                activeCompletedCount={completedCount}
+                activeStatus={gameState.activeSession.status}
               />
             )}
 
@@ -626,6 +845,12 @@ export default function App() {
                 onOpenCertificate={() => setIsCertificateOpen(true)}
                 onGoToMap={() => setCurrentScene('map')}
                 onRestartAll={handleRestartAll}
+                onRequestNewSession={handleRequestReset}
+                onOpenHistory={() => {
+                  sound.playClick();
+                  setIsHistoryOpen(true);
+                }}
+                activeAttemptNumber={gameState.activeSession.attemptNumber}
                 totalGameStars={gameState.stars}
               />
             )}
@@ -666,11 +891,28 @@ export default function App() {
 
       <CertificateModal
         isOpen={isCertificateOpen}
-        onClose={() => setIsCertificateOpen(false)}
-        playerName={gameState.studentName}
-        score={gameState.quizScore ?? 100}
-        badge={userBadge}
-        stars={gameState.stars}
+        onClose={() => {
+          setIsCertificateOpen(false);
+          setSelectedHistoryCertificate(null);
+        }}
+        playerName={selectedHistoryCertificate?.studentName || gameState.studentName}
+        score={selectedHistoryCertificate?.quizScore ?? gameState.quizScore ?? 100}
+        badge={
+          selectedHistoryCertificate?.quizScore !== undefined && selectedHistoryCertificate?.quizScore !== null
+            ? BADGES.find((b) => selectedHistoryCertificate.quizScore! >= b.minScore) || userBadge
+            : userBadge
+        }
+        stars={selectedHistoryCertificate?.stars ?? gameState.stars}
+        dateStr={
+          selectedHistoryCertificate?.completedAt
+            ? new Date(selectedHistoryCertificate.completedAt).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })
+            : undefined
+        }
+        attemptNumber={selectedHistoryCertificate?.attemptNumber ?? gameState.activeSession.attemptNumber}
       />
 
       <ExplorerJournal
@@ -695,6 +937,25 @@ export default function App() {
         isAlreadyClaimedToday={isDailyClaimedToday}
         onClaimBonus={handleClaimDailyBonus}
         onClose={() => setIsDailyCheckInOpen(false)}
+      />
+
+      {/* 7. Modal Konfirmasi Mulai Lagi / Sesi Baru (Anti-accidental reset) */}
+      <ConfirmResetModal
+        isOpen={isConfirmResetOpen}
+        onClose={() => setIsConfirmResetOpen(false)}
+        onConfirm={handleConfirmStartNewSession}
+        currentAttemptNumber={gameState.activeSession.attemptNumber}
+        completedCount={completedCount}
+      />
+
+      {/* 8. Modal Riwayat Pengerjaan (Arsip Sesi Murid) */}
+      <WorkHistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        sessions={gameState.history}
+        currentAttemptNumber={gameState.activeSession.attemptNumber}
+        onStartNewSession={handleRequestReset}
+        onViewCertificate={handleViewCertificateForSession}
       />
     </div>
   );

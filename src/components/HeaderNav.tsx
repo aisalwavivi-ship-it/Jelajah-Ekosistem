@@ -14,7 +14,9 @@ import {
   Sun,
   Sparkles,
   ChevronDown,
-  Calendar
+  Calendar,
+  RotateCcw,
+  History
 } from 'lucide-react';
 import { AppScene, MissionId } from '../types';
 import { sound } from '../utils/audio';
@@ -43,6 +45,9 @@ interface HeaderNavProps {
   onOpenCertificate?: () => void;
   isCertificateUnlocked?: boolean;
   onOpenJournal?: () => void;
+  onOpenHistory?: () => void;
+  onRequestReset?: () => void;
+  activeAttemptNumber?: number;
   completedCount?: number;
   completedMissions?: Record<MissionId, boolean>;
   isMusicPlaying?: boolean;
@@ -73,6 +78,9 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   onOpenCertificate,
   isCertificateUnlocked,
   onOpenJournal,
+  onOpenHistory,
+  onRequestReset,
+  activeAttemptNumber = 1,
   completedCount = 0,
   completedMissions = {},
   isMusicPlaying = false,
@@ -170,6 +178,22 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             >
               <span>{explorerLevel.icon}</span>
             </button>
+
+            {/* History trigger on mobile */}
+            {onOpenHistory && (
+              <button
+                id="btn-header-history-mobile"
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  onOpenHistory();
+                }}
+                className="p-1.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs flex items-center"
+                title="Riwayat Pengerjaan"
+              >
+                <History className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -182,6 +206,8 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
           4. Misi
           5. Kuis
           6. Profil/Progres
+          7. Riwayat
+          8. Mulai Lagi
         */}
         <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full scrollbar-none py-0.5">
           {/* 1. Beranda */}
@@ -337,6 +363,38 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             <span className="sm:hidden">Profil</span>
             <span className="text-[10px] font-black text-amber-600">⭐{stars}</span>
           </button>
+
+          {/* 7. Riwayat Pengerjaan */}
+          {onOpenHistory && (
+            <button
+              id="nav-btn-history"
+              onClick={() => {
+                sound.playClick();
+                onOpenHistory();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl font-display text-xs font-bold bg-amber-50/90 hover:bg-amber-100 text-amber-950 border border-amber-300 transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap"
+              title="Riwayat Sesi Pengerjaan"
+            >
+              <History className="w-3.5 h-3.5 text-amber-700" />
+              <span>Riwayat</span>
+            </button>
+          )}
+
+          {/* 8. Mulai Lagi / Sesi Baru */}
+          {onRequestReset && (
+            <button
+              id="nav-btn-restart"
+              onClick={() => {
+                sound.playClick();
+                onRequestReset();
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-2xl font-display text-xs font-bold bg-stone-100/90 hover:bg-rose-50 text-stone-700 hover:text-rose-900 border border-stone-200/70 transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap"
+              title="Mulai Sesi Baru dari M1"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-stone-600" />
+              <span>Mulai Lagi</span>
+            </button>
+          )}
         </nav>
 
         {/* Right Section: Sound, Music, Weather & Modals */}
@@ -360,6 +418,21 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             <span className="text-[11px] font-bold">{currentWeatherCond.label}</span>
           </button>
 
+          {/* History Icon in Header */}
+          {onOpenHistory && (
+            <button
+              id="btn-header-history"
+              onClick={() => {
+                sound.playClick();
+                onOpenHistory();
+              }}
+              className="p-1.5 bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs cursor-pointer"
+              title="Riwayat Sesi Pengerjaan"
+            >
+              <History className="w-4 h-4" />
+            </button>
+          )}
+
           {/* Jurnal Button */}
           {onOpenJournal && (
             <button
@@ -368,7 +441,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 sound.playClick();
                 onOpenJournal();
               }}
-              className="p-1.5 bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs"
+              className="p-1.5 bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs cursor-pointer"
               title="Jurnal Penjelajah"
             >
               <BookOpen className="w-4 h-4" />

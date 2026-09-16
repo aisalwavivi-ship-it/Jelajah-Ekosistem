@@ -108,3 +108,20 @@ export interface GameState {
   selectedPath: 'taman' | 'kolam' | null;
   journal?: MissionJournalEntry[];
 }
+
+export interface SessionRecord {
+  id: string;
+  attemptNumber: number; // 1, 2, 3...
+  studentName: string;
+  startedAt: string; // ISO string
+  completedAt?: string; // ISO string
+  status: 'active' | 'completed' | 'in-progress';
+  completedMissionsCount: number; // 0..8
+  completedMissions: Record<MissionId, boolean>;
+  progressPercent: number; // 0..100
+  stars: number;
+  missionScores: Record<number, number>; // missionId -> stars
+  quizScore: number | null;
+  badgeTitle: string;
+  badgeIcon: string;
+}
