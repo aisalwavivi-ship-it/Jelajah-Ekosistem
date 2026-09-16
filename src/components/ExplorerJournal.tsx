@@ -339,6 +339,7 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
                         duration: isJustCompleted ? 0.8 : 0.6,
                         ease: [0.175, 0.885, 0.32, 1.275],
                         delay: isUnlocked ? (badge.missionId - 1) * 0.06 : 0,
+                        type: 'tween',
                       }}
                       whileHover={isUnlocked ? { scale: 1.05, y: -2 } : { scale: 1.01 }}
                       onClick={() => {
@@ -362,7 +363,7 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
                       {isJustCompleted && (
                         <motion.span
                           animate={{ scale: [1, 1.1, 1] }}
-                          transition={{ duration: 1.2, repeat: Infinity }}
+                          transition={{ duration: 1.2, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
                           className="absolute -top-2 px-2 py-0.5 rounded-full bg-red-500 text-white font-black text-[8px] uppercase tracking-wider shadow-sm z-10"
                         >
                           🌟 BARU!
@@ -373,7 +374,7 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
                       {isUnlocked ? (
                         <motion.div
                           animate={{ rotate: [0, 8, -8, 0] }}
-                          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', type: 'tween' }}
                           className="text-3xl sm:text-4xl mb-1.5 filter drop-shadow-sm"
                         >
                           {badge.icon}
@@ -406,7 +407,7 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
                         <motion.span
                           initial={{ scale: 0.8 }}
                           animate={{ scale: [1, 1.08, 1] }}
-                          transition={{ duration: 1.8, repeat: Infinity }}
+                          transition={{ duration: 1.8, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
                           className="mt-1.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-500 text-stone-950 text-[9px] font-extrabold flex items-center gap-1 shadow-2xs"
                         >
                           <Sparkles className="w-2.5 h-2.5 fill-stone-950" />
@@ -761,7 +762,7 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
                           }
                         : {}
                     }
-                    transition={{ duration: 1.5, repeat: isUnlocked ? Infinity : 0 }}
+                    transition={{ duration: 1.5, repeat: isUnlocked ? Infinity : 0, type: 'tween', ease: 'easeInOut' }}
                     className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-amber-100 to-emerald-100 border-2 border-amber-300 flex items-center justify-center text-5xl shadow-md"
                   >
                     {badge.icon}

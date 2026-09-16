@@ -325,7 +325,7 @@ export const MapScene: React.FC<MapSceneProps> = ({
               {isWalking && (
                 <motion.div
                   animate={{ opacity: [0.7, 0], scale: [0.7, 1.4], x: [-3, -12] }}
-                  transition={{ repeat: Infinity, duration: 0.3 }}
+                  transition={{ repeat: Infinity, duration: 0.3, type: 'tween', ease: 'easeOut' }}
                   className="absolute -bottom-1 left-2 w-3.5 h-1.5 bg-amber-500/50 rounded-full blur-xs"
                 />
               )}
@@ -335,6 +335,7 @@ export const MapScene: React.FC<MapSceneProps> = ({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: [0, 1.2, 1], rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 0.8, type: 'tween', ease: 'easeInOut' }}
                   className="absolute -top-3 -right-2 text-amber-500"
                 >
                   <Sparkles className="w-5 h-5 fill-amber-400" />

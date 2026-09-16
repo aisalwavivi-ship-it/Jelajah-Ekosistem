@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, AlertCircle } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
+import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 
 interface Mission3Props {
   onComplete: (points: number) => void;
@@ -79,12 +80,12 @@ const CANDIDATE_ITEMS: ItemCard[] = [
   // Non-individuals (Groups or Abiotic)
   {
     id: 'stone_pile',
-    name: 'Sebongkah Batu Sungai',
+    name: 'Sebongkah Batu Taman',
     isSingleIndividual: false,
     icon: '🪨',
     category: 'Benda Tak Hidup (Abiotik)',
     individualCount: 0,
-    explanation: 'Batu adalah benda tak hidup (abiotik). "Individu" hanya berlaku untuk makhluk hidup!',
+    explanation: 'Batu taman adalah benda tak hidup (abiotik). "Individu" hanya berlaku untuk makhluk hidup!',
   },
   {
     id: 'many_bees',
@@ -128,6 +129,13 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
   } | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
   const [verificationChoice, setVerificationChoice] = useState<string | null>(null);
+
+  useEffect(() => {
+    sound.startSoundscape('grassland');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
 
   const targetIndividuals = CANDIDATE_ITEMS.filter((i) => i.isSingleIndividual);
 
@@ -354,9 +362,13 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
                       : 'bg-stone-50 hover:bg-teal-50/70 border-stone-200 hover:border-teal-300'
                   }`}
                 >
-                  <span className="text-4xl mb-1.5 filter drop-shadow-xs group-hover:scale-110 transition-transform">
-                    {item.icon}
-                  </span>
+                  {isBatuTaman(item.name) ? (
+                    <BatuTamanImage className="w-10 h-10 mb-1.5 drop-shadow-sm group-hover:scale-110 transition-transform" alt={item.name} />
+                  ) : (
+                    <span className="text-4xl mb-1.5 filter drop-shadow-xs group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </span>
+                  )}
                   <span className="font-display font-bold text-xs sm:text-sm text-stone-900 leading-tight">
                     {item.name}
                   </span>

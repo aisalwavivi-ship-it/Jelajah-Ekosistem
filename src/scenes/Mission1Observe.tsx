@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, RotateCcw, Map } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
+import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 
 interface Mission1Props {
   onComplete: (points: number) => void;
@@ -152,6 +153,13 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
   const [selectedDefinition, setSelectedDefinition] = useState<string | null>(null);
   const [isDefinitionCorrect, setIsDefinitionCorrect] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    sound.startSoundscape('grassland');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
+
   const inspectedBiotik = OBJECTS.filter((o) => inspectedIds.includes(o.id) && o.type === 'biotik');
   const inspectedAbiotik = OBJECTS.filter((o) => inspectedIds.includes(o.id) && o.type === 'abiotik');
 
@@ -287,8 +295,8 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
             <span className={`px-2 py-0.5 rounded-lg border ${hasWater ? 'bg-sky-50 text-sky-800 border-sky-300 font-bold' : 'bg-stone-50 border-stone-200'}`}>
               💧 Air {hasWater ? '✓' : ''}
             </span>
-            <span className={`px-2 py-0.5 rounded-lg border ${hasRock ? 'bg-stone-100 text-stone-800 border-stone-300 font-bold' : 'bg-stone-50 border-stone-200'}`}>
-              🪨 Batu {hasRock ? '✓' : ''}
+            <span className={`px-2 py-0.5 rounded-lg border flex items-center gap-1 ${hasRock ? 'bg-stone-100 text-stone-800 border-stone-300 font-bold' : 'bg-stone-50 border-stone-200'}`}>
+              <BatuTamanImage className="w-3.5 h-3.5" /> Batu {hasRock ? '✓' : ''}
             </span>
           </div>
         </div>
@@ -376,9 +384,13 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                       : 'bg-white/75 hover:bg-white border-2 border-amber-300 animate-pulse-subtle'
                   }`}
                 >
-                  <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
-                    {obj.icon}
-                  </span>
+                  {isBatuTaman(obj.name) ? (
+                    <BatuTamanImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={obj.name} />
+                  ) : (
+                    <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
+                      {obj.icon}
+                    </span>
+                  )}
                   <span className="text-[10px] sm:text-xs font-bold text-stone-800 mt-1 whitespace-nowrap bg-white/90 px-1.5 py-0.5 rounded shadow-xs">
                     {obj.name}
                   </span>
@@ -405,7 +417,11 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
               >
                 <div className="flex items-start justify-between gap-2 border-b border-emerald-100 pb-2.5 mb-2.5">
                   <div className="flex items-center gap-2.5">
-                    <span className="text-3xl">{activeObject.icon}</span>
+                    {isBatuTaman(activeObject.name) ? (
+                      <BatuTamanImage className="w-9 h-9" alt={activeObject.name} />
+                    ) : (
+                      <span className="text-3xl">{activeObject.icon}</span>
+                    )}
                     <div>
                       <h4 className="font-display font-bold text-stone-900 text-sm sm:text-base">
                         {activeObject.name}

@@ -13,7 +13,8 @@ import {
   User,
   Sun,
   Sparkles,
-  ChevronDown
+  ChevronDown,
+  Calendar
 } from 'lucide-react';
 import { AppScene, MissionId } from '../types';
 import { sound } from '../utils/audio';
@@ -50,6 +51,8 @@ interface HeaderNavProps {
   weatherMode?: WeatherMode;
   onChangeWeatherMode?: (mode: WeatherMode) => void;
   localTimeStr?: string;
+  onOpenDailyCheckIn?: () => void;
+  isDailyClaimedToday?: boolean;
 }
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
@@ -78,6 +81,8 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   weatherMode = 'auto-time',
   onChangeWeatherMode,
   localTimeStr = '',
+  onOpenDailyCheckIn,
+  isDailyClaimedToday = false,
 }) => {
   const [isLevelModalOpen, setIsLevelModalOpen] = useState<boolean>(false);
   const [isWeatherModalOpen, setIsWeatherModalOpen] = useState<boolean>(false);
@@ -367,6 +372,28 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               title="Jurnal Penjelajah"
             >
               <BookOpen className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Daily Check-in Button */}
+          {onOpenDailyCheckIn && (
+            <button
+              id="btn-header-daily-checkin"
+              onClick={() => {
+                sound.playClick();
+                onOpenDailyCheckIn();
+              }}
+              className={`p-1.5 rounded-xl border transition shadow-2xs relative cursor-pointer ${
+                isDailyClaimedToday
+                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-300'
+                  : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-400'
+              }`}
+              title="Bonus Kunjungan Harian (Daily Check-in)"
+            >
+              <Calendar className="w-4 h-4" />
+              {!isDailyClaimedToday && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-500 rounded-full ring-2 ring-white animate-pulse" />
+              )}
             </button>
           )}
 

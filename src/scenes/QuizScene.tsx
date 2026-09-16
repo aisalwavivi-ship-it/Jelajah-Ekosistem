@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
@@ -27,6 +27,13 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState<number>(0);
   const [isQuizCompleted, setIsQuizCompleted] = useState<boolean>(false);
+
+  useEffect(() => {
+    sound.startSoundscape('grassland');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
 
   const currentQ = QUIZ_QUESTIONS[currentIndex];
   const totalQuestions = QUIZ_QUESTIONS.length;

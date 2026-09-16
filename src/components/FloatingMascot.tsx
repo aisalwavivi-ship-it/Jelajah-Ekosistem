@@ -293,6 +293,7 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
             repeat: Infinity,
             duration: 3,
             ease: 'easeInOut',
+            type: 'tween',
           }}
           className="relative focus:outline-hidden group"
           title={isOpen ? 'Tutup tips Riko' : 'Buka tips Riko si Kancil'}
@@ -311,7 +312,7 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
               {/* Ears */}
               <motion.g
                 animate={{ rotate: [-3, 3, -3] }}
-                transition={{ repeat: Infinity, duration: 2.5 }}
+                transition={{ repeat: Infinity, duration: 2.5, type: 'tween', ease: 'easeInOut' }}
                 style={{ transformOrigin: '50% 30%' }}
               >
                 {/* Left Ear */}
@@ -339,7 +340,7 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
               {/* Eyes with blinking animation */}
               <motion.g
                 animate={{ scaleY: [1, 1, 0.1, 1, 1] }}
-                transition={{ repeat: Infinity, duration: 4, times: [0, 0.45, 0.5, 0.55, 1] }}
+                transition={{ repeat: Infinity, duration: 4, times: [0, 0.45, 0.5, 0.55, 1], type: 'tween', ease: 'easeInOut' }}
                 style={{ transformOrigin: '50% 52%' }}
               >
                 <ellipse cx="40" cy="52" rx="4.5" ry="6" fill="#1c1917" />
@@ -375,7 +376,7 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: [1, 1.25, 1] }}
-              transition={{ repeat: Infinity, duration: 1.8 }}
+              transition={{ repeat: Infinity, duration: 1.8, type: 'tween', ease: 'easeInOut' }}
               className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-amber-400 text-stone-900 border-2 border-white shadow-md flex items-center justify-center font-bold text-xs"
             >
               💡

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowRight,
@@ -127,6 +127,13 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
   const [placedMap, setPlacedMap] = useState<Record<string, string>>({});
   const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
+
+  useEffect(() => {
+    sound.startSoundscape('forest');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
 
   const placedCount = Object.keys(placedMap).length;
 

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, Split } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
+import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 
 interface Mission5Props {
   onComplete: (points: number) => void;
@@ -36,7 +37,8 @@ const GARDEN_ITEMS: EcosystemItem[] = [
   { id: 'g_ant', name: 'Populasi Semut Tanah', category: 'populasi', icon: '🐜', role: 'Koloni semut penggembur tanah', x: 35, y: 82 },
   // Faktor Abiotik pendukung
   { id: 'g_sun', name: 'Cahaya Matahari', category: 'abiotik', icon: '☀️', role: 'Penghangat bumi & energi fotosintesis', x: 85, y: 15 },
-  { id: 'g_soil', name: 'Tanah Gembur & Subur', category: 'abiotik', icon: '🪴', role: 'Media tempat tumbuh akar dan nutrisi', x: 25, y: 80 }
+  { id: 'g_soil', name: 'Tanah Gembur & Subur', category: 'abiotik', icon: '🪴', role: 'Media tempat tumbuh akar dan nutrisi', x: 25, y: 80 },
+  { id: 'g_rock', name: 'Batu Taman', category: 'abiotik', icon: '🪨', role: 'Tempat berteduh & pijakan serangga alami', x: 62, y: 82 }
 ];
 
 const POND_ITEMS: EcosystemItem[] = [
@@ -49,7 +51,7 @@ const POND_ITEMS: EcosystemItem[] = [
   { id: 'p_snail', name: 'Populasi Keong Kolam', category: 'populasi', icon: '🐌', role: 'Kumpulan keong pembersih lumut', x: 22, y: 72 },
   // Faktor Abiotik pendukung
   { id: 'p_water', name: 'Air Kolam Alami', category: 'abiotik', icon: '💧', role: 'Media cair tempat tinggal biota kolam', x: 40, y: 45 },
-  { id: 'p_rock', name: 'Batu Kali & Kerikil', category: 'abiotik', icon: '🪨', role: 'Tempat bertengger katak & keong', x: 88, y: 75 }
+  { id: 'p_rock', name: 'Batu Taman & Kali', category: 'abiotik', icon: '🪨', role: 'Tempat bertengger katak & keong', x: 88, y: 75 }
 ];
 
 export const Mission5BuildEco: React.FC<Mission5Props> = ({
@@ -62,6 +64,17 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
   const [showDiscoveryAnimation, setShowDiscoveryAnimation] = useState<boolean>(false);
   const [verificationChoice, setVerificationChoice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedEco === 'taman') {
+      sound.startSoundscape('grassland');
+    } else {
+      sound.startSoundscape('pond');
+    }
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, [selectedEco]);
 
   const currentAvailableItems = selectedEco === 'taman' ? GARDEN_ITEMS : POND_ITEMS;
 
@@ -338,11 +351,18 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                     opacity: 1,
                   }}
                   transition={{
-                    duration: 0.6,
+                    scale: {
+                      type: 'tween',
+                      ease: 'easeInOut',
+                      duration: 0.8,
+                    },
+                    y: {
+                      type: 'spring',
+                      stiffness: 260,
+                      damping: 20,
+                    },
+                    opacity: { duration: 0.4 },
                     delay: idx * 0.08,
-                    type: 'spring',
-                    stiffness: 260,
-                    damping: 20,
                   }}
                   style={{ left: `${item.x}%`, top: `${item.y}%` }}
                   className="absolute -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center"
@@ -360,10 +380,15 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                       repeat: Infinity,
                       duration: 2.4,
                       ease: 'easeInOut',
+                      type: 'tween',
                     }}
-                    className="text-4xl sm:text-5xl filter drop-shadow-md cursor-default"
+                    className="text-4xl sm:text-5xl filter drop-shadow-md cursor-default flex items-center justify-center"
                   >
-                    {item.icon}
+                    {isBatuTaman(item.name) ? (
+                      <BatuTamanImage className="w-12 h-12 drop-shadow-md" alt={item.name} />
+                    ) : (
+                      item.icon
+                    )}
                   </motion.div>
                   <span
                     className={`text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs mt-1 whitespace-nowrap ${
@@ -388,7 +413,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                   >
                     <motion.span
                       animate={{ rotate: [0, 360], scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
+                      transition={{ duration: 1.5, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
                       className="text-3xl shrink-0"
                     >
                       ✨
@@ -442,7 +467,11 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                           : 'bg-stone-50 hover:bg-stone-100 border-stone-200'
                       }`}
                     >
-                      <span className="text-2xl mb-1">{item.icon}</span>
+                      {isBatuTaman(item.name) ? (
+                        <BatuTamanImage className="w-8 h-8 mb-1" alt={item.name} />
+                      ) : (
+                        <span className="text-2xl mb-1">{item.icon}</span>
+                      )}
                       <span className="font-bold text-[11px] text-stone-800 truncate w-full">
                         {item.name}
                       </span>

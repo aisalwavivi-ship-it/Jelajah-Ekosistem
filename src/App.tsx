@@ -20,6 +20,7 @@ import { FloatingMascot } from './components/FloatingMascot';
 import { HowToPlayModal } from './components/HowToPlayModal';
 import { CertificateModal } from './components/CertificateModal';
 import { ExplorerJournal } from './components/ExplorerJournal';
+import { DailyCheckInModal } from './components/DailyCheckInModal';
 import { DynamicWeatherBackground } from './components/DynamicWeatherBackground';
 import { WeatherType, WeatherMode, resolveActiveWeather } from './utils/weather';
 
@@ -48,6 +49,8 @@ interface AppGameState {
   isMusicPlaying: boolean;
   quizScore: number | null;
   journalEntries: MissionJournalEntry[];
+  lastCheckInDate?: string;
+  checkInStreak?: number;
 }
 
 const INITIAL_GAME_STATE: AppGameState = {
@@ -68,6 +71,8 @@ const INITIAL_GAME_STATE: AppGameState = {
   isMusicPlaying: false,
   quizScore: null,
   journalEntries: [],
+  lastCheckInDate: undefined,
+  checkInStreak: 1,
 };
 
 export default function App() {
@@ -75,6 +80,7 @@ export default function App() {
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isCertificateOpen, setIsCertificateOpen] = useState<boolean>(false);
   const [isJournalOpen, setIsJournalOpen] = useState<boolean>(false);
+  const [isDailyCheckInOpen, setIsDailyCheckInOpen] = useState<boolean>(false);
   const [weatherMode, setWeatherMode] = useState<WeatherMode>('auto-time');
   const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
 
@@ -176,6 +182,51 @@ export default function App() {
       ambientMusic.stop();
     };
   }, []);
+
+  // Check if daily bonus is available today
+  const todayDateStr = new Date().toISOString().split('T')[0];
+  const isDailyClaimedToday = gameState.lastCheckInDate === todayDateStr;
+
+  // Auto-prompt daily check-in once per session if not claimed yet
+  useEffect(() => {
+    const hasPromptedThisSession = sessionStorage.getItem('daily_checkin_prompted');
+    if (!hasPromptedThisSession && !isDailyClaimedToday) {
+      sessionStorage.setItem('daily_checkin_prompted', 'true');
+      const timer = setTimeout(() => {
+        setIsDailyCheckInOpen(true);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [isDailyClaimedToday]);
+
+  const handleClaimDailyBonus = () => {
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    // Calculate streak
+    let nextStreak = 1;
+    if (gameState.lastCheckInDate) {
+      const lastDate = new Date(gameState.lastCheckInDate);
+      const diffTime = today.getTime() - lastDate.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
+      if (diffDays === 1) {
+        nextStreak = (gameState.checkInStreak || 1) + 1;
+      } else if (diffDays === 0) {
+        nextStreak = gameState.checkInStreak || 1;
+      } else {
+        nextStreak = 1;
+      }
+    }
+
+    setGameState((prev) => ({
+      ...prev,
+      stars: prev.stars + 5,
+      lastCheckInDate: todayStr,
+      checkInStreak: nextStreak,
+    }));
+    triggerMissionSuccessConfetti();
+    setIsDailyCheckInOpen(false);
+  };
 
   // Track the most recently completed mission to celebrate badge unlocking
   const [lastCompletedMissionId, setLastCompletedMissionId] = useState<MissionId | null>(null);
@@ -396,6 +447,11 @@ export default function App() {
           sound.playClick();
           setIsJournalOpen(true);
         }}
+        onOpenDailyCheckIn={() => {
+          sound.playClick();
+          setIsDailyCheckInOpen(true);
+        }}
+        isDailyClaimedToday={isDailyClaimedToday}
         completedCount={completedCount}
         completedMissions={gameState.completedMissions}
       />
@@ -629,6 +685,16 @@ export default function App() {
           setIsJournalOpen(false);
           navigateWithWalkingTrail(`mission-${missionId}` as AppScene);
         }}
+      />
+
+      <DailyCheckInModal
+        isOpen={isDailyCheckInOpen}
+        studentName={gameState.studentName}
+        streak={gameState.checkInStreak || 1}
+        bonusStars={5}
+        isAlreadyClaimedToday={isDailyClaimedToday}
+        onClaimBonus={handleClaimDailyBonus}
+        onClose={() => setIsDailyCheckInOpen(false)}
       />
     </div>
   );

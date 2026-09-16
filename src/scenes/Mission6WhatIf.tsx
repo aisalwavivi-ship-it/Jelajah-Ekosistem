@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowRight,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
+import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 
 interface Mission6Props {
   onComplete: (points: number) => void;
@@ -74,11 +75,11 @@ const SORT_ITEMS: SortItem[] = [
   },
   {
     id: 'batu',
-    name: 'Batu Kali',
+    name: 'Batu Taman',
     category: 'abiotik',
     icon: '🪨',
-    description: 'Mineral padat di dasar sungai atau tanah',
-    explanation: 'Batu kali tidak bertumbuh, tidak bernapas, dan tidak berketurunan. Jadi tergolong ABIOTIK!'
+    description: 'Bebatuan alam di taman atau tanah',
+    explanation: 'Batu taman tidak bertumbuh, tidak bernapas, dan tidak berketurunan. Jadi tergolong ABIOTIK!'
   },
   {
     id: 'lebah',
@@ -184,6 +185,13 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
     name: string;
   } | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
+
+  useEffect(() => {
+    sound.startSoundscape('forest');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
 
   // What-If Simulation state
   const [scenarioIndex, setScenarioIndex] = useState<number>(0);
@@ -449,7 +457,11 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         <div className="text-[10px] text-stone-400 font-semibold mb-0.5 flex items-center gap-1">
                           <span>🖐️ Tarik</span>
                         </div>
-                        <span className="text-3xl mb-1">{item.icon}</span>
+                        {isBatuTaman(item.name) ? (
+                          <BatuTamanImage className="w-9 h-9 mb-1" alt={item.name} />
+                        ) : (
+                          <span className="text-3xl mb-1">{item.icon}</span>
+                        )}
                         <span className="font-display font-bold text-xs text-stone-900 leading-tight">
                           {item.name}
                         </span>
@@ -555,7 +567,11 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         animate={{ scale: 1, opacity: 1 }}
                         className="px-3 py-1.5 bg-emerald-100 border border-emerald-300 rounded-xl flex items-center gap-2 shadow-xs"
                       >
-                        <span className="text-lg">{item.icon}</span>
+                        {isBatuTaman(item.name) ? (
+                          <BatuTamanImage className="w-5 h-5" alt={item.name} />
+                        ) : (
+                          <span className="text-lg">{item.icon}</span>
+                        )}
                         <div className="text-left">
                           <span className="font-bold text-xs text-emerald-950 block leading-tight">
                             {item.name}
@@ -638,7 +654,11 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         animate={{ scale: 1, opacity: 1 }}
                         className="px-3 py-1.5 bg-sky-100 border border-sky-300 rounded-xl flex items-center gap-2 shadow-xs"
                       >
-                        <span className="text-lg">{item.icon}</span>
+                        {isBatuTaman(item.name) ? (
+                          <BatuTamanImage className="w-5 h-5" alt={item.name} />
+                        ) : (
+                          <span className="text-lg">{item.icon}</span>
+                        )}
                         <div className="text-left">
                           <span className="font-bold text-xs text-sky-950 block leading-tight">
                             {item.name}
@@ -698,7 +718,7 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
               <div className="my-auto flex items-center justify-around py-3">
                 <motion.div
                   animate={isChangedMode ? { rotate: [0, 8, 5], opacity: 0.6 } : { rotate: [0, -2, 2, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
+                  transition={{ duration: 3, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
                   className="text-center"
                 >
                   <span className="text-6xl block filter drop-shadow-md">

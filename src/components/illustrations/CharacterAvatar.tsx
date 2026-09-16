@@ -39,6 +39,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
         duration: isCelebrating ? 0.7 : isWalking ? 0.35 : 2.5,
         repeat: Infinity,
         ease: 'easeInOut',
+        type: 'tween',
       }}
     >
       <svg
@@ -55,7 +56,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
           ry="6"
           fill="#00000018"
           animate={isWalking ? { scale: [0.85, 1, 0.85] } : {}}
-          transition={{ repeat: Infinity, duration: 0.35 }}
+          transition={{ repeat: Infinity, duration: 0.35, type: 'tween', ease: 'easeInOut' }}
         />
 
         {/* Explorer Backpack on back */}
@@ -75,7 +76,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
             ry="5"
             fill="#854d0e"
             animate={isWalking ? { y: [0, -5, 0], x: [0, 2, 0] } : {}}
-            transition={{ repeat: Infinity, duration: 0.35 }}
+            transition={{ repeat: Infinity, duration: 0.35, type: 'tween', ease: 'easeInOut' }}
           />
           <motion.ellipse
             cx="72"
@@ -84,7 +85,7 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
             ry="5"
             fill="#713f12"
             animate={isWalking ? { y: [-5, 0, -5], x: [0, -2, 0] } : {}}
-            transition={{ repeat: Infinity, duration: 0.35 }}
+            transition={{ repeat: Infinity, duration: 0.35, type: 'tween', ease: 'easeInOut' }}
           />
         </g>
 

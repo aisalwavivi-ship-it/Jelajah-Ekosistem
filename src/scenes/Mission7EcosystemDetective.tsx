@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, Map, Award, Eye } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
+import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 
 interface Mission7Props {
   onComplete: (points: number) => void;
@@ -36,7 +37,7 @@ const DETECTIVE_ITEMS: DetectiveObject[] = [
   { id: 'tmn_caterpillar', name: 'Ulat Daun', category: 'biotik', icon: '🐛', location: 'taman', x: 20, y: 75, hint: 'Hewan kecil pemakan daun' },
   { id: 'tmn_wind', name: 'Angin Sejuk', category: 'abiotik', icon: '🌬️', location: 'taman', x: 50, y: 20, hint: 'Udara segar bergerak' },
   { id: 'tmn_water', name: 'Air Siraman', category: 'abiotik', icon: '💧', location: 'taman', x: 40, y: 65, hint: 'Tetes air menyegarkan' },
-  { id: 'tmn_gravel', name: 'Batu Kerikil', category: 'abiotik', icon: '🪨', location: 'taman', x: 80, y: 80, hint: 'Bebatuan kecil di jalan setapak' },
+  { id: 'tmn_gravel', name: 'Batu Taman', category: 'abiotik', icon: '🪨', location: 'taman', x: 80, y: 80, hint: 'Bebatuan taman di jalan setapak' },
 
   // 3. Lokasi: Kolam
   { id: 'klm_fish', name: 'Ikan Nila', category: 'biotik', icon: '🐟', location: 'kolam', x: 45, y: 65, hint: 'Hewan air bernapas dengan insang' },
@@ -57,6 +58,19 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
   const [recentFound, setRecentFound] = useState<DetectiveObject | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
   const [showDiscoveryAnimation, setShowDiscoveryAnimation] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (currentLocation === 'kolam') {
+      sound.startSoundscape('pond');
+    } else if (currentLocation === 'taman') {
+      sound.startSoundscape('grassland');
+    } else {
+      sound.startSoundscape('forest');
+    }
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, [currentLocation]);
 
   const foundObjects = DETECTIVE_ITEMS.filter((i) => foundItemIds.includes(i.id));
   const bioticCount = foundObjects.filter((i) => i.category === 'biotik').length;
@@ -264,6 +278,8 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                   repeat: showDiscoveryAnimation ? 2 : 0,
                   duration: 0.8,
                   delay: idx * 0.1,
+                  type: 'tween',
+                  ease: 'easeInOut',
                 }}
                 whileHover={{ scale: 1.15 }}
                 whileTap={{ scale: 0.95 }}
@@ -281,9 +297,13 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                       : 'bg-white/80 hover:bg-white border-stone-300 animate-pulse-subtle'
                   }`}
                 >
-                  <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
-                    {item.icon}
-                  </span>
+                  {isBatuTaman(item.name) ? (
+                    <BatuTamanImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={item.name} />
+                  ) : (
+                    <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
+                      {item.icon}
+                    </span>
+                  )}
                   <span className="text-[10px] sm:text-xs font-bold text-stone-900 mt-1 whitespace-nowrap bg-white/90 px-1.5 py-0.5 rounded shadow-xs">
                     {item.name}
                   </span>
@@ -313,7 +333,7 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
               >
                 <motion.span
                   animate={{ rotate: [0, 360], scale: [1, 1.25, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  transition={{ duration: 2, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
                   className="text-4xl shrink-0"
                 >
                   🌟
@@ -341,7 +361,11 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 className="absolute bottom-4 right-4 max-w-xs bg-white/95 backdrop-blur-md rounded-2xl p-3.5 border-2 border-emerald-300 shadow-xl z-30"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-2xl">{recentFound.icon}</span>
+                  {isBatuTaman(recentFound.name) ? (
+                    <BatuTamanImage className="w-7 h-7" alt={recentFound.name} />
+                  ) : (
+                    <span className="text-2xl">{recentFound.icon}</span>
+                  )}
                   <span
                     className={`text-[9px] uppercase font-extrabold px-2 py-0.5 rounded-full ${
                       recentFound.category === 'biotik'

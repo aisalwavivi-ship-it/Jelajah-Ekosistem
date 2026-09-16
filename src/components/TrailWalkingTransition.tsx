@@ -200,14 +200,14 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
           {/* Floating Clouds & Gentle Sun */}
           <motion.div
             animate={{ x: [0, 25, 0] }}
-            transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut' }}
+            transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut', type: 'tween' }}
             className="absolute top-4 left-10 text-3xl opacity-80"
           >
             ☁️
           </motion.div>
           <motion.div
             animate={{ x: [0, -20, 0] }}
-            transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut' }}
+            transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut', type: 'tween' }}
             className="absolute top-8 right-16 text-2xl opacity-75"
           >
             ☁️
@@ -364,7 +364,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
               {!hasArrived && (
                 <motion.div
                   animate={{ opacity: [0.6, 0], scale: [0.8, 1.4], x: [-5, -15] }}
-                  transition={{ repeat: Infinity, duration: 0.35 }}
+                  transition={{ repeat: Infinity, duration: 0.35, type: 'tween', ease: 'easeOut' }}
                   className="absolute -bottom-1 left-2 w-4 h-2 bg-amber-400/40 rounded-full blur-xs pointer-events-none"
                 />
               )}
@@ -374,6 +374,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: [0, 1.3, 1], opacity: 1 }}
+                  transition={{ duration: 0.6, type: 'tween', ease: 'easeOut' }}
                   className="absolute -top-3 -right-2 text-2xl text-amber-500"
                 >
                   <Sparkles className="w-6 h-6 fill-amber-400 text-amber-500 animate-spin" style={{ animationDuration: '4s' }} />

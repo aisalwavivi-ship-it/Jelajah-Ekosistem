@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, Wind, Droplets, Sun, Mountain, Layers } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
@@ -120,6 +120,13 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
   const [verificationChoice, setVerificationChoice] = useState<string | null>(null);
   const weatherCond = WEATHER_CONDITIONS[activeWeather];
+
+  useEffect(() => {
+    sound.startSoundscape('forest');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
 
   const targetPopulations = POPULATION_ITEMS.filter((i) => i.isPopulation);
 

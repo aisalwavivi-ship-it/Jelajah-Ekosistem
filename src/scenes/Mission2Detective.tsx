@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, RotateCcw, AlertCircle, Sparkles, Map } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
@@ -100,6 +100,13 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
     itemName: string;
   } | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
+
+  useEffect(() => {
+    sound.startSoundscape('forest');
+    return () => {
+      sound.stopSoundscape();
+    };
+  }, []);
 
   // Remaining unclassified items
   const unplacedItems = ITEMS.filter((item) => !placedItems[item.id]);
