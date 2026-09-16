@@ -12,8 +12,6 @@ interface CertificateModalProps {
   score: number;
   badge: BadgeInfo;
   stars: number;
-  dateStr?: string;
-  attemptNumber?: number;
 }
 
 export const CertificateModal: React.FC<CertificateModalProps> = ({
@@ -23,8 +21,6 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   score,
   badge,
   stars,
-  dateStr,
-  attemptNumber,
 }) => {
   const explorerLevel = getExplorerLevel(stars);
 
@@ -41,7 +37,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
     window.print();
   };
 
-  const currentDate = dateStr || new Date().toLocaleDateString('id-ID', {
+  const currentDate = new Date().toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -71,11 +67,6 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
           <div className="inline-flex items-center justify-center gap-2 px-4 py-1 bg-amber-100 text-amber-900 rounded-full text-xs font-bold tracking-widest uppercase">
             <Sparkles className="w-3.5 h-3.5" />
             Media Pembelajaran IPAS Kelas V SD
-            {attemptNumber && (
-              <span className="ml-1 px-2 py-0.5 bg-amber-300 text-amber-950 rounded-full text-[10px] font-extrabold normal-case">
-                Sesi #{attemptNumber}
-              </span>
-            )}
           </div>
           <h2 className="font-display font-extrabold text-2xl sm:text-4xl text-emerald-950 tracking-tight">
             PIAGAM PENGHARGAAN

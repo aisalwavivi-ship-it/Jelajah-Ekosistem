@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, Sparkles, Map, Award, Eye } from 'lucide-reac
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
+import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
 
 interface Mission7Props {
   onComplete: (points: number) => void;
@@ -28,8 +29,8 @@ const DETECTIVE_ITEMS: DetectiveObject[] = [
   { id: 'sch_tree', name: 'Pohon Beringin', category: 'biotik', icon: '🌳', location: 'sekolah', x: 75, y: 40, hint: 'Tumbuhan peneduh sekolah' },
   { id: 'sch_bird', name: 'Burung Gereja', category: 'biotik', icon: '🐦', location: 'sekolah', x: 45, y: 25, hint: 'Hewan terbang di atap' },
   { id: 'sch_sun', name: 'Sinar Pagi', category: 'abiotik', icon: '☀️', location: 'sekolah', x: 85, y: 15, hint: 'Cahaya & panas matahari' },
-  { id: 'sch_soil', name: 'Tanah Lapangan', category: 'abiotik', icon: '🪴', location: 'sekolah', x: 50, y: 80, hint: 'Tanah tempat berpijak' },
-  { id: 'sch_stone', name: 'Batu Hias', category: 'abiotik', icon: '🪨', location: 'sekolah', x: 15, y: 82, hint: 'Batu alam batas taman' },
+  { id: 'sch_soil', name: 'Tanah Subur', category: 'abiotik', icon: '🪴', location: 'sekolah', x: 50, y: 80, hint: 'Tanah subur tempat berpijak dan tumbuhnya rumput' },
+  { id: 'sch_stone', name: 'Batu Taman', category: 'abiotik', icon: '🪨', location: 'sekolah', x: 15, y: 82, hint: 'Batu alam batas taman' },
 
   // 2. Lokasi: Taman
   { id: 'tmn_butterfly', name: 'Kupu-kupu Kuning', category: 'biotik', icon: '🦋', location: 'taman', x: 30, y: 40, hint: 'Serangga penyerbuk' },
@@ -151,20 +152,6 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 {abioticCount}/5
               </span>
             </div>
-
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-7"
-                onClick={() => {
-                  sound.playFootstep();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 text-white font-display font-bold rounded-2xl shadow-md text-xs sm:text-sm animate-pulse-subtle transition"
-              >
-                <span>Lanjut Misi 8</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 
@@ -299,6 +286,10 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 >
                   {isBatuTaman(item.name) ? (
                     <BatuTamanImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={item.name} />
+                  ) : isTanahSubur(item.name) ? (
+                    <TanahSuburImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={item.name} />
+                  ) : item.id === 'sch_student' ? (
+                    <img src="/karakter-penjelajah.png" alt={item.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain filter drop-shadow-sm my-0.5" referrerPolicy="no-referrer" />
                   ) : (
                     <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
                       {item.icon}
@@ -363,6 +354,10 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 <div className="flex items-center justify-between mb-1">
                   {isBatuTaman(recentFound.name) ? (
                     <BatuTamanImage className="w-7 h-7" alt={recentFound.name} />
+                  ) : isTanahSubur(recentFound.name) ? (
+                    <TanahSuburImage className="w-7 h-7" alt={recentFound.name} />
+                  ) : recentFound.id === 'sch_student' ? (
+                    <img src="/karakter-penjelajah.png" alt={recentFound.name} className="w-7 h-7 object-contain" referrerPolicy="no-referrer" />
                   ) : (
                     <span className="text-2xl">{recentFound.icon}</span>
                   )}

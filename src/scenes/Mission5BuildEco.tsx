@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, Split } from 'lucid
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
+import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
 
 interface Mission5Props {
   onComplete: (points: number) => void;
@@ -37,7 +38,7 @@ const GARDEN_ITEMS: EcosystemItem[] = [
   { id: 'g_ant', name: 'Populasi Semut Tanah', category: 'populasi', icon: '🐜', role: 'Koloni semut penggembur tanah', x: 35, y: 82 },
   // Faktor Abiotik pendukung
   { id: 'g_sun', name: 'Cahaya Matahari', category: 'abiotik', icon: '☀️', role: 'Penghangat bumi & energi fotosintesis', x: 85, y: 15 },
-  { id: 'g_soil', name: 'Tanah Gembur & Subur', category: 'abiotik', icon: '🪴', role: 'Media tempat tumbuh akar dan nutrisi', x: 25, y: 80 },
+  { id: 'g_soil', name: 'Tanah Subur', category: 'abiotik', icon: '🪴', role: 'Media tempat tumbuh akar dan nutrisi', x: 25, y: 80 },
   { id: 'g_rock', name: 'Batu Taman', category: 'abiotik', icon: '🪨', role: 'Tempat berteduh & pijakan serangga alami', x: 62, y: 82 }
 ];
 
@@ -142,22 +143,6 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 Jalan setapak bercabang! Pilih lingkungan alam, lalu kumpulkan berbagai <strong>populasi</strong> untuk membentuk <strong>komunitas</strong>.
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-5"
-                onClick={() => {
-                  sound.playFootstep();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 text-white font-display font-bold rounded-2xl shadow-md text-xs sm:text-sm animate-pulse-subtle transition"
-              >
-                <span>Lanjut Misi 6: Biotik & Abiotik</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 
@@ -386,6 +371,8 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                   >
                     {isBatuTaman(item.name) ? (
                       <BatuTamanImage className="w-12 h-12 drop-shadow-md" alt={item.name} />
+                    ) : isTanahSubur(item.name) ? (
+                      <TanahSuburImage className="w-12 h-12 drop-shadow-md" alt={item.name} />
                     ) : (
                       item.icon
                     )}
@@ -469,6 +456,8 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                     >
                       {isBatuTaman(item.name) ? (
                         <BatuTamanImage className="w-8 h-8 mb-1" alt={item.name} />
+                      ) : isTanahSubur(item.name) ? (
+                        <TanahSuburImage className="w-8 h-8 mb-1" alt={item.name} />
                       ) : (
                         <span className="text-2xl mb-1">{item.icon}</span>
                       )}

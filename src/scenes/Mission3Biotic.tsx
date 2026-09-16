@@ -225,20 +225,6 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
                 {foundIndividualIds.length} / {targetIndividuals.length}
               </span>
             </div>
-
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-3"
-                onClick={() => {
-                  sound.playFootstep();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-display font-bold rounded-2xl shadow-md text-xs sm:text-sm animate-pulse-subtle transition cursor-pointer"
-              >
-                <span>Lanjut Misi 4: Populasi</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 
@@ -281,20 +267,9 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
           </div>
         </div>
 
-        {/* Big Concept Card */}
-        <div className="bg-gradient-to-r from-teal-800 to-emerald-900 text-white p-4 sm:p-5 rounded-3xl shadow-lg border-2 border-teal-500 flex flex-col sm:flex-row items-center gap-4">
-          <CharacterAvatar size="md" className="shrink-0" />
-          <div>
-            <span className="text-xs font-bold px-2.5 py-0.5 bg-teal-700 text-teal-200 rounded-full inline-block mb-1">
-              Konsep Utama: Tingkatan Organisasi
-            </span>
-            <p className="font-display font-extrabold text-lg sm:text-xl text-amber-200 leading-snug">
-              “Individu adalah SATU makhluk hidup tunggal.”
-            </p>
-            <p className="text-xs sm:text-sm text-teal-100 mt-1">
-              Contohnya: 1 pohon beringin, 1 ekor ikan mas, 1 ekor burung kutilang, atau 1 ekor kupu-kupu.
-            </p>
-          </div>
+        {/* Big Concept Card: Kotak besar -> GAMBAR -> tanpa keterangan */}
+        <div className="bg-gradient-to-r from-teal-800 to-emerald-900 text-white p-4 sm:p-5 rounded-3xl shadow-lg border-2 border-teal-500 flex items-center justify-center">
+          <CharacterAvatar size="lg" className="shrink-0" />
         </div>
 
         {/* Feedback Message Bar */}

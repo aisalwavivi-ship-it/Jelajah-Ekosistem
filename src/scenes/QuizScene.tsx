@@ -1,11 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge, History } from 'lucide-react';
+import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { QUIZ_QUESTIONS, BADGE_CRITERIA } from '../data/missions';
 import { sound } from '../utils/audio';
 import { triggerQuizFinishConfetti, triggerCertificateConfetti } from '../utils/confetti';
 import { getExplorerLevel } from '../utils/levels';
+
+interface ShuffledOption {
+  id: string;
+  text: string;
+  isCorrect: boolean;
+  label: string;
+}
+
+interface PreparedQuizQuestion {
+  id: number;
+  badge?: string;
+  scenario?: string;
+  imageVisual?: string;
+  illustration?: (typeof QUIZ_QUESTIONS)[0]['illustration'];
+  question: string;
+  type: string;
+  explanation: string;
+  shuffledOptions: ShuffledOption[];
+}
+
+function shuffleOptions(options: (typeof QUIZ_QUESTIONS)[0]['options'], questionId: number): ShuffledOption[] {
+  const letters = ['A', 'B', 'C', 'D'];
+  const shuffled = [...options];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.map((opt, idx) => ({
+    id: `${questionId}-${opt.id}`,
+    text: opt.text,
+    isCorrect: !!opt.isCorrect,
+    label: letters[idx] || `${idx + 1}`,
+  }));
+}
+
+function prepareQuizQuestions(): PreparedQuizQuestion[] {
+  return QUIZ_QUESTIONS.map((q) => ({
+    ...q,
+    shuffledOptions: shuffleOptions(q.options, q.id),
+  }));
+}
 
 interface QuizSceneProps {
   onFinishQuiz: (finalScore: number) => void;
@@ -13,9 +54,6 @@ interface QuizSceneProps {
   onGoToMap: () => void;
   onRestartAll: () => void;
   totalGameStars: number;
-  onOpenHistory?: () => void;
-  onRequestNewSession?: () => void;
-  activeAttemptNumber?: number;
 }
 
 export const QuizScene: React.FC<QuizSceneProps> = ({
@@ -24,10 +62,8 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
   onGoToMap,
   onRestartAll,
   totalGameStars,
-  onOpenHistory,
-  onRequestNewSession,
-  activeAttemptNumber = 1,
 }) => {
+  const [questions, setQuestions] = useState<PreparedQuizQuestion[]>(() => prepareQuizQuestions());
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
@@ -41,8 +77,8 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
     };
   }, []);
 
-  const currentQ = QUIZ_QUESTIONS[currentIndex];
-  const totalQuestions = QUIZ_QUESTIONS.length;
+  const currentQ = questions[currentIndex] || questions[0];
+  const totalQuestions = questions.length;
 
   const handleSelectOption = (optionId: string) => {
     if (isAnswerSubmitted) return;
@@ -50,7 +86,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
     setSelectedOptionId(optionId);
     setIsAnswerSubmitted(true);
 
-    const isCorrect = currentQ.options.find((o) => o.id === optionId)?.isCorrect;
+    const isCorrect = currentQ.shuffledOptions.find((o) => o.id === optionId)?.isCorrect;
     if (isCorrect) {
       sound.playCorrect();
       setCorrectAnswersCount((prev) => prev + 1);
@@ -80,6 +116,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
 
   const handleRetakeQuiz = () => {
     sound.playClick();
+    setQuestions(prepareQuizQuestions());
     setCurrentIndex(0);
     setSelectedOptionId(null);
     setIsAnswerSubmitted(false);
@@ -242,7 +279,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
 
               {/* Options list */}
               <div className="space-y-2.5">
-                {currentQ.options.map((opt) => {
+                {currentQ.shuffledOptions.map((opt) => {
                   const isSelected = selectedOptionId === opt.id;
                   const isCorrect = opt.isCorrect;
 
@@ -271,7 +308,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                     >
                       <div className="flex items-center gap-3">
                         <span className="w-6 h-6 rounded-lg bg-white/80 border border-stone-300 flex items-center justify-center font-bold text-xs uppercase text-stone-700">
-                          {opt.id}
+                          {opt.label}
                         </span>
                         <span>{opt.text}</span>
                       </div>
@@ -298,14 +335,14 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`p-4 rounded-2xl border-2 space-y-1.5 ${
-                      currentQ.options.find((o) => o.id === selectedOptionId)?.isCorrect
+                      currentQ.shuffledOptions.find((o) => o.id === selectedOptionId)?.isCorrect
                         ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
                         : 'bg-amber-50 border-amber-300 text-amber-950'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="text-xl">
-                        {currentQ.options.find((o) => o.id === selectedOptionId)?.isCorrect
+                        {currentQ.shuffledOptions.find((o) => o.id === selectedOptionId)?.isCorrect
                           ? '🌟 Tepat Sekali!'
                           : '🤔 Kurang tepat, coba ingat kembali...'}
                       </span>
@@ -425,7 +462,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
               </p>
             </div>
 
-            {/* Action Buttons: Certificate, History, New Session, Retake, Map */}
+            {/* Action Buttons: Certificate, Retake, Map */}
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <button
                 id="btn-view-certificate"
@@ -434,46 +471,18 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                   triggerCertificateConfetti();
                   onOpenCertificate();
                 }}
-                className="px-5 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 text-stone-950 font-display font-black rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95"
+                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 text-stone-950 font-display font-black rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition"
               >
                 <FileBadge className="w-4 h-4" />
-                <span>Lihat Sertifikat 📜</span>
+                <span>Lihat & Unduh Sertifikat 📜</span>
               </button>
-
-              {onOpenHistory && (
-                <button
-                  id="btn-quiz-view-history"
-                  onClick={() => {
-                    sound.playClick();
-                    onOpenHistory();
-                  }}
-                  className="px-5 py-3 bg-amber-100 hover:bg-amber-200 text-amber-950 font-display font-bold rounded-2xl text-xs sm:text-sm border border-amber-300 shadow-xs flex items-center gap-2 transition cursor-pointer active:scale-95"
-                >
-                  <History className="w-4 h-4 text-amber-700" />
-                  <span>Riwayat Pengerjaan 📚</span>
-                </button>
-              )}
-
-              {onRequestNewSession && (
-                <button
-                  id="btn-quiz-start-new-session"
-                  onClick={() => {
-                    sound.playClick();
-                    onRequestNewSession();
-                  }}
-                  className="px-5 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-display font-bold rounded-2xl text-xs sm:text-sm shadow-md flex items-center gap-2 transition cursor-pointer active:scale-95"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  <span>Mulai Sesi Baru (Percobaan {activeAttemptNumber + 1})</span>
-                </button>
-              )}
 
               <button
                 id="btn-retake-quiz"
                 onClick={handleRetakeQuiz}
-                className="px-4 py-3 bg-white hover:bg-stone-50 border-2 border-stone-300 text-stone-800 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+                className="px-5 py-3 bg-white hover:bg-stone-50 border-2 border-stone-300 text-stone-800 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
+                <RotateCcw className="w-4 h-4" />
                 <span>Ulangi Kuis</span>
               </button>
 
@@ -482,10 +491,10 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                   sound.playClick();
                   onGoToMap();
                 }}
-                className="px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border border-emerald-300 font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-1.5 transition shadow-xs cursor-pointer active:scale-95"
+                className="px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center gap-2 transition shadow-xs"
               >
-                <Map className="w-3.5 h-3.5 text-emerald-700" />
-                <span>Peta Jalan</span>
+                <Map className="w-4 h-4" />
+                <span>Buka Peta Petualangan</span>
               </button>
             </div>
           </motion.div>
@@ -498,7 +507,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
               sound.playClick();
               onGoToMap();
             }}
-            className="px-4 py-2 bg-white hover:bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="px-4 py-2 bg-white hover:bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-xs"
           >
             <Map className="w-3.5 h-3.5" />
             <span>Peta Petualangan</span>
@@ -507,15 +516,11 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
           <button
             onClick={() => {
               sound.playClick();
-              if (onRequestNewSession) {
-                onRequestNewSession();
-              } else {
-                onRestartAll();
-              }
+              onRestartAll();
             }}
-            className="text-xs text-stone-500 hover:text-stone-800 underline cursor-pointer"
+            className="text-xs text-stone-500 hover:text-stone-800 underline"
           >
-            Mulai Sesi Baru dari M1
+            Mulai Dari Awal Gerbang Sekolah
           </button>
         </div>
       </div>

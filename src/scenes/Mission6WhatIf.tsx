@@ -16,6 +16,7 @@ import {
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
+import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
 
 interface Mission6Props {
   onComplete: (points: number) => void;
@@ -279,20 +280,6 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                 {sortedCount} / {totalItems}
               </span>
             </div>
-
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-6"
-                onClick={() => {
-                  sound.playFootstep();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 text-white font-display font-bold rounded-2xl shadow-md text-xs sm:text-sm animate-pulse-subtle transition cursor-pointer"
-              >
-                <span>Lanjut Misi 7: Detektif</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 
@@ -459,6 +446,8 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         </div>
                         {isBatuTaman(item.name) ? (
                           <BatuTamanImage className="w-9 h-9 mb-1" alt={item.name} />
+                        ) : isTanahSubur(item.name) ? (
+                          <TanahSuburImage className="w-9 h-9 mb-1" alt={item.name} />
                         ) : (
                           <span className="text-3xl mb-1">{item.icon}</span>
                         )}
@@ -569,6 +558,8 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                       >
                         {isBatuTaman(item.name) ? (
                           <BatuTamanImage className="w-5 h-5" alt={item.name} />
+                        ) : isTanahSubur(item.name) ? (
+                          <TanahSuburImage className="w-5 h-5" alt={item.name} />
                         ) : (
                           <span className="text-lg">{item.icon}</span>
                         )}
@@ -656,6 +647,8 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                       >
                         {isBatuTaman(item.name) ? (
                           <BatuTamanImage className="w-5 h-5" alt={item.name} />
+                        ) : isTanahSubur(item.name) ? (
+                          <TanahSuburImage className="w-5 h-5" alt={item.name} />
                         ) : (
                           <span className="text-lg">{item.icon}</span>
                         )}
@@ -729,10 +722,14 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                   </span>
                 </motion.div>
 
-                <div className="text-center">
-                  <span className="text-5xl block">
-                    {isChangedMode ? '🪨' : '🪴'}
-                  </span>
+                <div className="text-center flex flex-col items-center">
+                  <div className="h-14 flex items-center justify-center">
+                    {isChangedMode ? (
+                      <span className="text-5xl block">🪨</span>
+                    ) : (
+                      <TanahSuburImage className="w-14 h-14" alt="Tanah Subur Lembap" />
+                    )}
+                  </div>
                   <span className="text-xs font-bold text-stone-800 bg-white/80 px-2 py-0.5 rounded-full mt-1 inline-block">
                     {isChangedMode ? 'Tanah Kering' : 'Tanah Subur Lembap'}
                   </span>

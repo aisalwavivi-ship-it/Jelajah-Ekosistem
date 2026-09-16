@@ -41,10 +41,10 @@ const SCENE_TIPS: Record<AppScene, SceneTip> = {
     mood: 'thinking',
   },
   'mission-1': {
-    title: 'Misi 1: Komponen Alam',
-    badge: 'Pengamatan Taman',
-    tip: 'Gunakan kaca pembesar untuk menemukan 4 benda biotik (hidup) dan 4 benda abiotik (tak hidup) di taman!',
-    funFact: 'Biotik artinya bernyawa (seperti kupu-kupu & bunga), sedangkan abiotik tidak hidup (seperti batu & tanah).',
+    title: 'Misi 1: Mengenal Ekosistem',
+    badge: 'Pengamatan Alam',
+    tip: 'Klik objek-objek di taman untuk mengamati makhluk hidup (biotik) dan lingkungan tak hidup (abiotik). Keduanya saling berdampingan membentuk ekosistem!',
+    funFact: 'Tumbuhan, hewan, air, tanah, batu, dan sinar matahari berinteraksi bersama membentuk satu kesatuan ekosistem.',
     mood: 'curious',
   },
   'mission-2': {

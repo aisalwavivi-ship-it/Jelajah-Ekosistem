@@ -15,8 +15,8 @@ import {
   Sparkles,
   ChevronDown,
   Calendar,
+  Clock,
   RotateCcw,
-  History
 } from 'lucide-react';
 import { AppScene, MissionId } from '../types';
 import { sound } from '../utils/audio';
@@ -46,8 +46,9 @@ interface HeaderNavProps {
   isCertificateUnlocked?: boolean;
   onOpenJournal?: () => void;
   onOpenHistory?: () => void;
-  onRequestReset?: () => void;
-  activeAttemptNumber?: number;
+  historyCount?: number;
+  onOpenRestartConfirm?: () => void;
+  attemptNumber?: number;
   completedCount?: number;
   completedMissions?: Record<MissionId, boolean>;
   isMusicPlaying?: boolean;
@@ -79,8 +80,9 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   isCertificateUnlocked,
   onOpenJournal,
   onOpenHistory,
-  onRequestReset,
-  activeAttemptNumber = 1,
+  historyCount = 0,
+  onOpenRestartConfirm,
+  attemptNumber = 1,
   completedCount = 0,
   completedMissions = {},
   isMusicPlaying = false,
@@ -179,7 +181,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               <span>{explorerLevel.icon}</span>
             </button>
 
-            {/* History trigger on mobile */}
+            {/* Riwayat trigger on mobile */}
             {onOpenHistory && (
               <button
                 id="btn-header-history-mobile"
@@ -188,10 +190,26 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                   sound.playClick();
                   onOpenHistory();
                 }}
-                className="p-1.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs flex items-center"
+                className="p-1.5 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl text-xs flex items-center gap-1"
                 title="Riwayat Pengerjaan"
               >
-                <History className="w-3.5 h-3.5" />
+                <Clock className="w-3.5 h-3.5 text-amber-700" />
+              </button>
+            )}
+
+            {/* Mulai Lagi trigger on mobile */}
+            {onOpenRestartConfirm && (
+              <button
+                id="btn-header-restart-mobile"
+                type="button"
+                onClick={() => {
+                  sound.playClick();
+                  onOpenRestartConfirm();
+                }}
+                className="p-1.5 bg-stone-100 border border-stone-300 text-stone-700 rounded-xl text-xs flex items-center"
+                title="Mulai Lagi"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-stone-600" />
               </button>
             )}
           </div>
@@ -206,8 +224,6 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
           4. Misi
           5. Kuis
           6. Profil/Progres
-          7. Riwayat
-          8. Mulai Lagi
         */}
         <nav className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full scrollbar-none py-0.5">
           {/* 1. Beranda */}
@@ -372,27 +388,32 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 sound.playClick();
                 onOpenHistory();
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl font-display text-xs font-bold bg-amber-50/90 hover:bg-amber-100 text-amber-950 border border-amber-300 transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-2xl font-display text-xs font-bold bg-amber-50/90 hover:bg-amber-100 text-amber-950 border border-amber-300/80 transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap"
               title="Riwayat Sesi Pengerjaan"
             >
-              <History className="w-3.5 h-3.5 text-amber-700" />
+              <Clock className="w-3.5 h-3.5 text-amber-700" />
               <span>Riwayat</span>
+              {historyCount > 0 && (
+                <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-300 text-amber-950">
+                  {historyCount}
+                </span>
+              )}
             </button>
           )}
 
-          {/* 8. Mulai Lagi / Sesi Baru */}
-          {onRequestReset && (
+          {/* 8. Mulai Lagi */}
+          {onOpenRestartConfirm && (
             <button
               id="nav-btn-restart"
               onClick={() => {
                 sound.playClick();
-                onRequestReset();
+                onOpenRestartConfirm();
               }}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-2xl font-display text-xs font-bold bg-stone-100/90 hover:bg-rose-50 text-stone-700 hover:text-rose-900 border border-stone-200/70 transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap"
-              title="Mulai Sesi Baru dari M1"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl font-display text-xs font-bold bg-stone-100/90 hover:bg-amber-50 text-stone-700 hover:text-amber-900 border border-stone-200/80 transition-all duration-150 active:scale-95 cursor-pointer whitespace-nowrap"
+              title="Mulai Lagi dari M1 (Sesi Baru)"
             >
-              <RotateCcw className="w-3.5 h-3.5 text-stone-600" />
-              <span>Mulai Lagi</span>
+              <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
+              <span className="hidden lg:inline">Mulai Lagi</span>
             </button>
           )}
         </nav>
@@ -418,7 +439,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             <span className="text-[11px] font-bold">{currentWeatherCond.label}</span>
           </button>
 
-          {/* History Icon in Header */}
+          {/* Riwayat Button on Desktop */}
           {onOpenHistory && (
             <button
               id="btn-header-history"
@@ -426,10 +447,15 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 sound.playClick();
                 onOpenHistory();
               }}
-              className="p-1.5 bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs cursor-pointer"
-              title="Riwayat Sesi Pengerjaan"
+              className="p-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs relative"
+              title="Riwayat Pengerjaan"
             >
-              <History className="w-4 h-4" />
+              <Clock className="w-4 h-4 text-amber-800" />
+              {historyCount > 0 && (
+                <span className="absolute -top-1 -right-1 px-1 py-0.2 bg-amber-500 text-white rounded-full text-[9px] font-black leading-none">
+                  {historyCount}
+                </span>
+              )}
             </button>
           )}
 
@@ -441,10 +467,25 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 sound.playClick();
                 onOpenJournal();
               }}
-              className="p-1.5 bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs cursor-pointer"
+              className="p-1.5 bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 rounded-xl transition shadow-2xs"
               title="Jurnal Penjelajah"
             >
               <BookOpen className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Mulai Lagi Button on Desktop */}
+          {onOpenRestartConfirm && (
+            <button
+              id="btn-header-restart"
+              onClick={() => {
+                sound.playClick();
+                onOpenRestartConfirm();
+              }}
+              className="p-1.5 bg-stone-100 hover:bg-amber-50 text-stone-600 hover:text-amber-800 border border-stone-200 rounded-xl transition shadow-2xs"
+              title="Mulai Lagi dari Awal (Sesi Baru)"
+            >
+              <RotateCcw className="w-4 h-4" />
             </button>
           )}
 

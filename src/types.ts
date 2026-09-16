@@ -96,6 +96,39 @@ export interface ExplorerLevel {
   description: string;
 }
 
+export interface ActiveSession {
+  sessionId: number;
+  attemptNumber: number;
+  studentName?: string;
+  status: 'in-progress' | 'completed' | 'all_missions_done';
+  completedMissions: Record<MissionId, boolean>;
+  missionScores: Record<MissionId, number>;
+  stars: number;
+  quizScore: number | null;
+  totalScore: number;
+  badges: string[];
+  journalEntries: MissionJournalEntry[];
+  startedAt: string;
+  completedAt?: string;
+}
+
+export interface SessionHistoryItem {
+  sessionId: number;
+  attemptNumber: number;
+  studentName?: string;
+  completedAt: string;
+  completedCount: number;
+  progressPercent: number;
+  missionScores: Record<MissionId, number>;
+  quizScore: number | null;
+  totalScore: number;
+  stars: number;
+  badgeTitle?: string;
+  badgeIcon?: string;
+  badges: string[];
+  status: 'completed' | 'in-progress' | 'all_missions_done';
+}
+
 export interface GameState {
   studentName: string;
   currentMissionId: string;
@@ -107,21 +140,4 @@ export interface GameState {
   quizScore: number | null;
   selectedPath: 'taman' | 'kolam' | null;
   journal?: MissionJournalEntry[];
-}
-
-export interface SessionRecord {
-  id: string;
-  attemptNumber: number; // 1, 2, 3...
-  studentName: string;
-  startedAt: string; // ISO string
-  completedAt?: string; // ISO string
-  status: 'active' | 'completed' | 'in-progress';
-  completedMissionsCount: number; // 0..8
-  completedMissions: Record<MissionId, boolean>;
-  progressPercent: number; // 0..100
-  stars: number;
-  missionScores: Record<number, number>; // missionId -> stars
-  quizScore: number | null;
-  badgeTitle: string;
-  badgeIcon: string;
 }

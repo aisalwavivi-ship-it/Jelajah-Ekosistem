@@ -27,5 +27,6 @@ export const BatuTamanImage: React.FC<BatuTamanImageProps> = ({
 
 export function isBatuTaman(name?: string): boolean {
   if (!name) return false;
-  return name.trim().toLowerCase().includes('batu taman');
+  const n = name.trim().toLowerCase();
+  return n.includes('batu taman') || n.includes('batu hias');
 }

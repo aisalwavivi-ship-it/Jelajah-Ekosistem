@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { CharacterAvatar } from './illustrations/CharacterAvatar';
 import { AppScene, MissionId } from '../types';
@@ -31,6 +31,17 @@ export const TrailPath: React.FC<TrailPathProps> = ({
   };
 
   const currentStep = getStepIndex(currentScene);
+  const prevStepRef = useRef<number>(currentStep);
+  const [direction, setDirection] = useState<'left' | 'right'>('right');
+
+  useEffect(() => {
+    if (currentStep < prevStepRef.current) {
+      setDirection('left');
+    } else if (currentStep > prevStepRef.current) {
+      setDirection('right');
+    }
+    prevStepRef.current = currentStep;
+  }, [currentStep]);
 
   // Checkpoints representation
   const checkpoints = [
@@ -72,6 +83,23 @@ export const TrailPath: React.FC<TrailPathProps> = ({
                 }}
               />
 
+              {/* Smooth Animated Character moving along Jalan Setapak */}
+              <motion.div
+                className="absolute -top-7 sm:-top-8.5 z-30 pointer-events-none -translate-x-1/2 flex flex-col items-center"
+                initial={false}
+                animate={{
+                  left: `calc(1rem + ${(currentStep / 10)} * (100% - 2rem))`,
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 85,
+                  damping: 17,
+                  mass: 0.8,
+                }}
+              >
+                <CharacterAvatar size="sm" isWalking={true} direction={direction} />
+              </motion.div>
+
               {/* Checkpoints */}
               {checkpoints.map((cp) => {
                 const isStart = cp.step === 0;
@@ -103,21 +131,6 @@ export const TrailPath: React.FC<TrailPathProps> = ({
                       }
                     }}
                   >
-                    {/* Character walking/standing on active checkpoint with Framer Motion layoutId */}
-                    {isCurrent && (
-                      <motion.div
-                        layoutId="trail-hud-avatar"
-                        transition={{
-                          type: 'spring',
-                          stiffness: 280,
-                          damping: 24,
-                        }}
-                        className="absolute -top-7 sm:-top-8.5 z-30 pointer-events-none"
-                      >
-                        <CharacterAvatar size="sm" isWalking={true} direction="right" />
-                      </motion.div>
-                    )}
-
                     {/* Stepping Stone Node */}
                     <motion.div
                       whileHover={isUnlocked ? { scale: 1.15 } : {}}

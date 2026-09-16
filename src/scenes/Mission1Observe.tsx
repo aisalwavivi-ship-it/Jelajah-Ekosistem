@@ -5,6 +5,7 @@ import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
+import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
 
 interface Mission1Props {
   onComplete: (points: number) => void;
@@ -242,20 +243,6 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                 {inspectedIds.length} / {OBJECTS.length}
               </span>
             </div>
-
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-1"
-                onClick={() => {
-                  sound.playFootstep();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 text-white font-display font-bold rounded-2xl shadow-md text-xs sm:text-sm animate-pulse-subtle transition cursor-pointer"
-              >
-                <span>Lanjut Misi 2: Jenis Ekosistem</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 
@@ -386,6 +373,8 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                 >
                   {isBatuTaman(obj.name) ? (
                     <BatuTamanImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={obj.name} />
+                  ) : isTanahSubur(obj.name) ? (
+                    <TanahSuburImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={obj.name} />
                   ) : (
                     <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
                       {obj.icon}
@@ -419,6 +408,8 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                   <div className="flex items-center gap-2.5">
                     {isBatuTaman(activeObject.name) ? (
                       <BatuTamanImage className="w-9 h-9" alt={activeObject.name} />
+                    ) : isTanahSubur(activeObject.name) ? (
+                      <TanahSuburImage className="w-9 h-9" alt={activeObject.name} />
                     ) : (
                       <span className="text-3xl">{activeObject.icon}</span>
                     )}
@@ -564,7 +555,7 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
           <div className="flex items-center gap-2">
             <span className="text-lg">💡</span>
             <span>
-              Temukan minimal <strong>6 objek</strong> untuk membuka checkpoint Misi 2 di jalan setapak!
+              <strong>Tips Belajar:</strong> Klik dan amati minimal <strong>6 objek</strong> di taman (makhluk hidup & benda tak hidup) untuk memahami bagaimana komponen biotik dan abiotik berdampingan membentuk ekosistem, lalu buka Misi 2!
             </span>
           </div>
 

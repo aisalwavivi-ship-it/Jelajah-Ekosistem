@@ -408,8 +408,8 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
             {/* Walking Progress Bar */}
             <div className="w-full">
               <div className="flex justify-between text-[11px] font-bold text-stone-600 mb-1">
-                <span className="flex items-center gap-1">
-                  <span>🚶‍♂️</span>
+                <span className="flex items-center gap-1.5">
+                  <img src="/karakter-penjelajah.png" alt="Penjelajah" className="w-4 h-4 object-contain inline-block" referrerPolicy="no-referrer" />
                   <span>Jalan Setapak</span>
                 </span>
                 <span>{Math.round(progress)}%</span>

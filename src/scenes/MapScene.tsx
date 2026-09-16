@@ -58,6 +58,18 @@ export const MapScene: React.FC<MapSceneProps> = ({
       : `Dara siap menyusuri jalan setapak menuju Misi ${nextActiveMissionId}!`
   );
 
+  // Sync position and speech when completed missions change or reset
+  useEffect(() => {
+    const targetStep = allMissionsDone ? 9 : nextActiveMissionId;
+    setCurrentStep(targetStep);
+    setIsCelebrating(allMissionsDone);
+    setSpeechText(
+      allMissionsDone
+        ? 'Hore! Semua misi di jalan setapak telah selesai! Ayo ke Puncak Finish!'
+        : `Dara siap menyusuri jalan setapak menuju Misi ${nextActiveMissionId}!`
+    );
+  }, [completedCount, nextActiveMissionId, allMissionsDone]);
+
   // Function to walk the character along the winding path between nodes
   const handleWalkToNode = (targetStep: number, targetScene: AppScene) => {
     if (isWalking) return;

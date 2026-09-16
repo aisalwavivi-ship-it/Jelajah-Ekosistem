@@ -192,20 +192,6 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                 {Object.keys(placedItems).length} / {ITEMS.length}
               </span>
             </div>
-
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-2"
-                onClick={() => {
-                  sound.playFootstep();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 text-white font-display font-bold rounded-2xl shadow-md text-xs sm:text-sm animate-pulse-subtle transition"
-              >
-                <span>Lanjut Misi 3: Individu</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 

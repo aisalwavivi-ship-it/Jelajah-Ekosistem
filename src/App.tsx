@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AppScene, MissionId, GameState, MissionJournalEntry, SessionRecord } from './types';
+import { AppScene, MissionId, ActiveSession, SessionHistoryItem, MissionJournalEntry } from './types';
 import { sound } from './utils/audio';
 import { tts } from './utils/tts';
 import { ambientMusic } from './utils/ambientMusic';
@@ -10,6 +10,13 @@ import {
   triggerCertificateConfetti,
 } from './utils/confetti';
 import { BADGES, MISSIONS_DATA, MISSION_JOURNAL_DETAILS } from './data/missions';
+import {
+  loadActiveSessionFromStorage,
+  saveActiveSessionToStorage,
+  saveHistoryToStorage,
+  recordSessionToHistory,
+  startNewSession,
+} from './utils/sessionStorage';
 
 // Components
 import { HeaderNav } from './components/HeaderNav';
@@ -21,8 +28,9 @@ import { HowToPlayModal } from './components/HowToPlayModal';
 import { CertificateModal } from './components/CertificateModal';
 import { ExplorerJournal } from './components/ExplorerJournal';
 import { DailyCheckInModal } from './components/DailyCheckInModal';
-import { ConfirmResetModal } from './components/ConfirmResetModal';
-import { WorkHistoryModal } from './components/WorkHistoryModal';
+import { RestartConfirmModal } from './components/RestartConfirmModal';
+import { HistoryModal } from './components/HistoryModal';
+import { GameOpeningScreen } from './components/GameOpeningScreen';
 import { DynamicWeatherBackground } from './components/DynamicWeatherBackground';
 import { WeatherType, WeatherMode, resolveActiveWeather } from './utils/weather';
 
@@ -40,73 +48,14 @@ import { Mission8MindMap } from './scenes/Mission8MindMap';
 import { QuizScene } from './scenes/QuizScene';
 import { MaterialScene } from './scenes/MaterialScene';
 
-const STORAGE_KEY = 'jelajah_ekosistem_state_v3';
-const STORAGE_HISTORY_KEY = 'jelajah_ekosistem_history_v3';
-const LEGACY_STORAGE_KEY = 'jelajah_ekosistem_state_v2';
-
-export interface ActiveSessionMeta {
-  attemptNumber: number;
-  startedAt: string;
-  completedAt?: string;
-  status: 'active' | 'completed';
-  missionStars: Record<number, number>;
-}
-
-interface AppGameState {
-  studentName: string;
-  completedMissions: Record<MissionId, boolean>;
-  stars: number;
-  badges: string[];
-  isAudioMuted: boolean;
-  isMusicPlaying: boolean;
-  quizScore: number | null;
-  journalEntries: MissionJournalEntry[];
-  lastCheckInDate?: string;
-  checkInStreak?: number;
-  activeSession: ActiveSessionMeta;
-  history: SessionRecord[];
-}
-
-const INITIAL_ACTIVE_SESSION: ActiveSessionMeta = {
-  attemptNumber: 1,
-  startedAt: new Date().toISOString(),
-  status: 'active',
-  missionStars: {},
-};
-
-const INITIAL_GAME_STATE: AppGameState = {
-  studentName: 'Penjelajah Muda',
-  completedMissions: {
-    1: false,
-    2: false,
-    3: false,
-    4: false,
-    5: false,
-    6: false,
-    7: false,
-    8: false,
-  },
-  stars: 0,
-  badges: [],
-  isAudioMuted: false,
-  isMusicPlaying: false,
-  quizScore: null,
-  journalEntries: [],
-  lastCheckInDate: undefined,
-  checkInStreak: 1,
-  activeSession: INITIAL_ACTIVE_SESSION,
-  history: [],
-};
-
 export default function App() {
   const [currentScene, setCurrentScene] = useState<AppScene>('start');
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isCertificateOpen, setIsCertificateOpen] = useState<boolean>(false);
   const [isJournalOpen, setIsJournalOpen] = useState<boolean>(false);
   const [isDailyCheckInOpen, setIsDailyCheckInOpen] = useState<boolean>(false);
-  const [isConfirmResetOpen, setIsConfirmResetOpen] = useState<boolean>(false);
+  const [isRestartConfirmOpen, setIsRestartConfirmOpen] = useState<boolean>(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState<boolean>(false);
-  const [selectedHistoryCertificate, setSelectedHistoryCertificate] = useState<SessionRecord | null>(null);
 
   const [weatherMode, setWeatherMode] = useState<WeatherMode>('auto-time');
   const [currentTime, setCurrentTime] = useState<Date>(() => new Date());
@@ -119,120 +68,75 @@ export default function App() {
     return () => clearInterval(timer);
   }, []);
 
-  // Load initial state from localStorage if present with graceful migration
-  const [gameState, setGameState] = useState<AppGameState>(() => {
+  // Initialize activeSession and history from storage migration utility
+  const [initialData] = useState(() => loadActiveSessionFromStorage());
+  const [activeSession, setActiveSession] = useState<ActiveSession>(initialData.activeSession);
+  const [history, setHistory] = useState<SessionHistoryItem[]>(initialData.history);
+
+  // Audio / Music preference state
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(() => {
     try {
-      // 1. Try to load v3 state
-      const savedV3 = localStorage.getItem(STORAGE_KEY);
-      const savedHistory = localStorage.getItem(STORAGE_HISTORY_KEY);
-      let parsedHistory: SessionRecord[] = [];
-      if (savedHistory) {
-        try {
-          const ph = JSON.parse(savedHistory);
-          if (Array.isArray(ph)) parsedHistory = ph;
-        } catch {
-          // ignore
-        }
-      }
-
-      if (savedV3) {
-        const parsed = JSON.parse(savedV3);
-        if (parsed && parsed.completedMissions) {
-          const finalHistory = Array.isArray(parsed.history) && parsed.history.length > 0
-            ? parsed.history
-            : parsedHistory;
-
-          const activeSess: ActiveSessionMeta = parsed.activeSession || {
-            attemptNumber: 1,
-            startedAt: new Date().toISOString(),
-            status: parsed.quizScore !== null ? 'completed' : 'active',
-            missionStars: {},
-          };
-
-          return {
-            ...INITIAL_GAME_STATE,
-            ...parsed,
-            isMusicPlaying: false,
-            activeSession: activeSess,
-            history: finalHistory,
-          };
-        }
-      }
-
-      // 2. Backward compatibility fallback from v2
-      const savedV2 = localStorage.getItem(LEGACY_STORAGE_KEY);
-      if (savedV2) {
-        const legacy = JSON.parse(savedV2);
-        if (legacy && legacy.completedMissions) {
-          const completedCount = Object.values(legacy.completedMissions).filter(Boolean).length;
-          const isFinished = completedCount >= 8 && legacy.quizScore !== null;
-          const userBadge = BADGES.find((b) => (legacy.quizScore ?? 100) >= b.minScore) || BADGES[BADGES.length - 1];
-
-          let legacyHistory: SessionRecord[] = [];
-          if (isFinished) {
-            legacyHistory.push({
-              id: `session-legacy-1`,
-              attemptNumber: 1,
-              studentName: legacy.studentName || 'Penjelajah Muda',
-              startedAt: new Date(Date.now() - 3600000).toISOString(),
-              completedAt: new Date().toISOString(),
-              status: 'completed',
-              completedMissionsCount: 8,
-              completedMissions: { ...legacy.completedMissions },
-              progressPercent: 100,
-              stars: legacy.stars || 120,
-              missionScores: {},
-              quizScore: legacy.quizScore,
-              badgeTitle: userBadge.title,
-              badgeIcon: userBadge.icon,
-            });
-          }
-
-          const initialSession: ActiveSessionMeta = {
-            attemptNumber: isFinished ? 1 : 1,
-            startedAt: new Date().toISOString(),
-            completedAt: isFinished ? new Date().toISOString() : undefined,
-            status: isFinished ? 'completed' : 'active',
-            missionStars: {},
-          };
-
-          return {
-            ...INITIAL_GAME_STATE,
-            studentName: legacy.studentName || 'Penjelajah Muda',
-            completedMissions: legacy.completedMissions || INITIAL_GAME_STATE.completedMissions,
-            stars: legacy.stars || 0,
-            badges: legacy.badges || [],
-            quizScore: legacy.quizScore,
-            journalEntries: legacy.journalEntries || [],
-            lastCheckInDate: legacy.lastCheckInDate,
-            checkInStreak: legacy.checkInStreak || 1,
-            activeSession: initialSession,
-            history: legacyHistory,
-            isMusicPlaying: false,
-          };
-        }
-      }
-    } catch (e) {
-      console.warn('Could not read state from localStorage', e);
+      return localStorage.getItem('jelajah_audio_muted') === 'true';
+    } catch {
+      return false;
     }
-    return INITIAL_GAME_STATE;
+  });
+  const [isMusicPlaying, setIsMusicPlaying] = useState<boolean>(false);
+
+  // Daily check-in streak
+  const [lastCheckInDate, setLastCheckInDate] = useState<string | undefined>(() => {
+    try {
+      return localStorage.getItem('jelajah_last_checkin_date') || undefined;
+    } catch {
+      return undefined;
+    }
+  });
+  const [checkInStreak, setCheckInStreak] = useState<number>(() => {
+    try {
+      return parseInt(localStorage.getItem('jelajah_checkin_streak') || '1', 10);
+    } catch {
+      return 1;
+    }
   });
 
-  // Sync state to localStorage whenever it changes (without clear)
-  useEffect(() => {
+  // Game Opening Screen state (Only shown on initial entry, saved per session)
+  const [hasSeenOpening, setHasSeenOpening] = useState<boolean>(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
-      localStorage.setItem(STORAGE_HISTORY_KEY, JSON.stringify(gameState.history));
-    } catch (e) {
-      console.warn('Could not save state to localStorage', e);
+      return sessionStorage.getItem('jelajah_has_seen_opening') === 'true';
+    } catch {
+      return false;
     }
-  }, [gameState]);
+  });
 
-  // Audio mute sync
+  const handleFinishOpening = () => {
+    try {
+      sessionStorage.setItem('jelajah_has_seen_opening', 'true');
+    } catch {
+      // ignore
+    }
+    setHasSeenOpening(true);
+  };
+
+  // Automatically persist active session whenever it changes
+  useEffect(() => {
+    saveActiveSessionToStorage(activeSession);
+  }, [activeSession]);
+
+  // Automatically persist history whenever it changes
+  useEffect(() => {
+    saveHistoryToStorage(history);
+  }, [history]);
+
+  // Audio mute toggle
   const handleToggleAudio = () => {
     const nextMuted = sound.toggleMute();
     tts.setSoundEnabled(!nextMuted);
-    setGameState((prev) => ({ ...prev, isAudioMuted: nextMuted }));
+    setIsAudioMuted(nextMuted);
+    try {
+      localStorage.setItem('jelajah_audio_muted', String(nextMuted));
+    } catch {
+      // ignore
+    }
   };
 
   // Stop narration on scene transition
@@ -242,13 +146,13 @@ export default function App() {
 
   // Background Nature Music toggle
   const handleToggleMusic = () => {
-    const nextPlaying = !gameState.isMusicPlaying;
+    const nextPlaying = !isMusicPlaying;
     if (nextPlaying) {
       ambientMusic.start();
     } else {
       ambientMusic.stop();
     }
-    setGameState((prev) => ({ ...prev, isMusicPlaying: nextPlaying }));
+    setIsMusicPlaying(nextPlaying);
   };
 
   // Ensure audio nodes are stopped if the app unmounts
@@ -260,7 +164,7 @@ export default function App() {
 
   // Check if daily bonus is available today
   const todayDateStr = new Date().toISOString().split('T')[0];
-  const isDailyClaimedToday = gameState.lastCheckInDate === todayDateStr;
+  const isDailyClaimedToday = lastCheckInDate === todayDateStr;
 
   // Auto-prompt daily check-in once per session if not claimed yet
   useEffect(() => {
@@ -280,25 +184,34 @@ export default function App() {
 
     // Calculate streak
     let nextStreak = 1;
-    if (gameState.lastCheckInDate) {
-      const lastDate = new Date(gameState.lastCheckInDate);
+    if (lastCheckInDate) {
+      const lastDate = new Date(lastCheckInDate);
       const diffTime = today.getTime() - lastDate.getTime();
       const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
       if (diffDays === 1) {
-        nextStreak = (gameState.checkInStreak || 1) + 1;
+        nextStreak = (checkInStreak || 1) + 1;
       } else if (diffDays === 0) {
-        nextStreak = gameState.checkInStreak || 1;
+        nextStreak = checkInStreak || 1;
       } else {
         nextStreak = 1;
       }
     }
 
-    setGameState((prev) => ({
+    setLastCheckInDate(todayStr);
+    setCheckInStreak(nextStreak);
+    try {
+      localStorage.setItem('jelajah_last_checkin_date', todayStr);
+      localStorage.setItem('jelajah_checkin_streak', String(nextStreak));
+    } catch {
+      // ignore
+    }
+
+    // Award 5 stars to active session
+    setActiveSession((prev) => ({
       ...prev,
       stars: prev.stars + 5,
-      lastCheckInDate: todayStr,
-      checkInStreak: nextStreak,
     }));
+
     triggerMissionSuccessConfetti();
     setIsDailyCheckInOpen(false);
   };
@@ -308,7 +221,6 @@ export default function App() {
 
   // Generic mission completion handler
   const handleCompleteMission = (missionId: MissionId, earnedStars: number) => {
-    // Trigger celebratory confetti explosion
     triggerMissionSuccessConfetti();
     setLastCompletedMissionId(missionId);
 
@@ -316,16 +228,16 @@ export default function App() {
     const meta = MISSIONS_DATA.find((m) => m.id === missionId);
     const details = MISSION_JOURNAL_DETAILS[missionId];
 
-    setGameState((prev) => {
+    setActiveSession((prev) => {
       const isAlreadyCompleted = prev.completedMissions[missionId];
       const newCompleted = { ...prev.completedMissions, [missionId]: true };
       const updatedStars = isAlreadyCompleted ? prev.stars : prev.stars + earnedStars;
-      const updatedMissionStars = {
-        ...prev.activeSession.missionStars,
-        [missionId]: Math.max(prev.activeSession.missionStars[missionId] || 0, earnedStars),
+      const updatedScores = {
+        ...prev.missionScores,
+        [missionId]: Math.max(prev.missionScores[missionId] || 0, earnedStars),
       };
 
-      // Update or record journal entry with timestamp and stars earned
+      // Update or record journal entry
       const existingIndex = prev.journalEntries.findIndex((e) => e.missionId === missionId);
       let updatedJournal: MissionJournalEntry[];
 
@@ -352,15 +264,20 @@ export default function App() {
         updatedJournal = [...prev.journalEntries, newEntry];
       }
 
+      const totalMissionScore = (Object.values(updatedScores) as (number | undefined)[]).reduce<number>(
+        (sum, score) => sum + (score || 0),
+        0
+      );
+      const allDone = Object.values(newCompleted).filter(Boolean).length === 8;
+
       return {
         ...prev,
         completedMissions: newCompleted,
+        missionScores: updatedScores,
         stars: updatedStars,
         journalEntries: updatedJournal,
-        activeSession: {
-          ...prev.activeSession,
-          missionStars: updatedMissionStars,
-        },
+        totalScore: totalMissionScore + (prev.quizScore || 0),
+        status: allDone ? 'all_missions_done' : 'in_progress',
       };
     });
   };
@@ -383,21 +300,32 @@ export default function App() {
     }
   };
 
-  const handleStartAdventure = (name: string) => {
+  const handleStartAdventure = (name?: string) => {
     sound.playFootstep();
-    // Start ambient nature track upon beginning adventure for immersion
     ambientMusic.start();
-    setGameState((prev) => ({
+    setIsMusicPlaying(true);
+
+    const safeArgName = typeof name === 'string' ? name.trim() : '';
+    const safeCurrentName =
+      typeof activeSession?.studentName === 'string' ? activeSession.studentName.trim() : '';
+    const trimmed = safeArgName || safeCurrentName || 'Penjelajah Muda';
+    setActiveSession((prev) => ({
       ...prev,
-      studentName: name.trim() || 'Penjelajah Muda',
-      isMusicPlaying: true,
+      studentName: trimmed,
     }));
-    navigateWithWalkingTrail('mission-1', 'start');
+
+    // If user already completed some missions in this session, navigate to the first incomplete mission
+    for (let i = 1; i <= 8; i++) {
+      if (!activeSession.completedMissions[i as MissionId]) {
+        navigateWithWalkingTrail(`mission-${i}` as AppScene, 'start');
+        return;
+      }
+    }
+    navigateWithWalkingTrail('quiz', 'start');
   };
 
   const handleSelectMission = (scene: AppScene) => {
     sound.playFootstep();
-    // If moving between different mission scenes, show animated walking transition
     if (scene !== currentScene && (scene.startsWith('mission-') || scene === 'quiz')) {
       navigateWithWalkingTrail(scene, currentScene);
     } else {
@@ -406,148 +334,56 @@ export default function App() {
   };
 
   const handleFinishQuiz = (finalScore: number) => {
-    // Grand finale celebration confetti
     triggerQuizFinishConfetti();
 
-    setGameState((prev) => {
-      const completedCount = Object.values(prev.completedMissions).filter(Boolean).length;
-      const nowStr = new Date().toISOString();
-      const userBadge = BADGES.find((b) => finalScore >= b.minScore) || BADGES[BADGES.length - 1];
+    const earnedBadge =
+      BADGES.find((b) => finalScore >= b.minScore) || BADGES[BADGES.length - 1];
 
-      // Create session record for history archive
-      const finishedSessionRecord: SessionRecord = {
-        id: `session-${prev.activeSession.attemptNumber}-${Date.now()}`,
-        attemptNumber: prev.activeSession.attemptNumber,
-        studentName: prev.studentName,
-        startedAt: prev.activeSession.startedAt,
-        completedAt: nowStr,
-        status: 'completed',
-        completedMissionsCount: completedCount,
-        completedMissions: { ...prev.completedMissions },
-        progressPercent: Math.round((completedCount / 8) * 100),
-        stars: prev.stars,
-        missionScores: { ...prev.activeSession.missionStars },
-        quizScore: finalScore,
-        badgeTitle: userBadge.title,
-        badgeIcon: userBadge.icon,
-      };
-
-      const existingIndex = prev.history.findIndex(
-        (h) => h.attemptNumber === prev.activeSession.attemptNumber
+    setActiveSession((prev) => {
+      const missionScoreSum = (Object.values(prev.missionScores) as (number | undefined)[]).reduce<number>(
+        (sum, score) => sum + (score || 0),
+        0
       );
-      let newHistory: SessionRecord[];
-      if (existingIndex >= 0) {
-        newHistory = [...prev.history];
-        newHistory[existingIndex] = finishedSessionRecord;
-      } else {
-        newHistory = [finishedSessionRecord, ...prev.history];
-      }
+      const totalScore = missionScoreSum + finalScore;
+      const updatedBadges = prev.badges.includes(earnedBadge.id)
+        ? prev.badges
+        : [...prev.badges, earnedBadge.id];
 
-      return {
+      const completedSession: ActiveSession = {
         ...prev,
         quizScore: finalScore,
-        activeSession: {
-          ...prev.activeSession,
-          status: 'completed',
-          completedAt: nowStr,
-        },
-        history: newHistory,
+        totalScore,
+        badges: updatedBadges,
+        status: 'completed',
+        completedAt: new Date().toISOString(),
       };
+
+      // Immediately archive to history so this attempt is securely saved
+      setHistory((currHist) => recordSessionToHistory(completedSession, currHist));
+
+      return completedSession;
     });
   };
 
-  // Request restart / new session with confirmation dialog
-  const handleRequestReset = () => {
-    sound.playClick();
-    setIsConfirmResetOpen(true);
-  };
-
-  // Start new active session without clearing history
-  const handleConfirmStartNewSession = () => {
+  // Start a new session while preserving history
+  const handleConfirmRestart = () => {
     sound.playClick();
     ambientMusic.stop();
+    setIsMusicPlaying(false);
 
-    setGameState((prev) => {
-      let updatedHistory = [...prev.history];
-      const completedCount = Object.values(prev.completedMissions).filter(Boolean).length;
+    const { newSession, updatedHistory } = startNewSession(activeSession, history);
+    setActiveSession(newSession);
+    setHistory(updatedHistory);
+    setIsRestartConfirmOpen(false);
 
-      // If current session had progress and isn't archived yet, archive it
-      const alreadySaved = updatedHistory.some(
-        (h) => h.attemptNumber === prev.activeSession.attemptNumber
-      );
-      if (!alreadySaved && (completedCount > 0 || prev.quizScore !== null)) {
-        const userBadge = BADGES.find((b) => (prev.quizScore ?? 70) >= b.minScore) || BADGES[BADGES.length - 1];
-        const isDone = completedCount >= 8 && prev.quizScore !== null;
-        const archivedRecord: SessionRecord = {
-          id: `session-${prev.activeSession.attemptNumber}-${Date.now()}`,
-          attemptNumber: prev.activeSession.attemptNumber,
-          studentName: prev.studentName,
-          startedAt: prev.activeSession.startedAt,
-          completedAt: prev.activeSession.completedAt || (isDone ? new Date().toISOString() : undefined),
-          status: isDone ? 'completed' : 'in-progress',
-          completedMissionsCount: completedCount,
-          completedMissions: { ...prev.completedMissions },
-          progressPercent: Math.round((completedCount / 8) * 100),
-          stars: prev.stars,
-          missionScores: { ...prev.activeSession.missionStars },
-          quizScore: prev.quizScore,
-          badgeTitle: userBadge.title,
-          badgeIcon: userBadge.icon,
-        };
-        updatedHistory = [archivedRecord, ...updatedHistory];
-      }
-
-      // Determine next attempt number (incrementing)
-      const maxAttemptInHistory = updatedHistory.reduce((max, h) => Math.max(max, h.attemptNumber), 0);
-      const nextAttempt = Math.max(prev.activeSession.attemptNumber, maxAttemptInHistory) + 1;
-
-      return {
-        ...prev,
-        completedMissions: {
-          1: false,
-          2: false,
-          3: false,
-          4: false,
-          5: false,
-          6: false,
-          7: false,
-          8: false,
-        },
-        stars: 0,
-        quizScore: null,
-        journalEntries: [],
-        activeSession: {
-          attemptNumber: nextAttempt,
-          startedAt: new Date().toISOString(),
-          status: 'active',
-          missionStars: {},
-        },
-        history: updatedHistory,
-      };
-    });
-
-    setIsConfirmResetOpen(false);
-    setIsHistoryOpen(false);
-    setIsCertificateOpen(false);
-    setSelectedHistoryCertificate(null);
-    setLastCompletedMissionId(null);
-    navigateWithWalkingTrail('mission-1', currentScene);
+    // Smoothly return to the Map Scene with Checkpoint M1 active
+    setCurrentScene('map');
   };
 
-  const handleRestartAll = () => {
-    handleRequestReset();
-  };
-
-  const handleViewCertificateForSession = (session: SessionRecord) => {
-    setSelectedHistoryCertificate(session);
-    setIsHistoryOpen(false);
-    setIsCertificateOpen(true);
-  };
-
-  const completedCount = Object.values(gameState.completedMissions).filter(Boolean).length;
-  const isCertificateUnlocked = completedCount >= 8 || gameState.quizScore !== null;
+  const completedCount = Object.values(activeSession.completedMissions).filter(Boolean).length;
+  const isCertificateUnlocked = completedCount >= 8 || activeSession.quizScore !== null;
   const userBadge =
-    BADGES.find((b) => (gameState.quizScore ?? 100) >= b.minScore) ||
+    BADGES.find((b) => (activeSession.quizScore ?? 100) >= b.minScore) ||
     BADGES[BADGES.length - 1];
 
   // Resolve active weather state based on mode, local time, or mission progress
@@ -567,9 +403,6 @@ export default function App() {
       {/* 
         0. MANDATED FULL-SCREEN RESPONSIVE WORLD BACKGROUND:
         - Covers the entire viewport
-        - background-size: cover
-        - background-position: center center
-        - background-repeat: no-repeat
         - Consistent across all scenes to create ONE continuous Jelajah Ekosistem world
       */}
       <div
@@ -590,16 +423,16 @@ export default function App() {
       {/* Dynamic Weather & Atmospheric Abiotic Layer (Pointer-events-none) */}
       <DynamicWeatherBackground weather={activeWeather} />
 
-      {/* 1. Global Navigation Header (6 mandated items: Beranda, Peta, Materi, Misi, Kuis, Profil) */}
+      {/* 1. Global Navigation Header */}
       <HeaderNav
         currentScene={currentScene}
-        stars={gameState.stars}
-        playerName={gameState.studentName}
-        soundEnabled={!gameState.isAudioMuted}
-        isMuted={gameState.isAudioMuted}
+        stars={activeSession.stars}
+        playerName={activeSession.studentName}
+        soundEnabled={!isAudioMuted}
+        isMuted={isAudioMuted}
         onToggleSound={handleToggleAudio}
         onToggleMute={handleToggleAudio}
-        isMusicPlaying={gameState.isMusicPlaying}
+        isMusicPlaying={isMusicPlaying}
         onToggleMusic={handleToggleMusic}
         activeWeather={activeWeather}
         weatherMode={weatherMode}
@@ -629,9 +462,8 @@ export default function App() {
           if (targetMissionId) {
             handleSelectMission(`mission-${targetMissionId}` as AppScene);
           } else {
-            // Find first incomplete mission or default to mission-1
             for (let i = 1; i <= 8; i++) {
-              if (!gameState.completedMissions[i as MissionId]) {
+              if (!activeSession.completedMissions[i as MissionId]) {
                 handleSelectMission(`mission-${i}` as AppScene);
                 return;
               }
@@ -652,19 +484,23 @@ export default function App() {
           sound.playClick();
           setIsJournalOpen(true);
         }}
-        onOpenHistory={() => {
-          sound.playClick();
-          setIsHistoryOpen(true);
-        }}
-        onRequestReset={handleRequestReset}
-        activeAttemptNumber={gameState.activeSession.attemptNumber}
         onOpenDailyCheckIn={() => {
           sound.playClick();
           setIsDailyCheckInOpen(true);
         }}
         isDailyClaimedToday={isDailyClaimedToday}
         completedCount={completedCount}
-        completedMissions={gameState.completedMissions}
+        completedMissions={activeSession.completedMissions}
+        onOpenHistory={() => {
+          sound.playClick();
+          setIsHistoryOpen(true);
+        }}
+        onOpenRestartConfirm={() => {
+          sound.playClick();
+          setIsRestartConfirmOpen(true);
+        }}
+        attemptNumber={activeSession.attemptNumber}
+        historyCount={history.length}
       />
 
       {/* Visual Progress Bar beneath Header Navigation */}
@@ -678,9 +514,8 @@ export default function App() {
             setCurrentScene('quiz');
           }}
           onContinueMissions={() => {
-            // Find first incomplete mission or go to next
             for (let i = 1; i <= 8; i++) {
-              if (!gameState.completedMissions[i as MissionId]) {
+              if (!activeSession.completedMissions[i as MissionId]) {
                 handleSelectMission(`mission-${i}` as AppScene);
                 return;
               }
@@ -693,7 +528,7 @@ export default function App() {
       {/* 2. Persistent Interactive Trail Path (Visible throughout the learning journey) */}
       <TrailPath
         currentScene={currentScene}
-        completedMissions={gameState.completedMissions}
+        completedMissions={activeSession.completedMissions}
         onSelectScene={handleSelectMission}
       />
 
@@ -713,19 +548,20 @@ export default function App() {
           >
             {currentScene === 'start' && (
               <StartScene
-                playerName={gameState.studentName}
-                initialStudentName={gameState.studentName}
-                onUpdatePlayerName={(name) =>
-                  setGameState((prev) => ({
+                playerName={activeSession.studentName || 'Penjelajah Muda'}
+                initialStudentName={activeSession.studentName || 'Penjelajah Muda'}
+                onUpdatePlayerName={(name) => {
+                  const safeName = typeof name === 'string' ? name.trim() : '';
+                  setActiveSession((prev) => ({
                     ...prev,
-                    studentName: name.trim() || 'Penjelajah Muda',
-                  }))
-                }
+                    studentName: safeName || 'Penjelajah Muda',
+                  }));
+                }}
                 onStartAdventure={() => {
-                  handleStartAdventure(gameState.studentName);
+                  handleStartAdventure(activeSession.studentName || 'Penjelajah Muda');
                 }}
                 onStart={(name) => {
-                  handleStartAdventure(name);
+                  handleStartAdventure(name || activeSession.studentName || 'Penjelajah Muda');
                 }}
                 onGoToMaterial={() => {
                   sound.playClick();
@@ -743,21 +579,23 @@ export default function App() {
                   sound.playClick();
                   setIsHelpOpen(true);
                 }}
+                completedCount={completedCount}
+                activeAttemptNumber={activeSession.attemptNumber}
                 onOpenHistory={() => {
                   sound.playClick();
                   setIsHistoryOpen(true);
                 }}
-                onRequestReset={handleRequestReset}
-                activeAttemptNumber={gameState.activeSession.attemptNumber}
-                activeCompletedCount={completedCount}
-                activeStatus={gameState.activeSession.status}
+                onOpenRestartConfirm={() => {
+                  sound.playClick();
+                  setIsRestartConfirmOpen(true);
+                }}
               />
             )}
 
             {currentScene === 'map' && (
               <MapScene
-                completedMissions={gameState.completedMissions}
-                stars={gameState.stars}
+                completedMissions={activeSession.completedMissions}
+                stars={activeSession.stars}
                 onSelectMission={handleSelectMission}
                 onOpenJournal={() => setIsJournalOpen(true)}
               />
@@ -844,14 +682,8 @@ export default function App() {
                 onFinishQuiz={handleFinishQuiz}
                 onOpenCertificate={() => setIsCertificateOpen(true)}
                 onGoToMap={() => setCurrentScene('map')}
-                onRestartAll={handleRestartAll}
-                onRequestNewSession={handleRequestReset}
-                onOpenHistory={() => {
-                  sound.playClick();
-                  setIsHistoryOpen(true);
-                }}
-                activeAttemptNumber={gameState.activeSession.attemptNumber}
-                totalGameStars={gameState.stars}
+                onRestartAll={() => setIsRestartConfirmOpen(true)}
+                totalGameStars={activeSession.stars}
               />
             )}
           </motion.div>
@@ -875,11 +707,19 @@ export default function App() {
       )}
 
       {/* 5. Floating Mascot with Framer Motion entry and audio-cued contextual tips */}
-      {!pendingWalkingScene && (
+      {!pendingWalkingScene && hasSeenOpening && (
         <FloatingMascot
           currentScene={currentScene}
-          studentName={gameState.studentName}
-          isAudioMuted={gameState.isAudioMuted}
+          studentName={activeSession.studentName}
+          isAudioMuted={isAudioMuted}
+        />
+      )}
+
+      {/* 5b. Game Opening Screen (Intro cinematic adventure layer before entering main website) */}
+      {!hasSeenOpening && (
+        <GameOpeningScreen
+          onFinish={handleFinishOpening}
+          studentName={activeSession.studentName}
         />
       )}
 
@@ -891,71 +731,72 @@ export default function App() {
 
       <CertificateModal
         isOpen={isCertificateOpen}
-        onClose={() => {
-          setIsCertificateOpen(false);
-          setSelectedHistoryCertificate(null);
-        }}
-        playerName={selectedHistoryCertificate?.studentName || gameState.studentName}
-        score={selectedHistoryCertificate?.quizScore ?? gameState.quizScore ?? 100}
-        badge={
-          selectedHistoryCertificate?.quizScore !== undefined && selectedHistoryCertificate?.quizScore !== null
-            ? BADGES.find((b) => selectedHistoryCertificate.quizScore! >= b.minScore) || userBadge
-            : userBadge
-        }
-        stars={selectedHistoryCertificate?.stars ?? gameState.stars}
-        dateStr={
-          selectedHistoryCertificate?.completedAt
-            ? new Date(selectedHistoryCertificate.completedAt).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })
-            : undefined
-        }
-        attemptNumber={selectedHistoryCertificate?.attemptNumber ?? gameState.activeSession.attemptNumber}
+        onClose={() => setIsCertificateOpen(false)}
+        playerName={activeSession.studentName}
+        score={activeSession.quizScore ?? 100}
+        badge={userBadge}
+        stars={activeSession.stars}
       />
 
       <ExplorerJournal
         isOpen={isJournalOpen}
         onClose={() => setIsJournalOpen(false)}
-        entries={gameState.journalEntries}
-        studentName={gameState.studentName}
-        totalStars={gameState.stars}
-        completedMissions={gameState.completedMissions}
+        entries={activeSession.journalEntries}
+        studentName={activeSession.studentName}
+        totalStars={activeSession.stars}
+        completedMissions={activeSession.completedMissions}
         lastCompletedMissionId={lastCompletedMissionId}
         onNavigateToMission={(missionId) => {
           setIsJournalOpen(false);
           navigateWithWalkingTrail(`mission-${missionId}` as AppScene);
         }}
+        onOpenHistory={() => {
+          setIsJournalOpen(false);
+          setIsHistoryOpen(true);
+        }}
+        historyCount={history.length}
       />
 
       <DailyCheckInModal
         isOpen={isDailyCheckInOpen}
-        studentName={gameState.studentName}
-        streak={gameState.checkInStreak || 1}
+        studentName={activeSession.studentName}
+        streak={checkInStreak || 1}
         bonusStars={5}
         isAlreadyClaimedToday={isDailyClaimedToday}
         onClaimBonus={handleClaimDailyBonus}
         onClose={() => setIsDailyCheckInOpen(false)}
       />
 
-      {/* 7. Modal Konfirmasi Mulai Lagi / Sesi Baru (Anti-accidental reset) */}
-      <ConfirmResetModal
-        isOpen={isConfirmResetOpen}
-        onClose={() => setIsConfirmResetOpen(false)}
-        onConfirm={handleConfirmStartNewSession}
-        currentAttemptNumber={gameState.activeSession.attemptNumber}
+      {/* 7. Restart Confirmation Modal */}
+      <RestartConfirmModal
+        isOpen={isRestartConfirmOpen}
+        onClose={() => setIsRestartConfirmOpen(false)}
+        onConfirm={handleConfirmRestart}
+        onConfirmRestart={handleConfirmRestart}
         completedCount={completedCount}
+        stars={activeSession.stars}
+        currentAttempt={activeSession.attemptNumber}
+        currentAttemptNumber={activeSession.attemptNumber}
       />
 
-      {/* 8. Modal Riwayat Pengerjaan (Arsip Sesi Murid) */}
-      <WorkHistoryModal
+      {/* 8. Session History Modal */}
+      <HistoryModal
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
-        sessions={gameState.history}
-        currentAttemptNumber={gameState.activeSession.attemptNumber}
-        onStartNewSession={handleRequestReset}
-        onViewCertificate={handleViewCertificateForSession}
+        history={history}
+        activeSession={activeSession}
+        studentName={activeSession.studentName || 'Penjelajah Muda'}
+        onStartNewAttempt={() => {
+          setIsHistoryOpen(false);
+          setIsRestartConfirmOpen(true);
+        }}
+        onOpenRestartConfirm={() => {
+          setIsHistoryOpen(false);
+          setIsRestartConfirmOpen(true);
+        }}
+        onGoToMap={() => {
+          setCurrentScene('map');
+        }}
       />
     </div>
   );

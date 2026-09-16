@@ -29,6 +29,8 @@ interface ExplorerJournalProps {
   completedMissions: Record<MissionId, boolean>;
   lastCompletedMissionId?: MissionId | null;
   onNavigateToMission: (missionId: MissionId) => void;
+  onOpenHistory?: () => void;
+  historyCount?: number;
 }
 
 type SortOrder = 'newest' | 'oldest' | 'missionNumber';
@@ -43,6 +45,8 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
   completedMissions,
   lastCompletedMissionId,
   onNavigateToMission,
+  onOpenHistory,
+  historyCount = 0,
 }) => {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('all');
@@ -147,14 +151,36 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
               <p className="text-xs text-stone-600 flex items-center gap-2 mt-0.5">
                 <span>Catatan jejak observasi & perolehan bintang</span>
                 <span className="text-stone-300">•</span>
-                <span className="font-semibold text-emerald-800">
-                  🧑‍🌾 {studentName || 'Penjelajah'}
+                <span className="font-semibold text-emerald-800 flex items-center gap-1.5">
+                  <img src="/karakter-penjelajah.png" alt="Penjelajah" className="w-4 h-4 object-contain inline-block" referrerPolicy="no-referrer" />
+                  <span>{studentName || 'Penjelajah'}</span>
                 </span>
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            {onOpenHistory && (
+              <button
+                id="btn-journal-open-history"
+                onClick={() => {
+                  sound.playClick();
+                  onClose();
+                  onOpenHistory();
+                }}
+                className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-950 rounded-xl text-xs font-bold border border-amber-300 flex items-center gap-1.5 transition cursor-pointer active:scale-95 shadow-2xs"
+                title="Lihat Riwayat Sesi Pengerjaan"
+              >
+                <Clock className="w-3.5 h-3.5 text-amber-800" />
+                <span className="hidden sm:inline">Riwayat Sesi</span>
+                {historyCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-300 text-amber-950">
+                    {historyCount}
+                  </span>
+                )}
+              </button>
+            )}
+
             <button
               id="btn-journal-close"
               onClick={() => {

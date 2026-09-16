@@ -198,20 +198,6 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
                 {placedCount} / {HIERARCHY_SLOTS.length}
               </span>
             </div>
-
-            {hasCompleted && (
-              <button
-                id="btn-next-mission-8"
-                onClick={() => {
-                  sound.playFanfare();
-                  onNextMission();
-                }}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 text-stone-950 font-display font-black rounded-2xl shadow-lg text-xs sm:text-sm animate-pulse-subtle transition cursor-pointer"
-              >
-                <span>Uji Pemahaman: Kuis 🏆</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            )}
           </div>
         </div>
 
