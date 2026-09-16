@@ -28,7 +28,7 @@ export const WEATHER_CONDITIONS: Record<WeatherType, WeatherCondition> = {
     abioticDescription:
       'Intensitas cahaya matahari tinggi, menghangatkan suhu tanah dan memicu fotosintesis klorofil pada daun.',
     learningFact:
-      '💡 Faktor Abiotik: Cahaya matahari adalah sumber energi primer terbesar yang menggerakkan seluruh rantai makanan di bumi.',
+      '💡 Faktor Abiotik: Cahaya matahari adalah sumber energi primer terbesar yang menopang seluruh kehidupan makhluk hidup di bumi.',
   },
   clouds: {
     type: 'clouds',

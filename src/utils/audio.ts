@@ -22,6 +22,7 @@ class SoundEngine {
   public setEnabled(enabled: boolean) {
     this.enabled = enabled;
     if (!enabled) {
+      this.stopOpeningJingle();
       if (this.soundscapeMasterGain && this.ctx) {
         this.soundscapeMasterGain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
       }
@@ -579,6 +580,198 @@ class SoundEngine {
         });
       }, 4200);
       this.soundscapeIntervals.push(cricketInterval);
+    }
+  }
+
+  // ==========================================
+  // CHEERFUL EDUCATIONAL OPENING JINGLE
+  // Procedural 4.5s melodic adventure intro for elementary students
+  // ==========================================
+  private openingJingleActive: boolean = false;
+  private openingMasterGain: GainNode | null = null;
+  private openingJingleTimeouts: number[] = [];
+  private openingJingleSources: AudioNode[] = [];
+
+  public playOpeningJingle(): void {
+    if (!this.enabled) return;
+    this.stopOpeningJingle();
+    this.initCtx();
+    if (!this.ctx) return;
+
+    this.openingJingleActive = true;
+
+    // Browser Autoplay handling: resume context gracefully
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume().then(() => {
+        if (this.openingJingleActive) {
+          this.synthesizeOpeningJingle();
+        }
+      }).catch(() => {
+        // Autoplay policy prevented immediate playback; waiting for user gesture
+      });
+    } else {
+      this.synthesizeOpeningJingle();
+    }
+  }
+
+  private synthesizeOpeningJingle(): void {
+    if (!this.ctx || !this.enabled || !this.openingJingleActive) return;
+
+    const now = this.ctx.currentTime;
+    const masterGain = this.ctx.createGain();
+    this.openingMasterGain = masterGain;
+
+    // Gentle master level (soft, welcoming, friendly for children)
+    masterGain.gain.setValueAtTime(0.0001, now);
+    masterGain.gain.linearRampToValueAtTime(0.14, now + 0.15);
+    // Smooth natural decay at the end of ~4.6 seconds
+    masterGain.gain.setValueAtTime(0.14, now + 4.1);
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 4.6);
+    masterGain.connect(this.ctx.destination);
+
+    // 1. Cheerful Marimba / Glockenspiel Main Melody Line
+    // Key: C Major (Bright, uplifting, educational adventure vibe)
+    const melodyNotes: { f: number; start: number; dur: number }[] = [
+      { f: 523.25, start: 0.00, dur: 0.22 }, // C5
+      { f: 659.25, start: 0.24, dur: 0.22 }, // E5
+      { f: 783.99, start: 0.48, dur: 0.28 }, // G5
+      { f: 880.00, start: 0.78, dur: 0.28 }, // A5
+      { f: 783.99, start: 1.08, dur: 0.32 }, // G5
+      { f: 1046.5, start: 1.42, dur: 0.38 }, // C6 (Peak 1)
+      { f: 987.77, start: 1.82, dur: 0.24 }, // B5
+      { f: 880.00, start: 2.08, dur: 0.24 }, // A5
+      { f: 783.99, start: 2.34, dur: 0.36 }, // G5
+      { f: 659.25, start: 2.76, dur: 0.26 }, // E5
+      { f: 698.46, start: 3.04, dur: 0.26 }, // F5
+      { f: 783.99, start: 3.32, dur: 0.34 }, // G5
+      { f: 1046.5, start: 3.70, dur: 0.75 }, // C6 (Bright resolution)
+    ];
+
+    melodyNotes.forEach(note => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + note.start;
+
+      // Soft rounded marimba timbre (sine + gentle decay)
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(note.f, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + note.dur);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(t);
+      osc.stop(t + note.dur + 0.02);
+      this.openingJingleSources.push(osc, gain);
+    });
+
+    // 2. Warm Pad/Acoustic Bass Harmony
+    const harmonyChords = [
+      { f: 130.81, start: 0.00, dur: 1.35 }, // C3
+      { f: 174.61, start: 1.40, dur: 1.30 }, // F3
+      { f: 196.00, start: 2.72, dur: 0.95 }, // G3
+      { f: 261.63, start: 3.68, dur: 0.90 }, // C4
+    ];
+
+    harmonyChords.forEach(chord => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + chord.start;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(chord.f, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.08, t + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + chord.dur);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(t);
+      osc.stop(t + chord.dur + 0.05);
+      this.openingJingleSources.push(osc, gain);
+    });
+
+    // 3. Playful Sparkle Accents (High chimes at peak & resolution)
+    const sparkles = [
+      { f: 1318.51, start: 1.48 }, // E6
+      { f: 1567.98, start: 1.56 }, // G6
+      { f: 1567.98, start: 3.82 }, // G6
+      { f: 2093.00, start: 3.92 }, // C7
+    ];
+
+    sparkles.forEach(sparkle => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + sparkle.start;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(sparkle.f, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.06, t + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(t);
+      osc.stop(t + 0.32);
+      this.openingJingleSources.push(osc, gain);
+    });
+
+    // Automatically clean up state when jingle finishes playing
+    const timer = window.setTimeout(() => {
+      this.stopOpeningJingle();
+    }, 4800);
+    this.openingJingleTimeouts.push(timer);
+  }
+
+  public stopOpeningJingle(): void {
+    this.openingJingleActive = false;
+
+    // Clear all pending timers
+    this.openingJingleTimeouts.forEach(id => window.clearTimeout(id));
+    this.openingJingleTimeouts = [];
+
+    if (this.openingMasterGain && this.ctx) {
+      const now = this.ctx.currentTime;
+      // Quick gentle fade-out over 120ms to eliminate clicks or pops
+      this.openingMasterGain.gain.cancelScheduledValues(now);
+      this.openingMasterGain.gain.setValueAtTime(this.openingMasterGain.gain.value, now);
+      this.openingMasterGain.gain.linearRampToValueAtTime(0.0001, now + 0.12);
+
+      const gainToClean = this.openingMasterGain;
+      const sourcesToClean = [...this.openingJingleSources];
+      this.openingMasterGain = null;
+      this.openingJingleSources = [];
+
+      setTimeout(() => {
+        sourcesToClean.forEach(node => {
+          try {
+            if ('stop' in node && typeof (node as AudioScheduledSourceNode).stop === 'function') {
+              (node as AudioScheduledSourceNode).stop();
+            }
+            node.disconnect();
+          } catch {
+            // Ignore cleanup error
+          }
+        });
+        try {
+          gainToClean.disconnect();
+        } catch {
+          // Ignore
+        }
+      }, 150);
+    } else {
+      this.openingJingleSources = [];
     }
   }
 }

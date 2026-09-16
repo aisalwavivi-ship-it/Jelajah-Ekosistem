@@ -78,15 +78,15 @@ const SCENE_TIPS: Record<AppScene, SceneTip> = {
   'mission-6': {
     title: 'Misi 6: Uji Coba Gangguan',
     badge: 'Bagaimana Jika?',
-    tip: 'Amati efek berantai ketika salah satu komponen alam terganggu atau tercemar limbah!',
-    funFact: 'Satu perubahan kecil pada rantai makanan bisa memengaruhi seluruh kelangsungan makhluk hidup lainnya.',
+    tip: 'Amati dampak timbal balik ketika salah satu komponen alam terganggu atau tercemar limbah!',
+    funFact: 'Satu perubahan kecil pada komponen lingkungan bisa memengaruhi seluruh kelangsungan makhluk hidup lainnya.',
     mood: 'thinking',
   },
   'mission-7': {
-    title: 'Misi 7: Aliran Energi Rantai',
+    title: 'Misi 7: Penyelidikan Ekosistem',
     badge: 'Penyelidikan Ekosistem',
-    tip: 'Hubungkan panah rantai makanan: dari produsen ➔ herbivora ➔ karnivora ➔ pengurai!',
-    funFact: 'Panah pada rantai makanan menunjukkan arah perpindahan energi makanan dari mangsa ke pemangsa.',
+    tip: 'Temukan benda biotik dan abiotik yang tersembunyi di lingkungan sekolah, taman, dan kolam!',
+    funFact: 'Di sekitar kita, komponen biotik dan abiotik selalu berdampingan membentuk kesatuan ekosistem.',
     mood: 'curious',
   },
   'mission-8': {

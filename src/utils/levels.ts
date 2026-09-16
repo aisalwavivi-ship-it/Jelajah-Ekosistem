@@ -38,7 +38,7 @@ export const EXPLORER_LEVELS: ExplorerLevel[] = [
     borderColor: 'border-amber-300',
     bgColor: 'bg-amber-50',
     progressColor: 'bg-amber-500',
-    description: 'Memahami hubungan saling ketergantungan dan rantai kehidupan di dalam ekosistem.',
+    description: 'Memahami hubungan saling ketergantungan antar komponen di dalam ekosistem.',
   },
   {
     level: 4,
