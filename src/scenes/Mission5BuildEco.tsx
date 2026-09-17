@@ -187,25 +187,36 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
 
         {/* Trail Fork Selection (Percabangan Jalan Setapak) */}
         {!selectedEco ? (
-          <div className="bg-white/95 rounded-3xl p-6 sm:p-8 border-4 border-amber-300 shadow-xl text-center space-y-6">
-            <div className="max-w-lg mx-auto">
-              <span className="text-4xl">🛤️</span>
-              <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-900 mt-2">
+          <div
+            className="relative overflow-hidden rounded-3xl p-6 sm:p-8 border-4 border-amber-300 shadow-xl text-center space-y-6"
+            style={{
+              backgroundImage: "url('/misi5-fork-bg.jpg')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          >
+            {/* Soft semi-transparent backdrop overlay to guarantee crisp readability */}
+            <div className="absolute inset-0 bg-white/75 backdrop-blur-[1px] pointer-events-none" />
+
+            <div className="relative z-10 max-w-lg mx-auto">
+              <span className="text-4xl filter drop-shadow-xs">🛤️</span>
+              <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-900 mt-2 filter drop-shadow-xs">
                 Jalan Setapak Bercabang!
               </h3>
-              <p className="text-stone-600 text-sm mt-1">
+              <p className="text-stone-700 font-medium text-sm mt-1 filter drop-shadow-xs">
                 Kamu sampai di persimpangan jalan. Di manakah kamu ingin mengamati dan membangun komunitas makhluk hidup?
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto pt-2">
+            <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto pt-2">
               {/* Branch 1: Taman */}
               <motion.button
                 id="btn-choose-taman"
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleSelectEco('taman')}
-                className="p-6 rounded-3xl bg-gradient-to-b from-emerald-50 to-green-100 border-3 border-emerald-400 hover:border-emerald-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
+                className="p-6 rounded-3xl bg-gradient-to-b from-emerald-50/95 to-green-100/95 backdrop-blur-sm border-3 border-emerald-400 hover:border-emerald-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
               >
                 <div className="w-20 h-20 rounded-full bg-emerald-200 flex items-center justify-center text-4xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
                   🌳
@@ -227,7 +238,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleSelectEco('kolam')}
-                className="p-6 rounded-3xl bg-gradient-to-b from-sky-50 to-blue-100 border-3 border-sky-400 hover:border-sky-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
+                className="p-6 rounded-3xl bg-gradient-to-b from-sky-50/95 to-blue-100/95 backdrop-blur-sm border-3 border-sky-400 hover:border-sky-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
               >
                 <div className="w-20 h-20 rounded-full bg-sky-200 flex items-center justify-center text-4xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
                   🌊

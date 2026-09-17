@@ -28,19 +28,19 @@ interface PopulationItem {
 const POPULATION_ITEMS: PopulationItem[] = [
   {
     id: 'fish_population',
-    name: 'Kumpulan Ikan Mas',
+    name: 'Ikan Mas',
     isPopulation: true,
     speciesName: 'Ikan Mas',
     countDescription: 'Kumpulan 7 ekor ikan mas sejenis',
     icon: '🐟🐟🐟',
     imageSrc: '/misi4/tiga-ikan-mas.png',
-    x: 25,
-    y: 75,
+    x: 52,
+    y: 74,
     explanation: 'Tepat sekali! Kumpulan 7 ekor ikan mas sejenis di kolam air membentuk satu POPULASI ikan mas.',
   },
   {
     id: 'lotus_population',
-    name: 'Rumpun Bunga Teratai',
+    name: 'Bunga Teratai',
     isPopulation: true,
     speciesName: 'Bunga Teratai',
     countDescription: 'Sekelompok 5 tanaman teratai sejenis',
@@ -52,7 +52,7 @@ const POPULATION_ITEMS: PopulationItem[] = [
   },
   {
     id: 'bee_population',
-    name: 'Kawanan Lebah Madu',
+    name: 'Lebah Madu',
     isPopulation: true,
     speciesName: 'Lebah Madu',
     countDescription: 'Kawanan lebah pekerja sejenis',
@@ -64,7 +64,7 @@ const POPULATION_ITEMS: PopulationItem[] = [
   },
   {
     id: 'bird_population',
-    name: 'Sekawanan Burung Pipit',
+    name: 'Burung Pipit',
     isPopulation: true,
     speciesName: 'Burung Pipit',
     countDescription: 'Kumpulan 6 ekor burung pipit sejenis',
@@ -76,7 +76,7 @@ const POPULATION_ITEMS: PopulationItem[] = [
   },
   {
     id: 'pine_population',
-    name: 'Kumpulan Pohon Pinus',
+    name: 'Pohon Pinus',
     isPopulation: true,
     speciesName: 'Pohon Pinus',
     countDescription: 'Kelompok 6 pohon pinus sejenis',
@@ -89,19 +89,19 @@ const POPULATION_ITEMS: PopulationItem[] = [
   // Distractors
   {
     id: 'single_rabbit',
-    name: '1 Ekor Kelinci Sendirian',
+    name: 'Kelinci',
     isPopulation: false,
     speciesName: 'Kelinci',
     countDescription: 'Hanya 1 ekor',
     icon: '🐰',
     imageSrc: '/misi4/kelinci.png',
-    x: 52,
-    y: 60,
+    x: 30,
+    y: 84,
     explanation: 'Ini hanya 1 ekor kelinci, jadi ini adalah INDIVIDU, bukan populasi!',
   },
   {
     id: 'single_turtle',
-    name: '1 Ekor Kura-kura',
+    name: 'Kura-kura',
     isPopulation: false,
     speciesName: 'Kura-kura',
     countDescription: 'Hanya 1 ekor',
@@ -120,6 +120,7 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
   activeWeather = 'sunny',
 }) => {
   const [discoveredIds, setDiscoveredIds] = useState<string[]>([]);
+  const [wrongClickedIds, setWrongClickedIds] = useState<string[]>([]);
   const [activeItem, setActiveItem] = useState<PopulationItem | null>(null);
   const [feedback, setFeedback] = useState<{
     text: string;
@@ -164,6 +165,9 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
         text: item.explanation,
         isCorrect: false,
       });
+      if (!wrongClickedIds.includes(item.id)) {
+        setWrongClickedIds((prev) => [...prev, item.id]);
+      }
     }
   };
 
@@ -342,7 +346,7 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
           }}
         >
           {/* Character standing on path */}
-          <div className="absolute left-6 sm:left-14 bottom-14 sm:bottom-20 z-10 flex flex-col items-center">
+          <div className="absolute left-6 sm:left-14 bottom-14 sm:bottom-20 z-30 flex flex-col items-center pointer-events-none select-none">
             <CharacterAvatar size="md" isWalking={false} />
             <span className="text-[10px] font-bold bg-white/90 px-2 py-0.5 rounded-full text-stone-700 shadow-xs mt-1">
               Dara mencari populasi
@@ -352,6 +356,7 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
           {/* Interactive Population Items */}
           {POPULATION_ITEMS.map((item) => {
             const isDiscovered = discoveredIds.includes(item.id);
+            const isWrong = wrongClickedIds.includes(item.id);
             const isSelected = activeItem?.id === item.id;
 
             return (
@@ -365,30 +370,45 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
                 <button
                   id={`btn-population-${item.id}`}
                   onClick={() => handleSelectItem(item)}
-                  className={`p-2 sm:p-2.5 rounded-2xl transition-all shadow-lg flex flex-col items-center cursor-pointer border-3 ${
-                    isSelected
-                      ? 'bg-amber-300 border-white ring-4 ring-amber-400 scale-110'
-                      : isDiscovered
-                      ? 'bg-white/95 border-emerald-500 text-emerald-950 ring-2 ring-emerald-200'
-                      : 'bg-white/85 hover:bg-white border-amber-300 animate-pulse-subtle'
-                  }`}
+                  className="bg-transparent border-0 p-1 shadow-none outline-none flex flex-col items-center cursor-pointer relative group transition-transform"
                 >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center">
+                  <div
+                    className={`relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-transform duration-200 ${
+                      isSelected ? 'scale-115' : 'group-hover:scale-108'
+                    }`}
+                  >
                     <img
                       src={item.imageSrc}
                       alt={item.name}
-                      className="max-w-full max-h-full object-contain filter drop-shadow-xs pointer-events-none"
+                      className={`max-w-full max-h-full object-contain pointer-events-none transition-all duration-200 ${
+                        isSelected
+                          ? isWrong
+                            ? 'filter drop-shadow-[0_0_12px_rgba(239,68,68,0.95)]'
+                            : 'filter drop-shadow-[0_0_12px_rgba(251,191,36,0.95)]'
+                          : isDiscovered
+                          ? 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] drop-shadow-[0_0_8px_rgba(16,185,129,0.85)]'
+                          : isWrong
+                          ? 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] drop-shadow-[0_0_8px_rgba(239,68,68,0.85)]'
+                          : 'filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.45)] group-hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]'
+                      }`}
                     />
+
+                    {isDiscovered && (
+                      <span className="absolute -top-1 -right-1 bg-emerald-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] sm:text-xs shadow-md font-bold leading-none ring-2 ring-white">
+                        ✓
+                      </span>
+                    )}
+
+                    {isWrong && (
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] sm:text-xs shadow-md font-bold leading-none ring-2 ring-white">
+                        ✕
+                      </span>
+                    )}
                   </div>
-                  <span className="text-[10px] sm:text-xs font-bold mt-1 bg-white/95 px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap text-stone-800">
+
+                  <span className="text-[10px] sm:text-xs font-bold mt-1 bg-white/95 px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap text-stone-800 pointer-events-none">
                     {item.name}
                   </span>
-
-                  {isDiscovered && (
-                    <span className="absolute -top-2 -right-2 bg-emerald-600 text-white rounded-full p-0.5 text-xs shadow-xs font-bold">
-                      ✓
-                    </span>
-                  )}
                 </button>
               </motion.div>
             );
