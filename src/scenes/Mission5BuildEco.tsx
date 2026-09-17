@@ -127,8 +127,12 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
         {/* Header */}
         <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-2 border-emerald-200/80 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-2xl shrink-0">
-              👨‍👩‍👧‍👦
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+              <img
+                src="/misi5/header-komunitas.jpg"
+                alt="Komunitas Makhluk Hidup: Burung, Jangkrik, dan Bunga"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -154,7 +158,23 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
             <div className="p-3 rounded-2xl bg-emerald-50 border-2 border-emerald-400 flex items-center gap-3">
-              <span className="text-3xl shrink-0">🐟🐸🪷</span>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <img
+                  src="/misi4/satu-ikan-mas.png"
+                  alt="Ikan Mas"
+                  className="w-7 h-7 object-contain drop-shadow-xs"
+                />
+                <img
+                  src="/misi5/kodok.jpg"
+                  alt="Kodok"
+                  className="w-7 h-7 object-cover rounded-full border border-emerald-300 drop-shadow-xs"
+                />
+                <img
+                  src="/misi4/teratai.png"
+                  alt="Bunga Teratai"
+                  className="w-7 h-7 object-contain drop-shadow-xs"
+                />
+              </div>
               <div>
                 <span className="font-bold text-emerald-950 block text-xs sm:text-sm">Komunitas Kolam</span>
                 <p className="text-[11px] text-emerald-800 leading-snug">
@@ -164,9 +184,15 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-sky-50 border-2 border-sky-300 flex items-center gap-3">
-              <span className="text-3xl shrink-0">🐟🐟🐟</span>
+              <div className="w-12 h-8 shrink-0 flex items-center justify-center">
+                <img
+                  src="/misi4/tiga-ikan-mas.png"
+                  alt="3 Ikan Mas"
+                  className="w-full h-full object-contain drop-shadow-xs"
+                />
+              </div>
               <div>
-                <span className="font-bold text-sky-950 block text-xs sm:text-sm">Populasi Ikan Mas</span>
+                <span className="font-bold text-sky-950 block text-xs sm:text-sm">3 Ikan Mas</span>
                 <p className="text-[11px] text-sky-700 leading-snug">
                   Bukan komunitas! Ini hanya <strong>satu jenis</strong> populasi ikan mas saja.
                 </p>
@@ -174,7 +200,13 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-stone-50 border-2 border-stone-300 flex items-center gap-3">
-              <span className="text-3xl shrink-0">🐟</span>
+              <div className="w-10 h-8 shrink-0 flex items-center justify-center">
+                <img
+                  src="/misi4/satu-ikan-mas.png"
+                  alt="1 Ekor Ikan"
+                  className="w-full h-full object-contain drop-shadow-xs"
+                />
+              </div>
               <div>
                 <span className="font-bold text-stone-900 block text-xs sm:text-sm">1 Ekor Ikan (Individu)</span>
                 <p className="text-[11px] text-stone-600 leading-snug">
@@ -196,15 +228,12 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
               backgroundRepeat: 'no-repeat',
             }}
           >
-            {/* Soft semi-transparent backdrop overlay to guarantee crisp readability */}
-            <div className="absolute inset-0 bg-white/75 backdrop-blur-[1px] pointer-events-none" />
-
-            <div className="relative z-10 max-w-lg mx-auto">
-              <span className="text-4xl filter drop-shadow-xs">🛤️</span>
-              <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-900 mt-2 filter drop-shadow-xs">
+            <div className="relative z-10 max-w-lg mx-auto bg-white/80 backdrop-blur-xs rounded-2xl p-3 sm:p-4 shadow-sm border border-amber-200/50">
+              <span className="text-4xl">🛤️</span>
+              <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-900 mt-1">
                 Jalan Setapak Bercabang!
               </h3>
-              <p className="text-stone-700 font-medium text-sm mt-1 filter drop-shadow-xs">
+              <p className="text-stone-700 font-medium text-sm mt-1">
                 Kamu sampai di persimpangan jalan. Di manakah kamu ingin mengamati dan membangun komunitas makhluk hidup?
               </p>
             </div>
@@ -218,8 +247,12 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 onClick={() => handleSelectEco('taman')}
                 className="p-6 rounded-3xl bg-gradient-to-b from-emerald-50/95 to-green-100/95 backdrop-blur-sm border-3 border-emerald-400 hover:border-emerald-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
               >
-                <div className="w-20 h-20 rounded-full bg-emerald-200 flex items-center justify-center text-4xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
-                  🌳
+                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-3 shadow-inner group-hover:scale-110 transition-transform overflow-hidden border-2 border-emerald-300">
+                  <img
+                    src="/misi5/pohon-taman.jpg"
+                    alt="Pohon Taman"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="font-display font-bold text-xl text-emerald-950">
                   Komunitas Taman
@@ -240,8 +273,12 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 onClick={() => handleSelectEco('kolam')}
                 className="p-6 rounded-3xl bg-gradient-to-b from-sky-50/95 to-blue-100/95 backdrop-blur-sm border-3 border-sky-400 hover:border-sky-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
               >
-                <div className="w-20 h-20 rounded-full bg-sky-200 flex items-center justify-center text-4xl mb-3 shadow-inner group-hover:scale-110 transition-transform">
-                  🌊
+                <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center mb-3 shadow-inner group-hover:scale-110 transition-transform overflow-hidden border-2 border-sky-300">
+                  <img
+                    src="/misi5/air-kolam.jpg"
+                    alt="Air Kolam"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="font-display font-bold text-xl text-sky-950">
                   Komunitas Kolam
@@ -260,7 +297,13 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
           <div className="space-y-4">
             {/* Concept Banner */}
             <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white p-4 rounded-3xl shadow-md border-2 border-emerald-400 flex items-center gap-3">
-              <span className="text-3xl">👨‍👩‍👧‍👦</span>
+              <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-emerald-300/50 shadow-xs">
+                <img
+                  src="/misi5/header-komunitas.jpg"
+                  alt="Komunitas Makhluk Hidup"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-700 text-emerald-200 rounded-full inline-block mb-0.5">
                   Konsep Inti: Komunitas
