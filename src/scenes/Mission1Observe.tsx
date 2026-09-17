@@ -326,36 +326,6 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
             backgroundPosition: 'center',
           }}
         >
-          {/* Background Scenery SVG: School in distance, rolling greens, and CONTINUOUS PATH */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1000 600"
-            preserveAspectRatio="none"
-          >
-            {/* Distant school fence */}
-            <path d="M0 240 L1000 240" stroke="#cbd5e1" strokeWidth="3" />
-            
-            {/* Continuous Natural Path winding through this garden */}
-            {/* Shadow */}
-            <path
-              d="M 0 450 C 180 430, 280 460, 420 480 S 700 470, 850 510 L 1000 520 L 1000 580 L 0 580 Z"
-              fill="#92400e"
-              opacity="0.85"
-            />
-            {/* Soil */}
-            <path
-              d="M 0 455 C 180 435, 280 465, 420 485 S 700 475, 850 515 L 1000 525 L 1000 575 L 0 575 Z"
-              fill="#d97706"
-            />
-            {/* Stepping stones */}
-            <ellipse cx="120" cy="465" rx="16" ry="8" fill="#e2e8f0" stroke="#94a3b8" />
-            <ellipse cx="280" cy="475" rx="18" ry="9" fill="#cbd5e1" stroke="#94a3b8" />
-            <ellipse cx="440" cy="495" rx="20" ry="10" fill="#f1f5f9" stroke="#94a3b8" />
-            <ellipse cx="610" cy="490" rx="18" ry="9" fill="#e2e8f0" stroke="#94a3b8" />
-            <ellipse cx="780" cy="510" rx="22" ry="11" fill="#cbd5e1" stroke="#94a3b8" />
-            <ellipse cx="920" cy="530" rx="20" ry="10" fill="#f1f5f9" stroke="#94a3b8" />
-          </svg>
-
           {/* Character standing at path entrance */}
           <div className="absolute left-4 sm:left-8 bottom-12 sm:bottom-16 z-10 flex flex-col items-center">
             <CharacterAvatar size="md" isWalking={false} />

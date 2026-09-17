@@ -16,6 +16,7 @@ interface ItemToClassify {
   name: string;
   correctCategory: 'darat' | 'air';
   icon: string;
+  image: string;
   correctFeedback: string;
   wrongFeedback: string;
 }
@@ -26,6 +27,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Hutan Hujan',
     correctCategory: 'darat',
     icon: '🌲',
+    image: '/lingkungan/hutan-hujan.jpg',
     correctFeedback: 'Tepat sekali! Hutan hujan adalah ekosistem darat karena lingkungan utamanya berupa daratan berpepohonan lebat.',
     wrongFeedback: 'Coba amati lagi. Hutan hujan memiliki tanah dan pepohonan di daratan, bukan perairan utuh.'
   },
@@ -34,6 +36,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Sungai Berbatu',
     correctCategory: 'air',
     icon: '🌊',
+    image: '/lingkungan/sungai-berbatu.jpg',
     correctFeedback: 'Hebat! Sungai merupakan ekosistem air (perairan tawar mengalir).',
     wrongFeedback: 'Perhatikan baik-baik. Sungai lingkungan utamanya adalah badan air mengalir, jadi termasuk ekosistem air.'
   },
@@ -42,6 +45,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Kebun Bunga',
     correctCategory: 'darat',
     icon: '🏡',
+    image: '/lingkungan/kebun-bunga.jpg',
     correctFeedback: 'Benar! Kebun bunga berada di hamparan tanah daratan, sehingga termasuk ekosistem darat.',
     wrongFeedback: 'Kebun bunga ditanam di tanah daratan, bukan di dalam air perairan.'
   },
@@ -50,6 +54,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Kolam Ikan',
     correctCategory: 'air',
     icon: '🐟',
+    image: '/lingkungan/kolam-ikan.jpg',
     correctFeedback: 'Tepat! Kolam adalah genangan air tempat ikan dan tumbuhan air hidup, merupakan ekosistem air.',
     wrongFeedback: 'Kolam lingkungan utamanya adalah genangan perairan, jadi termasuk ekosistem air.'
   },
@@ -58,6 +63,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Padang Rumput',
     correctCategory: 'darat',
     icon: '🌾',
+    image: '/lingkungan/padang-rumput.jpg',
     correctFeedback: 'Bagus! Padang rumput adalah hamparan rumput luas di daratan, contoh ekosistem darat.',
     wrongFeedback: 'Padang rumput membentang luas di atas tanah daratan, bukan perairan.'
   },
@@ -66,6 +72,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Danau Alami',
     correctCategory: 'air',
     icon: '🏞️',
+    image: '/lingkungan/danau-alami.jpg',
     correctFeedback: 'Benar sekali! Danau merupakan cekungan air tawar yang luas, contoh nyata ekosistem air.',
     wrongFeedback: 'Danau adalah perairan diam yang luas, sehingga tergolong ekosistem air.'
   },
@@ -74,6 +81,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Taman Kota',
     correctCategory: 'darat',
     icon: '🌳',
+    image: '/lingkungan/taman-kota.jpg',
     correctFeedback: 'Hebat! Taman kota berisi pepohonan dan rumput di daratan, termasuk ekosistem darat.',
     wrongFeedback: 'Taman kota dibangun di atas daratan hijau terbuka.'
   },
@@ -82,6 +90,7 @@ const ITEMS: ItemToClassify[] = [
     name: 'Laut Tropis',
     correctCategory: 'air',
     icon: '🐠',
+    image: '/lingkungan/laut-tropis.jpg',
     correctFeedback: 'Tepat sekali! Laut adalah ekosistem perairan asin terluas di bumi.',
     wrongFeedback: 'Laut merupakan perairan luas, sehingga termasuk ekosistem air.'
   }
@@ -288,7 +297,12 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                     animate={{ scale: 1, opacity: 1 }}
                     className="p-2 bg-white rounded-2xl border border-emerald-300 shadow-xs flex items-center gap-1.5"
                   >
-                    <span className="text-xl">{item.icon}</span>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-7 h-7 rounded-lg object-cover shrink-0 border border-emerald-200"
+                      referrerPolicy="no-referrer"
+                    />
                     <span className="text-xs font-bold text-emerald-900 truncate">
                       {item.name}
                     </span>
@@ -361,7 +375,12 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                     animate={{ scale: 1, opacity: 1 }}
                     className="p-2 bg-white rounded-2xl border border-sky-300 shadow-xs flex items-center gap-1.5"
                   >
-                    <span className="text-xl">{item.icon}</span>
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-7 h-7 rounded-lg object-cover shrink-0 border border-sky-200"
+                      referrerPolicy="no-referrer"
+                    />
                     <span className="text-xs font-bold text-sky-900 truncate">
                       {item.name}
                     </span>
@@ -431,7 +450,15 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                         : 'bg-amber-50/70 hover:bg-amber-100/90 border-amber-200'
                     }`}
                   >
-                    <span className="text-3xl mb-1">{item.icon}</span>
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden mb-1.5 shadow-xs border border-amber-200/80 bg-stone-100 shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                        loading="eager"
+                      />
+                    </div>
                     <span className="font-bold text-xs text-stone-800 leading-tight">
                       {item.name}
                     </span>

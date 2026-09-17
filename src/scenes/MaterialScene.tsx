@@ -32,6 +32,7 @@ interface MaterialCardData {
   subtitle: string;
   category: 'ekosistem' | 'tingkatan' | 'komponen' | 'jenis';
   icon: string;
+  image?: string;
   badge: string;
   color: string;
   accentBorder: string;
@@ -73,6 +74,7 @@ const MATERIALS_LIST: MaterialCardData[] = [
     subtitle: 'Satuan Makhluk Hidup Tunggal',
     category: 'tingkatan',
     icon: '🐟',
+    image: '/misi3/ikan-individu.png',
     badge: 'Tingkatan 1',
     color: 'from-amber-500/20 to-yellow-500/20',
     accentBorder: 'border-amber-300',
@@ -97,6 +99,7 @@ const MATERIALS_LIST: MaterialCardData[] = [
     subtitle: 'Kumpulan Makhluk Hidup Sejenis',
     category: 'tingkatan',
     icon: '🐠',
+    image: '/misi3/ikan-populasi.png',
     badge: 'Tingkatan 2',
     color: 'from-blue-500/20 to-sky-500/20',
     accentBorder: 'border-blue-300',
@@ -349,8 +352,17 @@ export const MaterialScene: React.FC<MaterialSceneProps> = ({
                 {/* Top Row: Icon, Title & Audio Button */}
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-3xl shrink-0 shadow-2xs">
-                      {mat.icon}
+                    <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center p-1 shrink-0 shadow-2xs overflow-hidden">
+                      {mat.image ? (
+                        <img
+                          src={mat.image}
+                          alt={mat.title}
+                          className="w-full h-full object-contain drop-shadow-xs"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <span className="text-3xl leading-none">{mat.icon}</span>
+                      )}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">

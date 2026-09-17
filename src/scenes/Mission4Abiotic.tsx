@@ -304,50 +304,15 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
         </AnimatePresence>
 
         {/* Open Field Landscape Viewport */}
-        <div className="relative w-full min-h-[420px] sm:min-h-[480px] bg-gradient-to-b from-sky-300 via-sky-100 to-amber-100 rounded-3xl border-4 border-sky-300 shadow-xl overflow-hidden">
-          {/* Natural Vector Scenery & Winding Path */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1000 600"
-            preserveAspectRatio="none"
-          >
-            <polygon points="0,320 250,160 500,340" fill="#bae6fd" opacity="0.5" />
-            <polygon points="400,340 700,180 1000,350" fill="#7dd3fc" opacity="0.4" />
-
-            <path
-              d="M0 340 Q300 280 600 330 T1000 310 L1000 600 L0 600 Z"
-              fill="#86efac"
-              opacity="0.7"
-            />
-            <path
-              d="M0 380 Q400 320 750 370 T1000 360 L1000 600 L0 600 Z"
-              fill="#4ade80"
-            />
-
-            {/* River / Pond Water area */}
-            <path
-              d="M 160 380 C 220 440, 210 500, 250 600 L 450 600 C 420 510, 410 440, 360 380 Z"
-              fill="#0284c7"
-              opacity="0.8"
-            />
-            <path
-              d="M 180 400 C 240 450, 230 510, 270 600 L 430 600 C 400 510, 390 450, 340 400 Z"
-              fill="#38bdf8"
-              opacity="0.9"
-            />
-
-            {/* Winding soil path */}
-            <path
-              d="M 0 520 C 200 500, 350 530, 520 510 S 780 500, 1000 540 L 1000 600 L 0 600 Z"
-              fill="#92400e"
-              opacity="0.85"
-            />
-            <path
-              d="M 0 525 C 200 505, 350 535, 520 515 S 780 505, 1000 545 L 1000 595 L 0 595 Z"
-              fill="#d97706"
-            />
-          </svg>
-
+        <div
+          className="relative w-full min-h-[420px] sm:min-h-[480px] rounded-3xl border-4 border-sky-300 shadow-xl overflow-hidden"
+          style={{
+            backgroundImage: "url('/misi4-bg.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
           {/* Character standing on path */}
           <div className="absolute left-6 sm:left-14 bottom-14 sm:bottom-20 z-10 flex flex-col items-center">
             <CharacterAvatar size="md" isWalking={false} />
