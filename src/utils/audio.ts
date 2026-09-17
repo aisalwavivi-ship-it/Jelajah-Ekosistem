@@ -621,30 +621,59 @@ class SoundEngine {
     const masterGain = this.ctx.createGain();
     this.openingMasterGain = masterGain;
 
-    // Gentle master level (soft, welcoming, friendly for children)
+    // Gentle master level (soft, welcoming, friendly for children, no clipping)
     masterGain.gain.setValueAtTime(0.0001, now);
-    masterGain.gain.linearRampToValueAtTime(0.14, now + 0.15);
-    // Smooth natural decay at the end of ~4.6 seconds
-    masterGain.gain.setValueAtTime(0.14, now + 4.1);
-    masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 4.6);
+    masterGain.gain.linearRampToValueAtTime(0.16, now + 0.08);
+    // Smooth natural decay at the end of ~4.2 seconds
+    masterGain.gain.setValueAtTime(0.16, now + 3.8);
+    masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 4.3);
     masterGain.connect(this.ctx.destination);
 
-    // 1. Cheerful Marimba / Glockenspiel Main Melody Line
-    // Key: C Major (Bright, uplifting, educational adventure vibe)
-    const melodyNotes: { f: number; start: number; dur: number }[] = [
-      { f: 523.25, start: 0.00, dur: 0.22 }, // C5
-      { f: 659.25, start: 0.24, dur: 0.22 }, // E5
-      { f: 783.99, start: 0.48, dur: 0.28 }, // G5
-      { f: 880.00, start: 0.78, dur: 0.28 }, // A5
-      { f: 783.99, start: 1.08, dur: 0.32 }, // G5
-      { f: 1046.5, start: 1.42, dur: 0.38 }, // C6 (Peak 1)
-      { f: 987.77, start: 1.82, dur: 0.24 }, // B5
-      { f: 880.00, start: 2.08, dur: 0.24 }, // A5
-      { f: 783.99, start: 2.34, dur: 0.36 }, // G5
-      { f: 659.25, start: 2.76, dur: 0.26 }, // E5
-      { f: 698.46, start: 3.04, dur: 0.26 }, // F5
-      { f: 783.99, start: 3.32, dur: 0.34 }, // G5
-      { f: 1046.5, start: 3.70, dur: 0.75 }, // C6 (Bright resolution)
+    // ==========================================
+    // 1. AWAL (0.0s - 0.4s): Bunyi pembuka yang menarik perhatian (Joyful attention chime)
+    // ==========================================
+    const introChimes = [
+      { f: 587.33, start: 0.00, dur: 0.18, type: 'sine' as OscillatorType, vol: 0.16 }, // D5
+      { f: 880.00, start: 0.12, dur: 0.28, type: 'sine' as OscillatorType, vol: 0.20 }, // A5
+      { f: 1174.66, start: 0.24, dur: 0.35, type: 'triangle' as OscillatorType, vol: 0.15 }, // D6
+    ];
+
+    introChimes.forEach(chime => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + chime.start;
+
+      osc.type = chime.type;
+      osc.frequency.setValueAtTime(chime.f, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(chime.vol, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + chime.dur);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(t);
+      osc.stop(t + chime.dur + 0.03);
+      this.openingJingleSources.push(osc, gain);
+    });
+
+    // ==========================================
+    // 2. KEMUDIAN (0.45s - 2.9s): Melodi pendek yang ceria & energik (Game Marimba/Bells)
+    // ==========================================
+    // Tangga nada ceria khas game petualangan anak SD (G Major / D Major bright adventure)
+    const melodyNotes: { f: number; start: number; dur: number; vol?: number }[] = [
+      { f: 587.33, start: 0.45, dur: 0.18 }, // D5
+      { f: 739.99, start: 0.65, dur: 0.18 }, // F#5
+      { f: 880.00, start: 0.85, dur: 0.24 }, // A5
+      { f: 1174.66, start: 1.10, dur: 0.30 }, // D6 (Bouncing leap!)
+      { f: 987.77, start: 1.42, dur: 0.18 }, // B5
+      { f: 880.00, start: 1.62, dur: 0.18 }, // A5
+      { f: 739.99, start: 1.82, dur: 0.22 }, // F#5
+      { f: 880.00, start: 2.06, dur: 0.20 }, // A5
+      { f: 987.77, start: 2.28, dur: 0.24 }, // B5
+      { f: 1174.66, start: 2.54, dur: 0.45 }, // D6 (Triumphant summit!)
     ];
 
     melodyNotes.forEach(note => {
@@ -653,12 +682,12 @@ class SoundEngine {
       const gain = this.ctx.createGain();
       const t = now + note.start;
 
-      // Soft rounded marimba timbre (sine + gentle decay)
+      // Warm round marimba timbre with slight bell brightness
       osc.type = 'sine';
       osc.frequency.setValueAtTime(note.f, t);
 
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.18, t + 0.015);
+      gain.gain.linearRampToValueAtTime(note.vol || 0.18, t + 0.015);
       gain.gain.exponentialRampToValueAtTime(0.001, t + note.dur);
 
       osc.connect(gain);
@@ -669,15 +698,15 @@ class SoundEngine {
       this.openingJingleSources.push(osc, gain);
     });
 
-    // 2. Warm Pad/Acoustic Bass Harmony
-    const harmonyChords = [
-      { f: 130.81, start: 0.00, dur: 1.35 }, // C3
-      { f: 174.61, start: 1.40, dur: 1.30 }, // F3
-      { f: 196.00, start: 2.72, dur: 0.95 }, // G3
-      { f: 261.63, start: 3.68, dur: 0.90 }, // C4
+    // Bouncy game rhythm bassline (Staccato warmth for elementary school feel)
+    const rhythmBass = [
+      { f: 146.83, start: 0.45, dur: 0.35 }, // D3
+      { f: 196.00, start: 1.10, dur: 0.35 }, // G3
+      { f: 220.00, start: 1.82, dur: 0.35 }, // A3
+      { f: 146.83, start: 2.54, dur: 0.60 }, // D3
     ];
 
-    harmonyChords.forEach(chord => {
+    rhythmBass.forEach(chord => {
       if (!this.ctx) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -687,7 +716,7 @@ class SoundEngine {
       osc.frequency.setValueAtTime(chord.f, t);
 
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.08, t + 0.08);
+      gain.gain.linearRampToValueAtTime(0.12, t + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.001, t + chord.dur);
 
       osc.connect(gain);
@@ -698,15 +727,19 @@ class SoundEngine {
       this.openingJingleSources.push(osc, gain);
     });
 
-    // 3. Playful Sparkle Accents (High chimes at peak & resolution)
-    const sparkles = [
-      { f: 1318.51, start: 1.48 }, // E6
-      { f: 1567.98, start: 1.56 }, // G6
-      { f: 1567.98, start: 3.82 }, // G6
-      { f: 2093.00, start: 3.92 }, // C7
+    // ==========================================
+    // 3. AKHIR (2.9s - 4.2s): Sparkle / Magical / Game Start (Petualangan akan dimulai!)
+    // ==========================================
+    const finaleSparkles = [
+      { f: 880.00, start: 2.95, dur: 0.40 },  // A5
+      { f: 1174.66, start: 3.08, dur: 0.45 }, // D6
+      { f: 1479.98, start: 3.22, dur: 0.50 }, // F#6
+      { f: 1760.00, start: 3.36, dur: 0.55 }, // A6
+      { f: 2349.32, start: 3.50, dur: 0.80 }, // D7 (Magical high chime sparkle!)
+      { f: 2959.96, start: 3.60, dur: 0.60 }, // F#7 (Airy shimmer)
     ];
 
-    sparkles.forEach(sparkle => {
+    finaleSparkles.forEach(sparkle => {
       if (!this.ctx) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -716,22 +749,106 @@ class SoundEngine {
       osc.frequency.setValueAtTime(sparkle.f, t);
 
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.06, t + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+      gain.gain.linearRampToValueAtTime(0.10, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + sparkle.dur);
 
       osc.connect(gain);
       gain.connect(masterGain);
 
       osc.start(t);
-      osc.stop(t + 0.32);
+      osc.stop(t + sparkle.dur + 0.02);
       this.openingJingleSources.push(osc, gain);
     });
 
     // Automatically clean up state when jingle finishes playing
     const timer = window.setTimeout(() => {
       this.stopOpeningJingle();
-    }, 4800);
+    }, 4500);
     this.openingJingleTimeouts.push(timer);
+  }
+
+  // ==========================================
+  // GAME START TRANSITION SOUND EFFECT
+  // Cheerful, punchy, energetic transition when clicking 'Mulai Petualangan'
+  // ==========================================
+  public playGameStartTransition(): void {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const masterGain = this.ctx.createGain();
+    masterGain.gain.setValueAtTime(0.18, now);
+    masterGain.connect(this.ctx.destination);
+
+    // 1. Tactile punchy button click ping (0.0s)
+    const clickOsc = this.ctx.createOscillator();
+    const clickGain = this.ctx.createGain();
+    clickOsc.type = 'triangle';
+    clickOsc.frequency.setValueAtTime(320, now);
+    clickOsc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+    clickGain.gain.setValueAtTime(0.16, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+    clickOsc.connect(clickGain);
+    clickGain.connect(masterGain);
+    clickOsc.start(now);
+    clickOsc.stop(now + 0.09);
+
+    // 2. Ascending game fanfare / portal activation (C5 -> E5 -> G5 -> C6 -> E6)
+    const notes = [
+      { f: 523.25, offset: 0.05, dur: 0.18 }, // C5
+      { f: 659.25, offset: 0.12, dur: 0.20 }, // E5
+      { f: 783.99, offset: 0.20, dur: 0.24 }, // G5
+      { f: 1046.50, offset: 0.28, dur: 0.35 }, // C6
+      { f: 1318.51, offset: 0.38, dur: 0.50 }, // E6
+    ];
+
+    notes.forEach(n => {
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const t = now + n.offset;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(n.f, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.14, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + n.dur);
+
+      osc.connect(gain);
+      gain.connect(masterGain);
+
+      osc.start(t);
+      osc.stop(t + n.dur + 0.02);
+    });
+
+    // 3. Shimmering star sparkle cascade (High magical chimes)
+    const sparkles = [
+      { f: 1567.98, offset: 0.32 }, // G6
+      { f: 2093.00, offset: 0.40 }, // C7
+      { f: 2637.02, offset: 0.48 }, // E7
+    ];
+
+    sparkles.forEach(s => {
+      if (!this.ctx) return;
+      const sOsc = this.ctx.createOscillator();
+      const sGain = this.ctx.createGain();
+      const t = now + s.offset;
+
+      sOsc.type = 'sine';
+      sOsc.frequency.setValueAtTime(s.f, t);
+
+      sGain.gain.setValueAtTime(0.0001, t);
+      sGain.gain.linearRampToValueAtTime(0.08, t + 0.01);
+      sGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+
+      sOsc.connect(sGain);
+      sGain.connect(masterGain);
+
+      sOsc.start(t);
+      sOsc.stop(t + 0.36);
+    });
   }
 
   public stopOpeningJingle(): void {
