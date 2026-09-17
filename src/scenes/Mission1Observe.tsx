@@ -4,8 +4,7 @@ import { ArrowRight, CheckCircle2, Sparkles, RotateCcw, Map } from 'lucide-react
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
-import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
-import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
+import { BatuTamanImage } from '../components/BatuTamanImage';
 
 interface Mission1Props {
   onComplete: (points: number) => void;
@@ -19,6 +18,7 @@ interface ObservedObject {
   category: 'tumbuhan' | 'hewan' | 'air' | 'batu' | 'tanah_cahaya';
   type: 'biotik' | 'abiotik';
   icon: string;
+  image: string;
   x: number; // percentage
   y: number; // percentage
   dialog: string;
@@ -33,6 +33,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'tumbuhan',
     type: 'biotik',
     icon: '🌳',
+    image: '/misi1/tree.png',
     x: 14,
     y: 38,
     dialog: '“Pohon adalah tumbuhan hidup yang bernapas, berfotosintesis, dan bertumbuh. Di sini, aku adalah makhluk hidup (biotik)!”',
@@ -44,6 +45,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'tumbuhan',
     type: 'biotik',
     icon: '🌱',
+    image: '/misi1/grass.png',
     x: 28,
     y: 78,
     dialog: '“Rumput tumbuh menutupi hamparan tanah. Kami adalah tumbuhan hidup yang menyerap air dan cahaya!”',
@@ -55,6 +57,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'tumbuhan',
     type: 'biotik',
     icon: '🌺',
+    image: '/misi1/flower.png',
     x: 42,
     y: 65,
     dialog: '“Bungaku mekar cerah mengundang serangga. Aku tumbuhan hidup yang berkembang biak dengan indah!”',
@@ -67,6 +70,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'hewan',
     type: 'biotik',
     icon: '🦋',
+    image: '/misi1/butterfly.png',
     x: 50,
     y: 32,
     dialog: '“Aku kupu-kupu yang terbang lincah mencari nektar bunga. Aku hewan yang bernapas dan bergerak aktif!”',
@@ -78,6 +82,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'hewan',
     type: 'biotik',
     icon: '🐦',
+    image: '/misi1/bird.png',
     x: 75,
     y: 35,
     dialog: '“Cicit cuit! Aku bertengger di dahan pohon. Sebagai hewan, aku mencari makan dan hidup berdampingan di alam!”',
@@ -89,6 +94,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'hewan',
     type: 'biotik',
     icon: '🐟',
+    image: '/misi1/fish.png',
     x: 60,
     y: 74,
     dialog: '“Kecipak-kecipuk! Aku ikan yang berenang lincah di air jernih. Aku hewan perairan yang bernapas dengan insang!”',
@@ -101,6 +107,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'air',
     type: 'abiotik',
     icon: '💧',
+    image: '/misi1/water.png',
     x: 70,
     y: 75,
     dialog: '“Air tidak bernapas dan tidak berkembang biak. Air adalah lingkungan tak hidup (abiotik) yang mutlak dibutuhkan ikan dan tanaman!”',
@@ -113,6 +120,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'batu',
     type: 'abiotik',
     icon: '🪨',
+    image: '/misi1/stone.png',
     x: 36,
     y: 70,
     dialog: '“Batu adalah benda alam padat tak hidup (abiotik). Aku tidak bertumbuh, tetapi aku menjadi tempat berpijak dan berteduh serangga kecil!”',
@@ -125,6 +133,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'tanah_cahaya',
     type: 'abiotik',
     icon: '🪴',
+    image: '/misi1/soil.png',
     x: 20,
     y: 84,
     dialog: '“Tanah adalah lapisan tak hidup (abiotik) tempat berpijak dan menyediakan mineral untuk akar pohon!”',
@@ -136,6 +145,7 @@ const OBJECTS: ObservedObject[] = [
     category: 'tanah_cahaya',
     type: 'abiotik',
     icon: '☀️',
+    image: '/misi1/sun.png',
     x: 85,
     y: 15,
     dialog: '“Sinar matahari menyinari bumi dari kejauhan! Aku adalah faktor abiotik sumber energi utama yang menghangatkan seluruh taman!”',
@@ -308,7 +318,14 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
         )}
 
         {/* Interactive Garden Exploration Scene */}
-        <div className="relative w-full min-h-[440px] sm:min-h-[500px] bg-white/80 backdrop-blur-xs rounded-3xl border-4 border-emerald-300 shadow-xl overflow-hidden">
+        <div
+          className="relative w-full min-h-[440px] sm:min-h-[500px] bg-white/80 backdrop-blur-xs rounded-3xl border-4 border-emerald-300 shadow-xl overflow-hidden"
+          style={{
+            backgroundImage: "url('/misi1-bg.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           {/* Background Scenery SVG: School in distance, rolling greens, and CONTINUOUS PATH */}
           <svg
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -363,30 +380,34 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                 <button
                   id={`btn-observe-${obj.id}`}
                   onClick={() => handleInspect(obj)}
-                  className={`relative p-2.5 sm:p-3 rounded-2xl transition-all shadow-md flex flex-col items-center group cursor-pointer ${
-                    isSelected
-                      ? 'bg-amber-300 ring-4 ring-amber-400 scale-110 shadow-lg'
-                      : isInspected
-                      ? 'bg-white/90 hover:bg-white border-2 border-emerald-400'
-                      : 'bg-white/75 hover:bg-white border-2 border-amber-300 animate-pulse-subtle'
-                  }`}
+                  className="relative flex flex-col items-center group cursor-pointer focus:outline-hidden select-none"
                 >
-                  {isBatuTaman(obj.name) ? (
-                    <BatuTamanImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={obj.name} />
-                  ) : isTanahSubur(obj.name) ? (
-                    <TanahSuburImage className="w-10 h-10 sm:w-12 sm:h-12 drop-shadow-sm my-0.5" alt={obj.name} />
-                  ) : (
-                    <span className="text-3xl sm:text-4xl filter drop-shadow-xs">
-                      {obj.icon}
-                    </span>
-                  )}
-                  <span className="text-[10px] sm:text-xs font-bold text-stone-800 mt-1 whitespace-nowrap bg-white/90 px-1.5 py-0.5 rounded shadow-xs">
+                  <img
+                    src={obj.image}
+                    alt={obj.name}
+                    className={`object-contain transition-all duration-200 pointer-events-auto ${
+                      obj.id === 'tree'
+                        ? 'w-16 h-16 sm:w-20 sm:h-20'
+                        : obj.id === 'sun'
+                        ? 'w-14 h-14 sm:w-16 sm:h-16'
+                        : 'w-12 h-12 sm:w-14 sm:h-14'
+                    } ${
+                      isSelected
+                        ? 'scale-110 drop-shadow-[0_0_14px_rgba(250,204,21,0.95)] brightness-110'
+                        : isInspected
+                        ? 'drop-shadow-md hover:brightness-110'
+                        : 'drop-shadow-md animate-pulse-subtle hover:brightness-110'
+                    }`}
+                    referrerPolicy="no-referrer"
+                    loading="eager"
+                  />
+                  <span className="text-[10px] sm:text-xs font-bold text-stone-800 mt-1 whitespace-nowrap bg-white/90 px-2 py-0.5 rounded-full shadow-xs border border-stone-200/60 pointer-events-none">
                     {obj.name}
                   </span>
 
                   {/* Checked star marker */}
                   {isInspected && (
-                    <span className="absolute -top-2 -right-2 bg-emerald-600 text-white rounded-full p-0.5 text-xs shadow-xs">
+                    <span className="absolute -top-1 -right-1 bg-emerald-600 text-white rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs font-bold shadow-md ring-2 ring-white pointer-events-none">
                       ✓
                     </span>
                   )}
@@ -406,13 +427,12 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
               >
                 <div className="flex items-start justify-between gap-2 border-b border-emerald-100 pb-2.5 mb-2.5">
                   <div className="flex items-center gap-2.5">
-                    {isBatuTaman(activeObject.name) ? (
-                      <BatuTamanImage className="w-9 h-9" alt={activeObject.name} />
-                    ) : isTanahSubur(activeObject.name) ? (
-                      <TanahSuburImage className="w-9 h-9" alt={activeObject.name} />
-                    ) : (
-                      <span className="text-3xl">{activeObject.icon}</span>
-                    )}
+                    <img
+                      src={activeObject.image}
+                      alt={activeObject.name}
+                      className="w-10 h-10 object-contain drop-shadow-sm"
+                      referrerPolicy="no-referrer"
+                    />
                     <div>
                       <h4 className="font-display font-bold text-stone-900 text-sm sm:text-base">
                         {activeObject.name}
