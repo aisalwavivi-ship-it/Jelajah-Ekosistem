@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Volume2, VolumeX, X, Sparkles, Lightbulb, ChevronRight, ChevronDown } from 'lucide-react';
 import { AppScene } from '../types';
 import { sound } from '../utils/audio';
+import { tts } from '../utils/tts';
 
 interface FloatingMascotProps {
   currentScene: AppScene;
@@ -120,9 +121,39 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
   const [isOpen, setIsOpen] = useState(true);
   const [showFunFact, setShowFunFact] = useState(false);
   const [hasUnreadTip, setHasUnreadTip] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const prevSceneRef = useRef<AppScene>(currentScene);
 
   const sceneData = SCENE_TIPS[currentScene] || SCENE_TIPS.start;
+
+  // Stop any ongoing TTS when scene/mission changes
+  useEffect(() => {
+    tts.stop();
+    setIsSpeaking(false);
+  }, [currentScene]);
+
+  // Clean up TTS when unmounting
+  useEffect(() => {
+    return () => {
+      tts.stop();
+    };
+  }, []);
+
+  // Sync isSpeaking state with global TTS engine
+  useEffect(() => {
+    const currentSpeechId = `mascot-tip-${currentScene}`;
+    const unsubscribe = tts.subscribe(({ activeId, status }) => {
+      if (activeId === currentSpeechId && status === 'speaking') {
+        setIsSpeaking(true);
+      } else {
+        setIsSpeaking(false);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentScene]);
 
   // Trigger sound and bouncy entry whenever currentScene changes
   useEffect(() => {
@@ -156,9 +187,40 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
     setIsOpen((prev) => !prev);
   };
 
-  const handlePlaySoundAgain = (e: React.MouseEvent) => {
+  const handleToggleTipSpeech = (e: React.MouseEvent) => {
     e.stopPropagation();
-    sound.playMascotTip();
+
+    // If currently speaking, stop playback
+    if (isSpeaking) {
+      tts.stop();
+      setIsSpeaking(false);
+      return;
+    }
+
+    // Stop any existing speech before starting new speech
+    tts.stop();
+
+    const textToSpeak = sceneData?.tip;
+    if (!textToSpeak) return;
+
+    tts.setSoundEnabled(true);
+    const speechId = `mascot-tip-${currentScene}`;
+
+    tts.speak({
+      id: speechId,
+      text: textToSpeak,
+      rate: 0.92,
+      pitch: 1.05,
+      onStart: () => {
+        setIsSpeaking(true);
+      },
+      onEnd: () => {
+        setIsSpeaking(false);
+      },
+      onError: () => {
+        setIsSpeaking(false);
+      },
+    });
   };
 
   return (
@@ -194,12 +256,14 @@ export const FloatingMascot: React.FC<FloatingMascotProps> = ({
 
               {/* Header Action Controls */}
               <div className="flex items-center gap-1">
-                {/* Audio cue replay button */}
+                {/* Audio cue replay button -> TTS voice reader for Tips Riko */}
                 <button
                   id="btn-mascot-replay-audio"
-                  onClick={handlePlaySoundAgain}
-                  className="p-1 rounded-lg hover:bg-white/20 text-emerald-100 transition active:scale-95"
-                  title="Putar nada petunjuk"
+                  onClick={handleToggleTipSpeech}
+                  className={`p-1 rounded-lg hover:bg-white/20 text-emerald-100 transition active:scale-95 ${
+                    isSpeaking ? 'bg-white/20 text-amber-300' : ''
+                  }`}
+                  title={isSpeaking ? 'Hentikan pembacaan tips' : 'Dengarkan suara tips'}
                 >
                   <Volume2 className="w-3.5 h-3.5" />
                 </button>
