@@ -228,12 +228,12 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="relative z-10 max-w-lg mx-auto bg-white/80 backdrop-blur-xs rounded-2xl p-3 sm:p-4 shadow-sm border border-amber-200/50">
+            <div className="relative z-10 max-w-lg mx-auto bg-white/50 backdrop-blur-xs rounded-2xl p-3 sm:p-4 shadow-sm border border-amber-200/60">
               <span className="text-4xl">🛤️</span>
               <h3 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-900 mt-1">
                 Jalan Setapak Bercabang!
               </h3>
-              <p className="text-stone-700 font-medium text-sm mt-1">
+              <p className="text-stone-800 font-semibold text-sm mt-1">
                 Kamu sampai di persimpangan jalan. Di manakah kamu ingin mengamati dan membangun komunitas makhluk hidup?
               </p>
             </div>
@@ -245,7 +245,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleSelectEco('taman')}
-                className="p-6 rounded-3xl bg-gradient-to-b from-emerald-50/95 to-green-100/95 backdrop-blur-sm border-3 border-emerald-400 hover:border-emerald-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
+                className="p-6 rounded-3xl bg-white/55 backdrop-blur-xs border-3 border-emerald-400 hover:border-emerald-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
               >
                 <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-3 shadow-inner group-hover:scale-110 transition-transform overflow-hidden border-2 border-emerald-300">
                   <img
@@ -257,7 +257,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 <h4 className="font-display font-bold text-xl text-emerald-950">
                   Komunitas Taman
                 </h4>
-                <p className="text-xs text-stone-600 mt-1">
+                <p className="text-xs text-stone-800 font-medium mt-1">
                   Populasi pohon, bunga, kupu-kupu, lebah, burung, dan semut yang hidup bersama di taman.
                 </p>
                 <span className="mt-4 px-4 py-1.5 bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs">
@@ -271,7 +271,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 onClick={() => handleSelectEco('kolam')}
-                className="p-6 rounded-3xl bg-gradient-to-b from-sky-50/95 to-blue-100/95 backdrop-blur-sm border-3 border-sky-400 hover:border-sky-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
+                className="p-6 rounded-3xl bg-white/55 backdrop-blur-xs border-3 border-sky-400 hover:border-sky-600 shadow-lg text-center flex flex-col items-center group cursor-pointer transition"
               >
                 <div className="w-20 h-20 rounded-full bg-sky-100 flex items-center justify-center mb-3 shadow-inner group-hover:scale-110 transition-transform overflow-hidden border-2 border-sky-300">
                   <img
@@ -283,7 +283,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 <h4 className="font-display font-bold text-xl text-sky-950">
                   Komunitas Kolam
                 </h4>
-                <p className="text-xs text-stone-600 mt-1">
+                <p className="text-xs text-stone-800 font-medium mt-1">
                   Populasi ikan mas, teratai, katak, capung air, dan bebek yang hidup bersama di kolam.
                 </p>
                 <span className="mt-4 px-4 py-1.5 bg-sky-700 text-white rounded-xl text-xs font-bold shadow-xs">
