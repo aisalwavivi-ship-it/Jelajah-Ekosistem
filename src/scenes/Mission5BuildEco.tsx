@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, Split } from 'lucide-react';
+import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, Split, X } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
@@ -19,6 +19,7 @@ interface EcosystemItem {
   name: string;
   category: 'populasi' | 'abiotik';
   icon: string;
+  image?: string;
   role: string;
   x: number;
   y: number;
@@ -30,29 +31,182 @@ interface EcosystemItem {
 
 const GARDEN_ITEMS: EcosystemItem[] = [
   // Berbagai Populasi pembentuk Komunitas
-  { id: 'g_tree', name: 'Populasi Pohon Peneduh', category: 'populasi', icon: '🌳', role: 'Kumpulan pohon peneduh & penghasil oksigen', x: 20, y: 35 },
-  { id: 'g_flower', name: 'Populasi Bunga Warna-warni', category: 'populasi', icon: '🌺', role: 'Kumpulan tanaman bunga sumber nektar', x: 45, y: 75 },
-  { id: 'g_butterfly', name: 'Populasi Kupu-kupu', category: 'populasi', icon: '🦋', role: 'Kumpulan kupu-kupu penyerbuk bunga', x: 55, y: 35 },
-  { id: 'g_bee', name: 'Populasi Lebah Madu', category: 'populasi', icon: '🐝', role: 'Kawanan lebah pekerja di taman', x: 72, y: 40 },
-  { id: 'g_bird', name: 'Populasi Burung Pipit', category: 'populasi', icon: '🐦', role: 'Kumpulan burung pemakan biji-bijian', x: 82, y: 28 },
-  { id: 'g_ant', name: 'Populasi Semut Tanah', category: 'populasi', icon: '🐜', role: 'Koloni semut penggembur tanah', x: 35, y: 82 },
+  {
+    id: 'g_tree',
+    name: 'Pohon Peneduh',
+    category: 'populasi',
+    icon: '🌳',
+    image: '/misi1/tree.png',
+    role: 'Kumpulan pohon peneduh & penghasil oksigen',
+    x: 20,
+    y: 35,
+  },
+  {
+    id: 'g_flower',
+    name: 'Bunga Warna-warni',
+    category: 'populasi',
+    icon: '🌺',
+    image: '/misi1/flower.png',
+    role: 'Kumpulan tanaman bunga sumber nektar',
+    x: 45,
+    y: 75,
+  },
+  {
+    id: 'g_butterfly',
+    name: 'Kupu-kupu',
+    category: 'populasi',
+    icon: '🦋',
+    image: '/misi1/butterfly.png',
+    role: 'Kumpulan kupu-kupu penyerbuk bunga',
+    x: 55,
+    y: 35,
+  },
+  {
+    id: 'g_bee',
+    name: 'Lebah Madu',
+    category: 'populasi',
+    icon: '🐝',
+    image: '/misi4/kawanan-lebah.png',
+    role: 'Kawanan lebah pekerja di taman',
+    x: 72,
+    y: 40,
+  },
+  {
+    id: 'g_bird',
+    name: 'Burung Pipit',
+    category: 'populasi',
+    icon: '🐦',
+    image: '/misi4/burung-pipit.png',
+    role: 'Kumpulan burung pemakan biji-bijian',
+    x: 82,
+    y: 28,
+  },
+  {
+    id: 'g_ant',
+    name: 'Semut Tanah',
+    category: 'populasi',
+    icon: '🐜',
+    image: '/misi5/semut-tanah.png',
+    role: 'Koloni semut penggembur tanah',
+    x: 35,
+    y: 82,
+  },
   // Faktor Abiotik pendukung
-  { id: 'g_sun', name: 'Cahaya Matahari', category: 'abiotik', icon: '☀️', role: 'Penghangat bumi & energi fotosintesis', x: 85, y: 15 },
-  { id: 'g_soil', name: 'Tanah Subur', category: 'abiotik', icon: '🪴', role: 'Media tempat tumbuh akar dan nutrisi', x: 25, y: 80 },
-  { id: 'g_rock', name: 'Batu Taman', category: 'abiotik', icon: '🪨', role: 'Tempat berteduh & pijakan serangga alami', x: 62, y: 82 }
+  {
+    id: 'g_sun',
+    name: 'Matahari',
+    category: 'abiotik',
+    icon: '☀️',
+    image: '/misi5/matahari.png',
+    role: 'Penghangat bumi & energi fotosintesis',
+    x: 85,
+    y: 15,
+  },
+  {
+    id: 'g_soil',
+    name: 'Tanah Subur',
+    category: 'abiotik',
+    icon: '🪴',
+    image: '/misi5/tanah-subur.png',
+    role: 'Media tempat tumbuh akar dan nutrisi',
+    x: 25,
+    y: 80,
+  },
+  {
+    id: 'g_rock',
+    name: 'Batu Taman',
+    category: 'abiotik',
+    icon: '🪨',
+    image: '/misi5/batu-taman.png',
+    role: 'Tempat berteduh & pijakan serangga alami',
+    x: 62,
+    y: 82,
+  },
 ];
 
 const POND_ITEMS: EcosystemItem[] = [
   // Berbagai Populasi pembentuk Komunitas
-  { id: 'p_fish', name: 'Populasi Ikan Mas', category: 'populasi', icon: '🐟', role: 'Kumpulan ikan yang berenang di air', x: 50, y: 65 },
-  { id: 'p_lotus', name: 'Populasi Bunga Teratai', category: 'populasi', icon: '🪷', role: 'Kumpulan tanaman teratai berdaun lebar', x: 30, y: 55 },
-  { id: 'p_frog', name: 'Populasi Katak Hijau', category: 'populasi', icon: '🐸', role: 'Kumpulan katak amfibi di tepi kolam', x: 75, y: 70 },
-  { id: 'p_dragonfly', name: 'Populasi Capung Air', category: 'populasi', icon: '🦗', role: 'Kumpulan capung pembasmi jentik', x: 65, y: 30 },
-  { id: 'p_duck', name: 'Populasi Bebek Air', category: 'populasi', icon: '🦆', role: 'Kumpulan bebek berenang mencari makan', x: 82, y: 50 },
-  { id: 'p_snail', name: 'Populasi Keong Kolam', category: 'populasi', icon: '🐌', role: 'Kumpulan keong pembersih lumut', x: 22, y: 72 },
+  {
+    id: 'p_fish',
+    name: 'Ikan Mas',
+    category: 'populasi',
+    icon: '🐟',
+    image: '/misi5/ikan-mas-kolam.png',
+    role: 'Kumpulan ikan yang berenang di air',
+    x: 50,
+    y: 65,
+  },
+  {
+    id: 'p_lotus',
+    name: 'Bunga Teratai',
+    category: 'populasi',
+    icon: '🪷',
+    image: '/misi5/teratai-kolam.png',
+    role: 'Kumpulan tanaman teratai berdaun lebar',
+    x: 30,
+    y: 55,
+  },
+  {
+    id: 'p_frog',
+    name: 'Katak Hijau',
+    category: 'populasi',
+    icon: '🐸',
+    image: '/misi5/katak-hijau.png',
+    role: 'Kumpulan katak amfibi di tepi kolam',
+    x: 75,
+    y: 70,
+  },
+  {
+    id: 'p_dragonfly',
+    name: 'Capung Air',
+    category: 'populasi',
+    icon: '🦗',
+    image: '/misi5/capung-air.png',
+    role: 'Kumpulan capung pembasmi jentik',
+    x: 65,
+    y: 30,
+  },
+  {
+    id: 'p_duck',
+    name: 'Bebek',
+    category: 'populasi',
+    icon: '🦆',
+    image: '/misi5/bebek-kolam.png',
+    role: 'Kumpulan bebek berenang mencari makan',
+    x: 82,
+    y: 50,
+  },
+  {
+    id: 'p_snail',
+    name: 'Keong Kolam',
+    category: 'populasi',
+    icon: '🐌',
+    image: '/misi5/keong-kolam.png',
+    role: 'Kumpulan keong pembersih lumut',
+    x: 22,
+    y: 72,
+  },
   // Faktor Abiotik pendukung
-  { id: 'p_water', name: 'Air Kolam Alami', category: 'abiotik', icon: '💧', role: 'Media cair tempat tinggal biota kolam', x: 40, y: 45 },
-  { id: 'p_rock', name: 'Batu Taman & Kali', category: 'abiotik', icon: '🪨', role: 'Tempat bertengger katak & keong', x: 88, y: 75 }
+  {
+    id: 'p_water',
+    name: 'Air Kolam Alami',
+    category: 'abiotik',
+    icon: '💧',
+    image: '/misi5/air-kolam-alami.png',
+    role: 'Media cair tempat tinggal biota kolam',
+    x: 40,
+    y: 45,
+  },
+  {
+    id: 'p_rock',
+    name: 'Batu Taman & Kali',
+    category: 'abiotik',
+    icon: '🪨',
+    image: '/misi5/batu-kali.png',
+    role: 'Tempat bertengger katak & keong',
+    x: 88,
+    y: 75,
+  },
 ];
 
 export const Mission5BuildEco: React.FC<Mission5Props> = ({
@@ -349,20 +503,27 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 showDiscoveryAnimation ? 'ring-4 ring-amber-400 shadow-2xl' : ''
               } ${
                 selectedEco === 'taman'
-                  ? 'bg-gradient-to-b from-sky-200 via-emerald-100 to-amber-100 border-emerald-400'
-                  : 'bg-gradient-to-b from-sky-200 via-sky-100 to-blue-200 border-sky-400'
+                  ? 'border-emerald-400'
+                  : 'border-sky-400'
               }`}
+              style={
+                selectedEco === 'taman'
+                  ? {
+                      backgroundImage: "url('/misi5/taman-komunitas-bg.jpg')",
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                    }
+                  : {
+                      backgroundImage: "url('/misi5/kolam-komunitas-bg.jpg')",
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                    }
+              }
             >
               {/* Background Landscape Graphics */}
-              {selectedEco === 'taman' ? (
-                <svg viewBox="0 0 1000 500" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
-                  <polygon points="0,280 250,150 500,300" fill="#bae6fd" opacity="0.4" />
-                  <polygon points="450,300 750,160 1000,310" fill="#7dd3fc" opacity="0.4" />
-                  <path d="M 0 350 Q 250 310 500 340 T 1000 320 L 1000 500 L 0 500 Z" fill="#86efac" opacity="0.6" />
-                  <path d="M 0 420 Q 300 390 500 420 T 1000 400 L 1000 500 L 0 500 Z" fill="#b45309" />
-                  <path d="M 0 425 Q 300 395 500 425 T 1000 405 L 1000 495 L 0 495 Z" fill="#d97706" />
-                </svg>
-              ) : (
+              {selectedEco === 'taman' || selectedEco === 'kolam' ? null : (
                 <svg viewBox="0 0 1000 500" className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
                   <polygon points="0,280 250,150 500,300" fill="#bae6fd" opacity="0.4" />
                   <polygon points="450,300 750,160 1000,310" fill="#7dd3fc" opacity="0.4" />
@@ -375,8 +536,8 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
               )}
 
               {/* Character observing */}
-              <div className="absolute left-4 bottom-6 z-10">
-                <CharacterAvatar size="sm" isWalking={false} />
+              <div className="absolute left-3 bottom-2 z-10">
+                <CharacterAvatar size="lg" isWalking={false} />
               </div>
 
               {/* Render Selected Items Visually in the Canvas with Discovery Animation placement */}
@@ -421,14 +582,40 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                       ease: 'easeInOut',
                       type: 'tween',
                     }}
-                    className="text-4xl sm:text-5xl filter drop-shadow-md cursor-default flex items-center justify-center"
+                    className="filter drop-shadow-md cursor-default flex items-center justify-center"
                   >
-                    {isBatuTaman(item.name) ? (
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className={`${
+                          item.id === 'g_tree'
+                            ? 'w-20 h-20 sm:w-24 sm:h-24'
+                            : item.id === 'g_sun'
+                            ? 'w-16 h-16 sm:w-20 sm:h-20'
+                            : item.id === 'g_flower'
+                            ? 'w-14 h-14 sm:w-16 sm:h-16'
+                            : item.id === 'g_bird' || item.id === 'g_bee' || item.id === 'g_butterfly'
+                            ? 'w-14 h-14 sm:w-16 sm:h-16'
+                            : item.id === 'g_ant'
+                            ? 'w-14 h-14 sm:w-16 sm:h-16'
+                            : item.id === 'g_soil' || item.id === 'g_rock'
+                            ? 'w-16 h-16 sm:w-20 sm:h-20'
+                            : item.id === 'p_lotus' || item.id === 'p_duck' || item.id === 'p_rock'
+                            ? 'w-16 h-16 sm:w-20 sm:h-20'
+                            : item.id === 'p_fish' || item.id === 'p_frog' || item.id === 'p_water'
+                            ? 'w-14 h-14 sm:w-18 sm:h-18'
+                            : item.id === 'p_dragonfly' || item.id === 'p_snail'
+                            ? 'w-13 h-13 sm:w-16 sm:h-16'
+                            : 'w-12 h-12 sm:w-14 sm:h-14'
+                        } object-contain drop-shadow-md select-none pointer-events-none`}
+                      />
+                    ) : isBatuTaman(item.name) ? (
                       <BatuTamanImage className="w-12 h-12 drop-shadow-md" alt={item.name} />
                     ) : isTanahSubur(item.name) ? (
                       <TanahSuburImage className="w-12 h-12 drop-shadow-md" alt={item.name} />
                     ) : (
-                      item.icon
+                      <span className="text-4xl sm:text-5xl">{item.icon}</span>
                     )}
                   </motion.div>
                   <span
@@ -450,8 +637,23 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    className="absolute top-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gradient-to-r from-amber-400 to-amber-500 text-stone-900 p-3.5 rounded-2xl border-2 border-white shadow-2xl z-30 flex items-center gap-3"
+                    className="absolute top-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 bg-gradient-to-r from-amber-400 to-amber-500 text-stone-900 p-3.5 pr-9 rounded-2xl border-2 border-white shadow-2xl z-30 flex items-center gap-3 relative"
                   >
+                    {/* Tombol Close (X) */}
+                    <button
+                      type="button"
+                      id="btn-close-discovery-anim"
+                      onClick={() => {
+                        sound.playClick();
+                        setShowDiscoveryAnimation(false);
+                      }}
+                      className="absolute top-2.5 right-2.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-900/15 hover:bg-amber-900/30 text-amber-950 flex items-center justify-center transition-colors border border-amber-900/20 cursor-pointer shadow-xs active:scale-95"
+                      title="Tutup"
+                      aria-label="Tutup Animasi Pertemuan"
+                    >
+                      <X className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
+                    </button>
+
                     <motion.span
                       animate={{ rotate: [0, 360], scale: [1, 1.2, 1] }}
                       transition={{ duration: 1.5, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
@@ -490,7 +692,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                 </span>
               </h4>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-2">
                 {currentAvailableItems.map((item) => {
                   const isPicked = activeItems.includes(item.id);
                   return (
@@ -508,7 +710,15 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                           : 'bg-stone-50 hover:bg-stone-100 border-stone-200'
                       }`}
                     >
-                      {isBatuTaman(item.name) ? (
+                      {item.image ? (
+                        <div className="w-8 h-8 mb-1 flex items-center justify-center">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-contain drop-shadow-xs select-none pointer-events-none"
+                          />
+                        </div>
+                      ) : isBatuTaman(item.name) ? (
                         <BatuTamanImage className="w-8 h-8 mb-1" alt={item.name} />
                       ) : isTanahSubur(item.name) ? (
                         <TanahSuburImage className="w-8 h-8 mb-1" alt={item.name} />
