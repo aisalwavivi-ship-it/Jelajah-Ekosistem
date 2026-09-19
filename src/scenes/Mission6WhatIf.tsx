@@ -13,10 +13,7 @@ import {
   Check,
   X
 } from 'lucide-react';
-import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
-import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
-import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
 
 interface Mission6Props {
   onComplete: (points: number) => void;
@@ -29,6 +26,7 @@ interface SortItem {
   name: string;
   category: 'biotik' | 'abiotik';
   icon: string;
+  image: string;
   description: string;
   explanation: string;
 }
@@ -39,6 +37,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Ikan Mas',
     category: 'biotik',
     icon: '🐟',
+    image: '/misi6/ikan-mas.png',
     description: 'Berenang dan bernapas menggunakan insang',
     explanation: 'Ikan mas adalah hewan (makhluk hidup) yang bernapas, bergerak, dan berkembang biak. Jadi tergolong BIOTIK!'
   },
@@ -47,6 +46,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Cahaya Matahari',
     category: 'abiotik',
     icon: '☀️',
+    image: '/misi6/cahaya-matahari.png',
     description: 'Sumber energi utama dan kehangatan bumi',
     explanation: 'Cahaya matahari adalah energi dan faktor fisik alami tak hidup. Jadi tergolong ABIOTIK!'
   },
@@ -55,6 +55,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Bunga Teratai',
     category: 'biotik',
     icon: '🪷',
+    image: '/misi6/bunga-teratai.png',
     description: 'Tumbuhan air berdaun lebar mengapung',
     explanation: 'Bunga teratai adalah tumbuhan (makhluk hidup) yang melakukan fotosintesis. Jadi tergolong BIOTIK!'
   },
@@ -63,6 +64,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Air Bersih',
     category: 'abiotik',
     icon: '💧',
+    image: '/misi6/air-bersih.png',
     description: 'Cairan penghidupan bagi seluruh ekosistem',
     explanation: 'Air adalah zat cair mati (benda tak hidup) yang sangat dibutuhkan makhluk hidup. Jadi tergolong ABIOTIK!'
   },
@@ -71,6 +73,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Katak Hijau',
     category: 'biotik',
     icon: '🐸',
+    image: '/misi6/katak-hijau.png',
     description: 'Hewan amfibi yang hidup di darat dan air',
     explanation: 'Katak adalah hewan (makhluk hidup) yang membutuhkan makan dan oksigen. Jadi tergolong BIOTIK!'
   },
@@ -79,6 +82,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Batu Taman',
     category: 'abiotik',
     icon: '🪨',
+    image: '/misi6/batu-taman.png',
     description: 'Bebatuan alam di taman atau tanah',
     explanation: 'Batu taman tidak bertumbuh, tidak bernapas, dan tidak berketurunan. Jadi tergolong ABIOTIK!'
   },
@@ -87,6 +91,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Lebah Madu',
     category: 'biotik',
     icon: '🐝',
+    image: '/misi6/lebah-madu.png',
     description: 'Serangga penyerbuk bunga tanaman',
     explanation: 'Lebah adalah serangga hidup yang beraktivitas dan berkembang biak. Jadi tergolong BIOTIK!'
   },
@@ -95,6 +100,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Udara (Oksigen)',
     category: 'abiotik',
     icon: '🌬️',
+    image: '/misi6/udara-oksigen.png',
     description: 'Campuran gas untuk pernapasan makhluk hidup',
     explanation: 'Udara adalah campuran gas alami tak hidup penyedia oksigen dan karbon dioksida. Jadi tergolong ABIOTIK!'
   },
@@ -103,6 +109,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Jamur Kayu',
     category: 'biotik',
     icon: '🍄',
+    image: '/misi6/jamur-kayu.png',
     description: 'Organisme yang tumbuh di batang lapuk',
     explanation: 'Jamur adalah organisme hidup dari dunia fungi yang tumbuh dan menyerap nutrisi. Jadi tergolong BIOTIK!'
   },
@@ -111,6 +118,7 @@ const SORT_ITEMS: SortItem[] = [
     name: 'Tanah Subur',
     category: 'abiotik',
     icon: '🪴',
+    image: '/misi6/tanah-subur.png',
     description: 'Lapisan mineral tempat tumbuhnya akar tanaman',
     explanation: 'Tanah merupakan campuran partikel batuan dan mineral tak hidup tempat berdirinya tumbuhan. Jadi tergolong ABIOTIK!'
   }
@@ -137,8 +145,8 @@ const SCENARIOS: WhatIfScenario[] = [
   {
     id: 1,
     title: 'Bagaimana jika taman tidak mendapatkan air sama sekali?',
-    conditionNormalTitle: 'Kondisi Normal: Cukup Air 💧',
-    conditionChangedTitle: 'Kondisi Berubah: Tanpa Air 🏜️',
+    conditionNormalTitle: 'Kondisi Normal: Cukup Air',
+    conditionChangedTitle: 'Kondisi Berubah: Tanpa Air',
     normalDescription: 'Tanah lembap, bunga bermekaran cerah, dan rerumputan hijau segar.',
     changedDescription: 'Tanah menjadi kering dan retak-retak, daun tanaman menguning dan terkulai layu.',
     question: 'Apa yang mungkin terjadi pada makhluk hidup (biotik) di taman tersebut?',
@@ -153,8 +161,8 @@ const SCENARIOS: WhatIfScenario[] = [
   {
     id: 2,
     title: 'Bagaimana jika lingkungan tertutup rapat dari cahaya matahari?',
-    conditionNormalTitle: 'Kondisi Normal: Terang & Hangat ☀️',
-    conditionChangedTitle: 'Kondisi Berubah: Gelap Gulita 🌑',
+    conditionNormalTitle: 'Kondisi Normal: Terang & Hangat',
+    conditionChangedTitle: 'Kondisi Berubah: Gelap Gulita',
     normalDescription: 'Sinar matahari menghangatkan lingkungan, daun hijau segar membuat makanan.',
     changedDescription: 'Lingkungan menjadi gelap, udara dingin, daun kehilangan warna hijaunya.',
     question: 'Apa dampak hilangnya cahaya matahari bagi komponen biotik?',
@@ -296,7 +304,8 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                 : 'text-stone-700 hover:bg-emerald-50'
             }`}
           >
-            <span>🎮 Game Sortir Biotik & Abiotik</span>
+            <Layers className="w-4 h-4" />
+            <span>Game Sortir Biotik & Abiotik</span>
             <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">
               {sortedCount}/{totalItems}
             </span>
@@ -313,7 +322,8 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                 : 'text-stone-700 hover:bg-amber-50'
             }`}
           >
-            <span>💭 Simulasi Ketergantungan: Andaikan...</span>
+            <HelpCircle className="w-4 h-4" />
+            <span>Simulasi Ketergantungan: Andaikan...</span>
           </button>
         </div>
 
@@ -444,13 +454,15 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         <div className="text-[10px] text-stone-400 font-semibold mb-0.5 flex items-center gap-1">
                           <span>🖐️ Tarik</span>
                         </div>
-                        {isBatuTaman(item.name) ? (
-                          <BatuTamanImage className="w-9 h-9 mb-1" alt={item.name} />
-                        ) : isTanahSubur(item.name) ? (
-                          <TanahSuburImage className="w-9 h-9 mb-1" alt={item.name} />
-                        ) : (
-                          <span className="text-3xl mb-1">{item.icon}</span>
-                        )}
+                        <div className="w-11 h-11 mb-1 flex items-center justify-center shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs pointer-events-none select-none"
+                            referrerPolicy="no-referrer"
+                            loading="eager"
+                          />
+                        </div>
                         <span className="font-display font-bold text-xs text-stone-900 leading-tight">
                           {item.name}
                         </span>
@@ -556,13 +568,14 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         animate={{ scale: 1, opacity: 1 }}
                         className="px-3 py-1.5 bg-emerald-100 border border-emerald-300 rounded-xl flex items-center gap-2 shadow-xs"
                       >
-                        {isBatuTaman(item.name) ? (
-                          <BatuTamanImage className="w-5 h-5" alt={item.name} />
-                        ) : isTanahSubur(item.name) ? (
-                          <TanahSuburImage className="w-5 h-5" alt={item.name} />
-                        ) : (
-                          <span className="text-lg">{item.icon}</span>
-                        )}
+                        <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs select-none"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
                         <div className="text-left">
                           <span className="font-bold text-xs text-emerald-950 block leading-tight">
                             {item.name}
@@ -645,13 +658,14 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         animate={{ scale: 1, opacity: 1 }}
                         className="px-3 py-1.5 bg-sky-100 border border-sky-300 rounded-xl flex items-center gap-2 shadow-xs"
                       >
-                        {isBatuTaman(item.name) ? (
-                          <BatuTamanImage className="w-5 h-5" alt={item.name} />
-                        ) : isTanahSubur(item.name) ? (
-                          <TanahSuburImage className="w-5 h-5" alt={item.name} />
-                        ) : (
-                          <span className="text-lg">{item.icon}</span>
-                        )}
+                        <div className="w-6 h-6 flex items-center justify-center shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs select-none"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
                         <div className="text-left">
                           <span className="font-bold text-xs text-sky-950 block leading-tight">
                             {item.name}
@@ -672,14 +686,28 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
           <div className="space-y-4">
             {/* Simulation Canvas */}
             <div
-              className={`relative w-full min-h-[280px] rounded-3xl border-4 transition-all duration-700 shadow-xl overflow-hidden p-5 flex flex-col justify-between ${
+              className={`relative w-full min-h-[320px] sm:min-h-[360px] rounded-3xl border-4 transition-all duration-700 shadow-xl overflow-hidden p-5 flex flex-col justify-between ${
                 isChangedMode
-                  ? 'bg-gradient-to-b from-amber-200 via-stone-200 to-amber-300 border-amber-600'
-                  : 'bg-gradient-to-b from-sky-200 via-emerald-100 to-green-200 border-emerald-400'
+                  ? 'border-amber-600'
+                  : 'border-emerald-500'
               }`}
             >
-              <div className="relative z-10 flex items-start justify-between">
-                <div className="bg-white/90 backdrop-blur-xs p-3 rounded-2xl border border-stone-200 shadow-sm max-w-sm">
+              {/* Single unified panoramic illustration fulfilling the simulation area */}
+              <div className="absolute inset-0 z-0">
+                <img
+                  src={isChangedMode ? '/misi6/taman-kering-tandus-panorama.jpg' : '/misi6/taman-subur-lembap-panorama.jpg'}
+                  alt={isChangedMode ? 'Panorama Taman Kering dan Tanaman Layu' : 'Panorama Taman Subur dan Lembap'}
+                  className="w-full h-full object-cover select-none transition-all duration-700"
+                  referrerPolicy="no-referrer"
+                  loading="eager"
+                />
+                {/* Subtle soft gradient overlay so UI elements and texts remain crystal clear */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/25 pointer-events-none" />
+              </div>
+
+              {/* Top Controls & Info */}
+              <div className="relative z-10 flex flex-wrap items-start justify-between gap-3">
+                <div className="bg-white/95 backdrop-blur-xs p-3.5 rounded-2xl border border-stone-200/90 shadow-md max-w-sm">
                   <span className="text-xs font-bold uppercase tracking-wider text-stone-500 block">
                     Kondisi Simulasi:
                   </span>
@@ -698,48 +726,20 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                   }}
                   className={`px-4 py-2.5 rounded-2xl font-display font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 border-2 cursor-pointer ${
                     isChangedMode
-                      ? 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-400 animate-pulse-subtle'
+                      ? 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-300 animate-pulse-subtle'
                       : 'bg-amber-600 hover:bg-amber-700 text-white border-amber-300'
                   }`}
                 >
                   <RefreshCw className="w-4 h-4" />
-                  <span>{isChangedMode ? 'Kembalikan Kondisi Normal 🌿' : 'Ubah Kondisi: Andaikan... 💭'}</span>
+                  <span>{isChangedMode ? 'Kembalikan Kondisi Normal' : 'Ubah Kondisi: Andaikan...'}</span>
                 </button>
               </div>
 
-              {/* Visual scene elements */}
-              <div className="my-auto flex items-center justify-around py-3">
-                <motion.div
-                  animate={isChangedMode ? { rotate: [0, 8, 5], opacity: 0.6 } : { rotate: [0, -2, 2, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, type: 'tween', ease: 'easeInOut' }}
-                  className="text-center"
-                >
-                  <span className="text-6xl block filter drop-shadow-md">
-                    {isChangedMode ? '🥀' : '🌻'}
-                  </span>
-                  <span className="text-xs font-bold text-stone-800 bg-white/80 px-2 py-0.5 rounded-full mt-1 inline-block">
-                    {isChangedMode ? 'Tanaman Layu' : 'Tanaman Segar'}
-                  </span>
-                </motion.div>
-
-                <div className="text-center flex flex-col items-center">
-                  <div className="h-14 flex items-center justify-center">
-                    {isChangedMode ? (
-                      <span className="text-5xl block">🪨</span>
-                    ) : (
-                      <TanahSuburImage className="w-14 h-14" alt="Tanah Subur Lembap" />
-                    )}
-                  </div>
-                  <span className="text-xs font-bold text-stone-800 bg-white/80 px-2 py-0.5 rounded-full mt-1 inline-block">
-                    {isChangedMode ? 'Tanah Kering' : 'Tanah Subur Lembap'}
-                  </span>
-                </div>
-
-                <div className="text-center flex flex-col items-center">
-                  <CharacterAvatar size="md" isWalking={false} />
-                  <span className="text-xs font-bold text-stone-800 bg-white/80 px-2 py-0.5 rounded-full mt-1 inline-block">
-                    Dara Mengamati
-                  </span>
+              {/* Bottom status badge indicating the holistic state */}
+              <div className="relative z-10 flex items-center justify-between mt-auto pt-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-xs border border-stone-200/80 shadow-xs text-xs font-bold text-stone-800">
+                  <span className={`w-2.5 h-2.5 rounded-full ${isChangedMode ? 'bg-amber-500' : 'bg-emerald-500'}`} />
+                  <span>{isChangedMode ? 'Ekosistem Mengalami Kekeringan (Tanpa Air)' : 'Ekosistem Taman Subur Lembap & Sehat (Cukup Air)'}</span>
                 </div>
               </div>
             </div>
@@ -778,7 +778,11 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                     >
                       <span>{opt.text}</span>
                       {isSelected && (
-                        <span className="text-base shrink-0">{opt.isCorrect ? '✅' : '❌'}</span>
+                        opt.isCorrect ? (
+                          <Check className="w-5 h-5 text-emerald-600 shrink-0" />
+                        ) : (
+                          <X className="w-5 h-5 text-red-600 shrink-0" />
+                        )
                       )}
                     </button>
                   );
@@ -787,7 +791,10 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
 
               {selectedOptionId && (
                 <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-950">
-                  <p className="font-bold mb-0.5">🌟 Kesimpulan Hubungan Biotik & Abiotik:</p>
+                  <p className="font-bold mb-0.5 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <span>Kesimpulan Hubungan Biotik & Abiotik:</span>
+                  </p>
                   <p>{currentScenario.explanation}</p>
                 </div>
               )}
