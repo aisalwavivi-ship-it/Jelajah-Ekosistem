@@ -213,45 +213,21 @@ export const MapScene: React.FC<MapSceneProps> = ({
         </div>
 
         {/* The Illustrated Panoramic Map Canvas */}
-        <div className="relative w-full bg-white/80 backdrop-blur-sm rounded-3xl border-4 border-amber-300/90 shadow-xl overflow-hidden min-h-[480px] sm:min-h-[540px]">
-          {/* Subtle natural scenery illustrations inside map */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Mountain backdrop */}
-            <svg viewBox="0 0 1000 600" className="w-full h-full opacity-40" preserveAspectRatio="none">
-              <polygon points="0,220 180,80 340,240" fill="#93c5fd" />
-              <polygon points="260,240 450,70 650,260" fill="#bfdbfe" />
-              <polygon points="560,250 780,100 1000,280" fill="#a7f3d0" />
-            </svg>
+        <div className="relative w-full bg-stone-900/10 rounded-3xl border-4 border-amber-300/90 shadow-2xl overflow-hidden min-h-[480px] sm:min-h-[540px] md:min-h-[580px] aspect-[16/9] max-h-[640px]">
+          {/* Main Natural Landscape Background Image */}
+          <img
+            src="/jelajah-ekosistem-bg.jpg"
+            alt="Lansekap Peta Petualangan Ekosistem"
+            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none z-0"
+            referrerPolicy="no-referrer"
+          />
 
-            {/* Clouds & Sun */}
-            <div className="absolute top-4 left-8 text-4xl">☀️</div>
-            <div className="absolute top-6 left-1/4 text-3xl opacity-60">☁️</div>
-            <div className="absolute top-10 right-1/4 text-4xl opacity-50">☁️</div>
-
-            {/* School Gate icon on start */}
-            <div className="absolute left-[3%] bottom-[12%] text-center">
-              <div className="text-3xl">🏫</div>
-              <span className="text-[10px] font-bold text-emerald-950 bg-white/80 px-1.5 py-0.5 rounded shadow-xs">
-                Gerbang
-              </span>
-            </div>
-
-            {/* Pond visual near mission 5 */}
-            <div className="absolute left-[58%] top-[64%] w-24 h-14 bg-sky-300/80 rounded-[50%] border-2 border-sky-400/80 flex items-center justify-center text-xs">
-              <span className="text-lg">🪷</span>
-            </div>
-
-            {/* Trees scattered around map */}
-            <div className="absolute left-[16%] top-[35%] text-2xl">🌳</div>
-            <div className="absolute left-[32%] top-[40%] text-2xl">🌲</div>
-            <div className="absolute left-[45%] top-[70%] text-xl">🪴</div>
-            <div className="absolute right-[22%] top-[25%] text-2xl">🌳</div>
-            <div className="absolute right-[8%] top-[12%] text-3xl">🌅</div>
-          </div>
+          {/* Subtle natural atmosphere gradient overlay for contrast */}
+          <div className="absolute inset-0 bg-radial-[ellipse_at_center,_var(--tw-gradient-stops)] from-transparent via-stone-900/5 to-stone-950/20 pointer-events-none z-0" />
 
           {/* SVG Winding Natural Trail Path across all nodes */}
           <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full pointer-events-none z-10"
             viewBox="0 0 1000 600"
             preserveAspectRatio="none"
           >
