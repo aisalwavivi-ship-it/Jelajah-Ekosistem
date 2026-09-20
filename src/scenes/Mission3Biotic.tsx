@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, AlertCircle } from 
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
+import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 
 interface Mission3Props {
   onComplete: (points: number) => void;
@@ -16,113 +17,114 @@ interface ItemCard {
   name: string;
   isSingleIndividual: boolean;
   icon: string;
-  image: string;
   category: string;
   individualCount: number;
   explanation: string;
 }
 
 const CANDIDATE_ITEMS: ItemCard[] = [
+  // BARIS 1
+  // Posisi 1: 1 Batang Pohon Beringin (BENAR)
   {
     id: 'one_tree',
     name: '1 Batang Pohon Beringin',
     isSingleIndividual: true,
     icon: '🌳',
-    image: '/misi3/pohon-beringin.png',
     category: '1 Individu Tumbuhan',
     individualCount: 1,
     explanation: 'Tepat sekali! Satu pohon yang berdiri kokoh di taman adalah SATU individu.',
   },
+  // Posisi 2: 1 Batu Taman (SALAH)
+  {
+    id: 'stone_pile',
+    name: '1 Batu Taman',
+    isSingleIndividual: false,
+    icon: '🪨',
+    category: 'Benda Tak Hidup (Abiotik)',
+    individualCount: 0,
+    explanation: 'Batu taman adalah benda tak hidup (abiotik). "Individu" hanya berlaku untuk makhluk hidup!',
+  },
+  // Posisi 3: 1 Ekor Ikan Mas (BENAR)
   {
     id: 'one_fish',
     name: '1 Ekor Ikan Mas',
     isSingleIndividual: true,
     icon: '🐟',
-    image: '/misi3/ikan-individu.png',
     category: '1 Individu Hewan Air',
     individualCount: 1,
     explanation: 'Benar! Seekor ikan mas yang berenang sendirian di kolam adalah SATU individu.',
   },
+  // Posisi 4: Banyak Lebah (SALAH)
+  {
+    id: 'many_bees',
+    name: 'Banyak Lebah',
+    isSingleIndividual: false,
+    icon: '🐝🐝🐝',
+    category: 'Bukan 1 Individu (Populasi)',
+    individualCount: 15,
+    explanation: 'Banyak lebah terdiri dari sekumpulan lebah sejenis. Itu disebut POPULASI, bukan 1 individu.',
+  },
+  // Posisi 5: 1 Ekor Kupu-kupu (BENAR)
   {
     id: 'one_butterfly',
     name: '1 Ekor Kupu-kupu',
     isSingleIndividual: true,
     icon: '🦋',
-    image: '/misi3/kupu-kupu.png',
     category: '1 Individu Serangga',
     individualCount: 1,
     explanation: 'Hebat! Satu ekor kupu-kupu yang hinggap di bunga adalah SATU individu.',
   },
-  {
-    id: 'one_bird',
-    name: '1 Ekor Burung Kutilang',
-    isSingleIndividual: true,
-    icon: '🐦',
-    image: '/misi3/burung-kutilang.png',
-    category: '1 Individu Burung',
-    individualCount: 1,
-    explanation: 'Bagus! Seekor burung kutilang di atas ranting adalah SATU individu.',
-  },
-  {
-    id: 'one_rabbit',
-    name: '1 Ekor Kelinci',
-    isSingleIndividual: true,
-    icon: '🐰',
-    image: '/misi3/kelinci.png',
-    category: '1 Individu Mamalia',
-    individualCount: 1,
-    explanation: 'Tepat! Satu ekor kelinci yang melompat di rerumputan adalah SATU individu.',
-  },
-  {
-    id: 'one_lotus',
-    name: '1 Bunga Teratai',
-    isSingleIndividual: true,
-    icon: '🪷',
-    image: '/misi3/teratai.png',
-    category: '1 Individu Tumbuhan',
-    individualCount: 1,
-    explanation: 'Benar sekali! Satu tangkai bunga teratai di atas kolam adalah SATU individu.',
-  },
-  // Non-individuals (Groups or Abiotic)
-  {
-    id: 'stone_pile',
-    name: 'Sebongkah Batu Taman',
-    isSingleIndividual: false,
-    icon: '🪨',
-    image: '/misi3/batu.png',
-    category: 'Benda Tak Hidup (Abiotik)',
-    individualCount: 0,
-    explanation: 'Batu taman adalah benda tak hidup (abiotik). "Individu" hanya berlaku untuk makhluk hidup!',
-  },
-  {
-    id: 'many_bees',
-    name: 'Kawanan Banyak Lebah',
-    isSingleIndividual: false,
-    icon: '🐝🐝🐝',
-    image: '/misi3/kawanan-lebah.png',
-    category: 'Bukan 1 Individu (Populasi)',
-    individualCount: 15,
-    explanation: 'Kawanan lebah terdiri dari BANYAK lebah sejenis. Itu disebut POPULASI, bukan 1 individu.',
-  },
+
+  // BARIS 2
+  // Posisi 6: Genangan Air Kolam (SALAH)
   {
     id: 'puddle_water',
     name: 'Genangan Air Kolam',
     isSingleIndividual: false,
     icon: '💧',
-    image: '/misi3/genangan-air.png',
     category: 'Benda Tak Hidup (Abiotik)',
     individualCount: 0,
     explanation: 'Air adalah faktor abiotik, bukan makhluk hidup tunggal.',
   },
+  // Posisi 7: 1 Ekor Burung Kutilang (BENAR)
+  {
+    id: 'one_bird',
+    name: '1 Ekor Burung Kutilang',
+    isSingleIndividual: true,
+    icon: '🐦',
+    category: '1 Individu Burung',
+    individualCount: 1,
+    explanation: 'Bagus! Seekor burung kutilang di atas ranting adalah SATU individu.',
+  },
+  // Posisi 8: Kumpulan 10 Ikan Mujair (SALAH)
   {
     id: 'fish_shoal',
     name: 'Kumpulan 10 Ikan Mujair',
     isSingleIndividual: false,
     icon: '🐟🐟🐟',
-    image: '/misi3/ikan-populasi.png',
     category: 'Bukan 1 Individu (Populasi)',
     individualCount: 10,
     explanation: 'Kumpulan 10 ekor ikan sejenis adalah POPULASI, bukan satu individu.',
+  },
+  // Posisi 9: 1 Ekor Kelinci (BENAR)
+  {
+    id: 'one_rabbit',
+    name: '1 Ekor Kelinci',
+    isSingleIndividual: true,
+    icon: '🐰',
+    category: '1 Individu Mamalia',
+    individualCount: 1,
+    explanation: 'Tepat! Satu ekor kelinci yang melompat di rerumputan adalah SATU individu.',
+  },
+  // Posisi 10: 1 Bunga Teratai (BENAR)
+  {
+    id: 'one_lotus',
+    name: '1 Bunga Teratai',
+    isSingleIndividual: true,
+    icon: '🪷',
+    category: '1 Individu Tumbuhan',
+    individualCount: 1,
+    explanation: 'Benar sekali! Satu tangkai bunga teratai di atas kolam adalah SATU individu.',
   },
 ];
 
@@ -132,6 +134,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
   onNextMission,
 }) => {
   const [foundIndividualIds, setFoundIndividualIds] = useState<string[]>([]);
+  const [wrongCardIds, setWrongCardIds] = useState<string[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<{
     text: string;
     isCorrect: boolean;
@@ -169,6 +172,9 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
       });
     } else {
       sound.playWrong();
+      if (!wrongCardIds.includes(item.id)) {
+        setWrongCardIds((prev) => [...prev, item.id]);
+      }
       setSelectedMessage({
         text: `⚠️ Perhatikan: ${item.explanation}`,
         isCorrect: false,
@@ -180,6 +186,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
   const handleReset = () => {
     sound.playClick();
     setFoundIndividualIds([]);
+    setWrongCardIds([]);
     setSelectedMessage(null);
     setHasCompleted(false);
   };
@@ -199,13 +206,8 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
         {/* Header */}
         <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-2 border-emerald-200/80 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-300 flex items-center justify-center p-1 shrink-0 overflow-hidden shadow-xs">
-              <img
-                src="/misi3/ikan-individu.png"
-                alt="Ikan Realistis"
-                className="w-full h-full object-contain"
-                referrerPolicy="no-referrer"
-              />
+            <div className="w-12 h-12 rounded-2xl bg-teal-100 border border-teal-300 flex items-center justify-center text-2xl shrink-0">
+              👤
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -251,14 +253,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
             <div className="p-3 rounded-2xl bg-teal-50 border-2 border-teal-400 flex items-center gap-3">
-              <div className="w-10 h-10 shrink-0 flex items-center justify-center">
-                <img
-                  src="/misi3/ikan-individu.png"
-                  alt="1 Ekor Ikan (Individu)"
-                  className="w-full h-full object-contain drop-shadow-xs"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+              <span className="text-3xl shrink-0">🐟</span>
               <div>
                 <span className="font-bold text-teal-950 block text-xs sm:text-sm">1 Ekor Ikan (Individu)</span>
                 <p className="text-[11px] text-teal-700 leading-snug">
@@ -268,14 +263,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-amber-50 border-2 border-amber-300 flex items-center gap-3">
-              <div className="w-10 h-10 shrink-0 flex items-center justify-center">
-                <img
-                  src="/misi3/ikan-populasi.png"
-                  alt="Kumpulan Ikan (Populasi)"
-                  className="w-full h-full object-contain drop-shadow-xs"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+              <span className="text-3xl shrink-0">🐟🐟🐟</span>
               <div>
                 <span className="font-bold text-amber-950 block text-xs sm:text-sm">Kumpulan Ikan (Populasi)</span>
                 <p className="text-[11px] text-amber-800 leading-snug">
@@ -285,14 +273,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-stone-50 border-2 border-stone-300 flex items-center gap-3">
-              <div className="w-10 h-10 shrink-0 flex items-center justify-center">
-                <img
-                  src="/misi3/batu.png"
-                  alt="Batu / Air (Abiotik)"
-                  className="w-full h-full object-contain drop-shadow-xs"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
+              <span className="text-3xl shrink-0">🪨</span>
               <div>
                 <span className="font-bold text-stone-900 block text-xs sm:text-sm">Batu / Air (Abiotik)</span>
                 <p className="text-[11px] text-stone-600 leading-snug">
@@ -318,12 +299,12 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
               className={`p-3.5 rounded-2xl border-2 flex items-center justify-between gap-3 shadow-md ${
                 selectedMessage.isCorrect
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                  : 'bg-amber-50 border-amber-300 text-amber-950'
+                  : 'bg-red-50 border-red-300 text-red-950'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <span className="text-2xl">
-                  {selectedMessage.isCorrect ? '🌟' : '🤔'}
+                  {selectedMessage.isCorrect ? '🌟' : '❌'}
                 </span>
                 <p className="text-xs sm:text-sm font-medium">
                   {selectedMessage.text}
@@ -356,9 +337,19 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {CANDIDATE_ITEMS.map((item) => {
               const isFound = foundIndividualIds.includes(item.id);
+              const isWrong = wrongCardIds.includes(item.id);
+
+              let cardStyle = 'bg-stone-50 hover:bg-teal-50/70 border-stone-200 hover:border-teal-300 text-stone-800';
+              if (isFound) {
+                // Kartu berubah menjadi warna hijau (BENAR)
+                cardStyle = 'bg-emerald-100 hover:bg-emerald-200/80 border-emerald-500 ring-2 ring-emerald-300 shadow-sm text-emerald-950';
+              } else if (isWrong) {
+                // Kartu berubah menjadi warna merah (SALAH)
+                cardStyle = 'bg-red-100 hover:bg-red-200/80 border-red-500 ring-2 ring-red-300 shadow-sm text-red-950';
+              }
 
               return (
                 <motion.button
@@ -367,28 +358,43 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
                   onClick={() => handleItemClick(item)}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.96 }}
-                  className={`p-3.5 rounded-2xl border-2 text-left transition-all flex flex-col items-center justify-center text-center relative group cursor-pointer ${
-                    isFound
-                      ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-300 shadow-sm'
-                      : 'bg-stone-50 hover:bg-teal-50/70 border-stone-200 hover:border-teal-300'
-                  }`}
+                  className={`p-3.5 rounded-2xl border-2 text-left transition-all flex flex-col items-center justify-center text-center relative group cursor-pointer ${cardStyle}`}
                 >
-                  <div className="w-12 h-12 mb-1.5 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-contain drop-shadow-xs"
-                      referrerPolicy="no-referrer"
-                      loading="eager"
-                    />
-                  </div>
-                  <span className="font-display font-bold text-xs sm:text-sm text-stone-900 leading-tight">
+                  {isBatuTaman(item.name) ? (
+                    <BatuTamanImage className="w-10 h-10 mb-1.5 drop-shadow-sm group-hover:scale-110 transition-transform" alt={item.name} />
+                  ) : (
+                    <span className="text-4xl mb-1.5 filter drop-shadow-xs group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </span>
+                  )}
+                  <span className={`font-display font-bold text-xs sm:text-sm leading-tight ${
+                    isFound ? 'text-emerald-950' : isWrong ? 'text-red-950' : 'text-stone-900'
+                  }`}>
                     {item.name}
                   </span>
+                  <span className={`text-[10px] font-semibold mt-1 ${
+                    isFound ? 'text-emerald-800' : isWrong ? 'text-red-700' : 'text-teal-800'
+                  }`}>
+                    {item.category}
+                  </span>
 
+                  {/* Indikator BENAR: Centang Hijau */}
                   {isFound && (
-                    <span className="absolute top-2 right-2 bg-teal-600 text-white rounded-full p-0.5 text-xs shadow-xs font-bold">
+                    <span
+                      className="absolute top-2 right-2 bg-emerald-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-xs font-bold"
+                      title="Jawaban Benar"
+                    >
                       ✓
+                    </span>
+                  )}
+
+                  {/* Indikator SALAH: Silang Merah */}
+                  {isWrong && (
+                    <span
+                      className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-xs font-bold"
+                      title="Jawaban Salah"
+                    >
+                      ✖
                     </span>
                   )}
                 </motion.button>
@@ -423,15 +429,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
               }`}
             >
               <div className="font-bold mb-1 flex items-center justify-between text-teal-900">
-                <span className="flex items-center gap-1.5">
-                  <span>Pilihan A</span>
-                  <img
-                    src="/misi3/ikan-individu.png"
-                    alt="1 Ikan"
-                    className="w-5 h-5 object-contain inline-block"
-                    referrerPolicy="no-referrer"
-                  />
-                </span>
+                <span>Pilihan A 🐟</span>
                 {verificationChoice === 'correct' && <span className="text-teal-700 font-bold">✓ Tepat Sekali!</span>}
               </div>
               <p className="text-[11px] text-stone-700">
@@ -448,15 +446,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
               }`}
             >
               <div className="font-bold mb-1 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <span>Pilihan B</span>
-                  <img
-                    src="/misi3/ikan-populasi.png"
-                    alt="Kumpulan Ikan"
-                    className="w-6 h-5 object-contain inline-block"
-                    referrerPolicy="no-referrer"
-                  />
-                </span>
+                <span>Pilihan B 🐟🐟🐟</span>
                 {verificationChoice === 'wrong1' && <span className="text-red-600 font-bold">✗ Ini Populasi</span>}
               </div>
               <p className="text-[11px] text-stone-600">
@@ -473,15 +463,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
               }`}
             >
               <div className="font-bold mb-1 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <span>Pilihan C</span>
-                  <img
-                    src="/misi3/batu.png"
-                    alt="Batu Kali"
-                    className="w-5 h-5 object-contain inline-block"
-                    referrerPolicy="no-referrer"
-                  />
-                </span>
+                <span>Pilihan C 🪨</span>
                 {verificationChoice === 'wrong2' && <span className="text-red-600 font-bold">✗ Ini Abiotik</span>}
               </div>
               <p className="text-[11px] text-stone-600">

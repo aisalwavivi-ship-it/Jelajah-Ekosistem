@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppScene, MissionId, ActiveSession, SessionHistoryItem, MissionJournalEntry } from './types';
 import { sound } from './utils/audio';
@@ -31,10 +31,9 @@ import { DailyCheckInModal } from './components/DailyCheckInModal';
 import { RestartConfirmModal } from './components/RestartConfirmModal';
 import { HistoryModal } from './components/HistoryModal';
 import { GameOpeningScreen } from './components/GameOpeningScreen';
-import { MissionVoicePromptGuide } from './components/MissionVoicePromptGuide';
 import { DynamicWeatherBackground } from './components/DynamicWeatherBackground';
 import { WeatherType, WeatherMode, resolveActiveWeather } from './utils/weather';
-import { playMissionVoicePrompt, stopCurrentVoicePrompt } from './utils/missionVoicePrompts';
+import { scrollToPageTop, scheduleSceneScrollReset } from './utils/scrollHelper';
 
 // Scenes
 import { StartScene } from './scenes/StartScene';
@@ -52,12 +51,6 @@ import { MaterialScene } from './scenes/MaterialScene';
 
 export default function App() {
   const [currentScene, setCurrentScene] = useState<AppScene>('start');
-  // Walking transition state when traveling between missions
-  const [pendingWalkingScene, setPendingWalkingScene] = useState<{
-    fromScene: AppScene;
-    toScene: AppScene;
-  } | null>(null);
-
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isCertificateOpen, setIsCertificateOpen] = useState<boolean>(false);
   const [isJournalOpen, setIsJournalOpen] = useState<boolean>(false);
@@ -147,59 +140,22 @@ export default function App() {
     }
   };
 
-  // Voice prompt and narration manager for scenes
-  const lastPlayedVoicePromptRef = useRef<string | null>(null);
-
-  // Stop narration, opening jingle, and voice prompts on scene transition
+  // Handle scene transition: stop narration and immediately reset scroll to the top
   useEffect(() => {
     tts.stop();
-    stopCurrentVoicePrompt();
-    sound.stopOpeningJingle();
+    const cleanupScroll = scheduleSceneScrollReset();
+    return () => {
+      cleanupScroll();
+    };
   }, [currentScene]);
 
-  // Voice prompt played ONCE when user enters each mission scene or quiz
-  // Does not re-trigger on re-render, respects isAudioMuted, and waits until walking trail is finished
+  // Set browser scrollRestoration to manual so refresh/reload always starts at the top
   useEffect(() => {
-    if (isAudioMuted || pendingWalkingScene || !hasSeenOpening) {
-      stopCurrentVoicePrompt();
-      return;
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
     }
-
-    const missionScenes = [
-      'mission-1',
-      'mission-2',
-      'mission-3',
-      'mission-4',
-      'mission-5',
-      'mission-6',
-      'mission-7',
-      'mission-8',
-      'quiz',
-    ];
-
-    if (missionScenes.includes(currentScene)) {
-      if (lastPlayedVoicePromptRef.current !== currentScene) {
-        lastPlayedVoicePromptRef.current = currentScene;
-        // Wait 450ms for scene transition to settle smoothly before guiding the student
-        const timer = setTimeout(() => {
-          playMissionVoicePrompt(currentScene, { isMuted: isAudioMuted });
-        }, 450);
-        return () => clearTimeout(timer);
-      }
-    } else {
-      // Reset tracker when returning to start, map, or material so returning to mission plays cleanly
-      lastPlayedVoicePromptRef.current = null;
-      stopCurrentVoicePrompt();
-    }
-  }, [currentScene, pendingWalkingScene, hasSeenOpening, isAudioMuted]);
-
-  // Handle immediate mute toggling
-  useEffect(() => {
-    if (isAudioMuted) {
-      stopCurrentVoicePrompt();
-      sound.stopOpeningJingle();
-    }
-  }, [isAudioMuted]);
+    scrollToPageTop();
+  }, []);
 
   // Background Nature Music toggle
   const handleToggleMusic = () => {
@@ -307,7 +263,7 @@ export default function App() {
         };
       } else {
         const newEntry: MissionJournalEntry = {
-          id: `journal-m${missionId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          id: `journal-m${missionId}-${Date.now()}`,
           missionId,
           title: meta?.title || `Misi ${missionId}`,
           subtitle: meta?.subtitle || '',
@@ -339,8 +295,15 @@ export default function App() {
     });
   };
 
+  // Walking transition state when traveling between missions
+  const [pendingWalkingScene, setPendingWalkingScene] = useState<{
+    fromScene: AppScene;
+    toScene: AppScene;
+  } | null>(null);
+
   const navigateWithWalkingTrail = (toScene: AppScene, fromScene?: AppScene) => {
     const from = fromScene || currentScene;
+    scrollToPageTop();
     if (from !== toScene) {
       setPendingWalkingScene({
         fromScene: from,
@@ -597,14 +560,6 @@ export default function App() {
             }}
             className="flex-1 w-full flex flex-col"
           >
-            {/* Contextual Adventure Guide Voice Prompt Banner for Missions 1-8 and Tantangan */}
-            {['mission-1', 'mission-2', 'mission-3', 'mission-4', 'mission-5', 'mission-6', 'mission-7', 'mission-8', 'quiz'].includes(currentScene) && !pendingWalkingScene && (
-              <MissionVoicePromptGuide
-                sceneKey={currentScene}
-                isAudioMuted={isAudioMuted}
-              />
-            )}
-
             {currentScene === 'start' && (
               <StartScene
                 playerName={activeSession.studentName || 'Penjelajah Muda'}
@@ -755,10 +710,12 @@ export default function App() {
           fromScene={pendingWalkingScene.fromScene}
           toScene={pendingWalkingScene.toScene}
           onFinish={() => {
+            scrollToPageTop();
             setCurrentScene(pendingWalkingScene.toScene);
             setPendingWalkingScene(null);
           }}
           onSkip={() => {
+            scrollToPageTop();
             setCurrentScene(pendingWalkingScene.toScene);
             setPendingWalkingScene(null);
           }}
