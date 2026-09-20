@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Sparkles, Compass, Footprints } from 'lucide-react';
 import { AppScene } from '../types';
@@ -200,6 +200,17 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
   const [isWalking, setIsWalking] = useState<boolean>(false);
   const [hasArrived, setHasArrived] = useState<boolean>(false);
   const [footsteps, setFootsteps] = useState<{ id: number; x: number; y: number }[]>([]);
+  const footstepCounterRef = useRef<number>(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
 
   // Current mission data slice
   const activeMissionIndex = Math.max(0, Math.min(totalMission - 1, currentMission - 1));
@@ -228,23 +239,30 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
     const startTime = Date.now();
     const duration = 1250; // Smooth 1.25s walking animation along the curve
 
-    const interval = setInterval(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const p = Math.min(1, elapsed / duration);
       setWalkProgress(p);
 
       const pos = getPathCoordinates(p);
       if (p > 0.06 && p < 0.94) {
+        footstepCounterRef.current += 1;
+        const newStepId = footstepCounterRef.current;
         setFootsteps((prev) => {
-          if (prev.length > 7) {
-            return [...prev.slice(1), { id: Date.now(), x: pos.xPercent, y: pos.yPercent }];
-          }
-          return [...prev, { id: Date.now(), x: pos.xPercent, y: pos.yPercent }];
+          const next = [...prev, { id: newStepId, x: pos.xPercent, y: pos.yPercent }];
+          return next.length > 8 ? next.slice(next.length - 8) : next;
         });
       }
 
       if (elapsed >= duration) {
-        clearInterval(interval);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
         setWalkProgress(1);
         setHasArrived(true);
         sound.playStarEarned();
@@ -268,6 +286,10 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
 
   const handleEnterOrSkip = () => {
     sound.playClick();
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
     if (onFinish) {
       onFinish();
     } else if (onSkip) {
@@ -366,9 +388,9 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
           />
 
           {/* Dynamic Footsteps along the Motion Curve */}
-          {footsteps.map((fs) => (
+          {footsteps.map((fs, idx) => (
             <motion.div
-              key={fs.id}
+              key={`footstep-node-${fs.id}-${idx}`}
               initial={{ opacity: 0.8, scale: 0.6 }}
               animate={{ opacity: 0.15, scale: 1 }}
               transition={{ duration: 1.4 }}

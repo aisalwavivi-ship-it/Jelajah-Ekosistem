@@ -551,7 +551,7 @@ export const ExplorerJournal: React.FC<ExplorerJournalProps> = ({
 
                   return (
                     <motion.div
-                      key={entry.id || `entry-${entry.missionId}-${index}`}
+                      key={`journal-entry-${entry.id || entry.missionId}-${index}`}
                       initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}

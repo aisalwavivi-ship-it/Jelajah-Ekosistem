@@ -307,7 +307,7 @@ export default function App() {
         };
       } else {
         const newEntry: MissionJournalEntry = {
-          id: `journal-m${missionId}-${Date.now()}`,
+          id: `journal-m${missionId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           missionId,
           title: meta?.title || `Misi ${missionId}`,
           subtitle: meta?.subtitle || '',
