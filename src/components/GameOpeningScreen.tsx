@@ -70,9 +70,9 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
           id="game-opening-screen"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.04, filter: 'blur(6px)' }}
+          exit={{ opacity: 0, scale: 1.02, filter: 'blur(6px)' }}
           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[9999] flex flex-col justify-between items-center w-full h-full overflow-y-auto overflow-x-hidden select-none touch-manipulation"
+          className="fixed inset-0 z-[9999] flex flex-col justify-between items-center w-full h-full h-screen max-h-screen overflow-hidden select-none touch-manipulation"
         >
           {/* SCENE 1: Existing Ecosystem Background with gentle cinematic zoom */}
           <motion.div
@@ -133,13 +133,13 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
           </div>
 
           {/* Top Bar: Skip Button and Mini Tag */}
-          <div className="w-full max-w-6xl mx-auto px-4 pt-4 sm:pt-6 flex items-center justify-between z-20">
+          <div className="w-full max-w-6xl mx-auto px-4 pt-3 sm:pt-4 flex items-center justify-between z-20 shrink-0">
             {/* Mini Game Badge */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-white/60 shadow-md text-emerald-950 text-xs font-bold"
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/85 backdrop-blur-md border border-white/60 shadow-md text-emerald-950 text-xs font-bold"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               <span>Game Petualangan Sains SD</span>
@@ -151,7 +151,7 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
               type="button"
               onClick={handleSkip}
               onTouchEnd={handleSkip}
-              className="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/85 hover:bg-white active:scale-95 text-stone-700 hover:text-stone-900 border border-stone-200/80 shadow-md text-xs font-bold transition-all cursor-pointer backdrop-blur-md pointer-events-auto touch-manipulation"
+              className="group inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/85 hover:bg-white active:scale-95 text-stone-700 hover:text-stone-900 border border-stone-200/80 shadow-md text-xs font-bold transition-all cursor-pointer backdrop-blur-md pointer-events-auto touch-manipulation"
             >
               <span>Lewati</span>
               <ChevronRight className="w-3.5 h-3.5 text-stone-500 group-hover:translate-x-0.5 transition-transform" />
@@ -159,26 +159,26 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
           </div>
 
           {/* Center Stage: Title, Subtitle, Character & Call to Action */}
-          <div className="w-full max-w-3xl mx-auto px-4 py-4 flex flex-col items-center justify-center text-center relative z-30 pointer-events-auto">
+          <div className="w-full max-w-3xl mx-auto px-4 py-1 flex-1 flex flex-col items-center justify-center text-center relative z-30 pointer-events-auto min-h-0">
             
             {/* SCENE 2: Game Title "🌿 JELAJAH EKOSISTEM" */}
             <AnimatePresence>
               {phase >= 2 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 24, scale: 0.92 }}
+                  initial={{ opacity: 0, y: 20, scale: 0.94 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="space-y-3"
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                  className="space-y-1.5 sm:space-y-2"
                 >
                   {/* Category Pill */}
-                  <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-400/90 text-amber-950 font-bold text-xs sm:text-sm shadow-md border border-amber-200/80">
-                    <Sparkles className="w-3.5 h-3.5 fill-current" />
+                  <div className="inline-flex items-center gap-2 px-3.5 py-0.5 rounded-full bg-amber-400/90 text-amber-950 font-bold text-xs shadow-md border border-amber-200/80">
+                    <Sparkles className="w-3 h-3 fill-current" />
                     <span>Petualangan Penyelidikan Alam</span>
-                    <Sparkles className="w-3.5 h-3.5 fill-current" />
+                    <Sparkles className="w-3 h-3 fill-current" />
                   </div>
 
                   {/* Main Title Card */}
-                  <h1 className="font-display font-black text-4xl sm:text-6xl md:text-7xl text-white tracking-tight leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.55)]">
+                  <h1 className="font-display font-black text-3xl sm:text-5xl md:text-6xl text-white tracking-tight leading-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.55)]">
                     <span className="text-emerald-300 drop-shadow-[0_2px_4px_rgba(6,78,59,0.9)]">🌿 </span>
                     <span className="bg-gradient-to-b from-white via-amber-50 to-amber-100 bg-clip-text text-transparent drop-shadow-[0_3px_6px_rgba(0,0,0,0.4)]">
                       JELAJAH EKOSISTEM
@@ -192,15 +192,15 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
             <AnimatePresence>
               {phase >= 3 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 15 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                  className="mt-3 max-w-xl"
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  className="mt-1 sm:mt-2 max-w-xl"
                 >
-                  <p className="font-display font-medium text-base sm:text-xl md:text-2xl text-amber-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                  <p className="font-display font-medium text-sm sm:text-lg md:text-xl text-amber-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
                     “Siap menjelajahi dunia ekosistem?”
                   </p>
-                  <p className="text-xs sm:text-sm text-stone-100/90 font-medium mt-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+                  <p className="text-[11px] sm:text-xs md:text-sm text-stone-100/90 font-medium mt-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
                     Temukan komponen biotik, abiotik, rantai makanan, dan rahasia keseimbangan alam di sekitarmu!
                   </p>
                 </motion.div>
@@ -211,7 +211,7 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
             <AnimatePresence>
               {phase >= 4 && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.75, y: 30 }}
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{
                     type: 'spring',
@@ -219,25 +219,25 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
                     damping: 20,
                     delay: 0.1,
                   }}
-                  className="mt-5 mb-2 flex flex-col items-center relative"
+                  className="mt-2 sm:mt-3 mb-1 sm:mb-2 flex flex-col items-center relative"
                 >
                   {/* Floating speech bubble greeting */}
                   <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.9 }}
+                    initial={{ opacity: 0, y: 6, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ delay: 0.35, duration: 0.3 }}
-                    className="bg-white/95 text-stone-800 px-3.5 py-1.5 rounded-2xl shadow-xl border-2 border-amber-300 text-center mb-2"
+                    transition={{ delay: 0.3, duration: 0.3 }}
+                    className="bg-white/95 text-stone-800 px-3 py-1 rounded-2xl shadow-xl border-2 border-amber-300 text-center mb-1"
                   >
-                    <span className="text-xs font-bold text-emerald-950 flex items-center gap-1">
+                    <span className="text-[11px] sm:text-xs font-bold text-emerald-950 flex items-center gap-1">
                       <span>👋 Halo {studentName}! Ayo kita mulai petualangannya!</span>
                     </span>
-                    <div className="w-2.5 h-2.5 bg-white rotate-45 mx-auto -mb-2 border-r-2 border-b-2 border-amber-300" />
+                    <div className="w-2 h-2 bg-white rotate-45 mx-auto -mb-1 border-r-2 border-b-2 border-amber-300" />
                   </motion.div>
 
-                  {/* Character Avatar from uploaded reference */}
+                  {/* Character Avatar */}
                   <div className="relative">
                     <CharacterAvatar
-                      size="lg"
+                      size="md"
                       isCelebrating={true}
                       direction="right"
                     />
@@ -250,23 +250,23 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
             <AnimatePresence>
               {phase >= 5 && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  initial={{ opacity: 0, y: 16, scale: 0.9 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   transition={{
                     type: 'spring',
                     stiffness: 280,
                     damping: 18,
                   }}
-                  className="mt-4 w-full max-w-sm relative z-40 pointer-events-auto"
+                  className="mt-2 sm:mt-3 w-full max-w-xs sm:max-w-sm relative z-40 pointer-events-auto shrink-0"
                 >
                   <button
                     id="btn-start-opening-adventure"
                     type="button"
                     onClick={handleStart}
                     onTouchEnd={handleStart}
-                    className="w-full py-4 px-8 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:to-teal-700 active:scale-95 text-white font-display font-black text-lg sm:text-xl rounded-2xl shadow-xl shadow-emerald-700/40 border-2 border-emerald-300 flex items-center justify-center gap-3 transition-all duration-150 cursor-pointer pointer-events-auto touch-manipulation select-none ring-4 ring-emerald-400/30"
+                    className="w-full py-3 sm:py-3.5 px-6 sm:px-8 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-600 hover:to-teal-700 active:scale-95 text-white font-display font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-emerald-700/40 border-2 border-emerald-300 flex items-center justify-center gap-2.5 transition-all duration-150 cursor-pointer pointer-events-auto touch-manipulation select-none ring-4 ring-emerald-400/30"
                   >
-                    <Play className="w-6 h-6 fill-current shrink-0" />
+                    <Play className="w-5 h-5 fill-current shrink-0" />
                     <span>MULAI PETUALANGAN</span>
                   </button>
                 </motion.div>
@@ -279,10 +279,10 @@ export const GameOpeningScreen: React.FC<GameOpeningScreenProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.9 }}
-            transition={{ delay: 0.6, duration: 0.5 }}
-            className="w-full text-center pb-4 z-20"
+            transition={{ delay: 0.4, duration: 0.4 }}
+            className="w-full text-center pb-2 sm:pb-3 z-20 shrink-0"
           >
-            <p className="text-[11px] text-white/80 font-medium drop-shadow-sm">
+            <p className="text-[10px] sm:text-[11px] text-white/80 font-medium drop-shadow-sm">
               Kurikulum Merdeka • Kelas 5 SD • Ilmu Pengetahuan Alam dan Sosial (IPAS)
             </p>
           </motion.div>
