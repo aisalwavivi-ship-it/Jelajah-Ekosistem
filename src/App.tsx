@@ -315,9 +315,17 @@ export default function App() {
   };
 
   const handleStartAdventure = (name?: string) => {
-    sound.playFootstep();
-    ambientMusic.start();
-    setIsMusicPlaying(true);
+    try {
+      sound.playFootstep();
+    } catch (err) {
+      console.warn('Audio footstep error:', err);
+    }
+    try {
+      ambientMusic.start();
+      setIsMusicPlaying(true);
+    } catch (err) {
+      console.warn('Ambient music error:', err);
+    }
 
     const safeArgName = typeof name === 'string' ? name.trim() : '';
     const safeCurrentName =
