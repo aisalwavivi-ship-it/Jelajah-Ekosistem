@@ -259,9 +259,9 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 sound.playFootstep();
                 onNextMission();
               }}
-              className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-950 text-white font-display font-bold text-xs sm:text-sm rounded-2xl shadow-md shrink-0 flex items-center gap-2"
+              className="px-5 py-2.5 bg-emerald-900 hover:bg-emerald-950 text-white font-display font-bold text-xs sm:text-sm rounded-2xl shadow-md shrink-0 flex items-center gap-2 cursor-pointer"
             >
-              <span>Ke Misi 8: Peta Pikiran</span>
+              <span>Ke Misi 8: Piramida Ekosistem</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </motion.div>
@@ -534,9 +534,9 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 sound.playFootstep();
                 onNextMission();
               }}
-              className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl font-display font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md"
+              className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl font-display font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md cursor-pointer"
             >
-              <span>Lanjut ke Misi 8: Peta Pikiran Ekosistem</span>
+              <span>Lanjut ke Misi 8: Piramida Ekosistem</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}

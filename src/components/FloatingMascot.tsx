@@ -91,10 +91,10 @@ const SCENE_TIPS: Record<AppScene, SceneTip> = {
     mood: 'curious',
   },
   'mission-8': {
-    title: 'Misi 8: Rangkuman Peta Konsep',
-    badge: 'Puncak Pandang',
-    tip: 'Tarik dan pasangkan simpul kata kunci untuk membentuk peta konsep ekosistem yang utuh!',
-    funFact: 'Peta pikiran menghubungkan pemahaman biotik, abiotik, dan perannya dalam satu gambar besar.',
+    title: 'Misi 8: Tantangan Susun Piramida Ekosistem',
+    badge: 'Piramida Ekosistem',
+    tip: 'Susun tingkat trofik dari Produsen di dasar hingga Konsumen III di puncak piramida!',
+    funFact: 'Semakin ke atas tingkat piramida ekosistem, jumlah individu biasanya semakin sedikit.',
     mood: 'happy',
   },
   quiz: {

@@ -81,9 +81,9 @@ export const MISSION_VOICE_PROMPTS: Record<string, MissionVoicePromptItem> = {
     id: 'voice-mission-8',
     sceneKey: 'mission-8',
     missionNumber: 8,
-    title: 'Misi 8: Peta Konsep Ekosistem',
-    badge: 'Rangkuman Pengetahuan',
-    text: 'Misi delapan! Mari rangkum semua petualangan kita dalam peta konsep ekosistem yang seru!',
+    title: 'Misi 8: Tantangan Susun Piramida Ekosistem',
+    badge: 'Piramida Ekosistem',
+    text: 'Misi delapan! Yuk, susun piramida ekosistem dari dasar sampai puncak! 🌱',
     audioFile: '/audio/mission-8.mp3',
   },
   'quiz': {

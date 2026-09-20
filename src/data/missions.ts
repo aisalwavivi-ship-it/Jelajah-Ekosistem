@@ -66,12 +66,12 @@ export const MISSIONS_DATA: MissionMeta[] = [
   },
   {
     id: 8,
-    title: 'Peta Konsep Interaktif',
-    subtitle: 'Puncak Rangkuman Ekosistem',
+    title: 'Tantangan Susun Piramida Ekosistem',
+    subtitle: 'Susun tingkat trofik ekosistem dari dasar hingga puncak!',
     location: 'Puncak Pandang Ekosistem',
-    icon: '🗺️',
-    description: 'Buka dan jelajahi peta konsep interaktif: Ekosistem, Jenis Ekosistem, Tingkatan Makhluk Hidup, dan Komponennya.',
-    points: 15
+    icon: '🔺',
+    description: 'Susun tingkat trofik ekosistem dari Produsen (tumbuhan hijau) hingga Konsumen III (elang) membentuk Piramida Ekosistem yang utuh!',
+    points: 20
   }
 ];
 
@@ -167,14 +167,14 @@ export const MISSION_JOURNAL_DETAILS: Record<
     },
   },
   8: {
-    summary: 'Meninjau dan merangkum seluruh pengetahuan melalui Peta Konsep Ekosistem Interaktif.',
-    keyDiscovery: 'Ekosistem mencakup 2 jenis (darat & air), 3 tingkatan makhluk hidup (individu, populasi, komunitas), dan 2 komponen (biotik & abiotik).',
+    summary: 'Menyusun tingkat trofik ekosistem dari Produsen hingga Konsumen III membentuk Piramida Ekosistem yang utuh.',
+    keyDiscovery: 'Piramida ekosistem tersusun dari Produsen di dasar (tumbuhan hijau), Konsumen I (herbivora/belalang), Konsumen II (katak), dan Konsumen III (elang) di puncak.',
     categoryTag: 'ekosistem',
-    learningObjective: 'Menyusun pemahaman konseptual yang utuh, terstruktur, dan mudah diingat.',
+    learningObjective: 'Memahami tingkat trofik ekosistem dan membedakan komponen trofik rantai makanan dari faktor abiotik.',
     keyConcepts: {
-      biotik: 'Komponen bernyawa yang membentuk struktur piramida kehidupan: Individu, Populasi, dan Komunitas di darat maupun perairan.',
-      abiotik: 'Komponen penopang fisik: energi matahari, kelembapan air, atmosfer udara, mineral batuan, dan suhu lingkungan.',
-      relationship: 'Keseimbangan bumi terjaga apabila komponen biotik dan abiotik senantiasa berinteraksi secara serasi dan harmonis.',
+      biotik: 'Organisme trofik berjenjang: Produsen (penghasil energi) ➔ Konsumen I (pemakan tumbuhan) ➔ Konsumen II (pemakan serangga) ➔ Konsumen III (predator puncak).',
+      abiotik: 'Faktor fisik tak hidup (air, tanah, batu, cahaya matahari) menyokong kehidupan tetapi bukan merupakan tingkat trofik rantai makanan.',
+      relationship: 'Semakin ke atas tingkat trofik piramida, jumlah organisme biasanya semakin sedikit dan energi yang dialirkan semakin berkurang.',
     },
   },
 };
@@ -276,7 +276,7 @@ export const EXPLORER_BADGES: ExplorerBadge[] = [
     category: 'Puncak Konsep',
     icon: '👑',
     badgeName: 'Lencana Mahkota Penjelajah',
-    unlockedDesc: 'Menyelesaikan seluruh peta konsep hierarki dan jenis ekosistem IPAS.',
+    unlockedDesc: 'Menyelesaikan susunan piramida ekosistem dari Produsen hingga Konsumen III.',
     lockedDesc: 'Selesaikan Misi 8 untuk membuka lencana mahkota ini!',
     color: 'from-amber-300 via-yellow-400 to-orange-500',
   },
