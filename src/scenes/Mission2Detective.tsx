@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, RotateCcw, AlertCircle, Sparkles, Map } from 
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
+import { EcosystemImage } from '../components/EcosystemImage';
 
 interface Mission2Props {
   onComplete: (points: number) => void;
@@ -297,11 +298,10 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                     animate={{ scale: 1, opacity: 1 }}
                     className="p-2 bg-white rounded-2xl border border-emerald-300 shadow-xs flex items-center gap-1.5"
                   >
-                    <img
+                    <EcosystemImage
                       src={item.image}
                       alt={item.name}
                       className="w-7 h-7 rounded-lg object-cover shrink-0 border border-emerald-200"
-                      referrerPolicy="no-referrer"
                     />
                     <span className="text-xs font-bold text-emerald-900 truncate">
                       {item.name}
@@ -375,11 +375,10 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                     animate={{ scale: 1, opacity: 1 }}
                     className="p-2 bg-white rounded-2xl border border-sky-300 shadow-xs flex items-center gap-1.5"
                   >
-                    <img
+                    <EcosystemImage
                       src={item.image}
                       alt={item.name}
                       className="w-7 h-7 rounded-lg object-cover shrink-0 border border-sky-200"
-                      referrerPolicy="no-referrer"
                     />
                     <span className="text-xs font-bold text-sky-900 truncate">
                       {item.name}
@@ -451,12 +450,10 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                     }`}
                   >
                     <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden mb-1.5 shadow-xs border border-amber-200/80 bg-stone-100 shrink-0">
-                      <img
+                      <EcosystemImage
                         src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                        loading="eager"
                       />
                     </div>
                     <span className="font-bold text-xs text-stone-800 leading-tight">

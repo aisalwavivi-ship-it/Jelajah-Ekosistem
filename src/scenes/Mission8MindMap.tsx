@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
+import { EcosystemImage } from '../components/EcosystemImage';
 
 interface Mission8Props {
   onComplete: (points: number) => void;
@@ -498,11 +499,10 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
                       className="flex items-center gap-3 sm:gap-4"
                     >
                       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden bg-white border-2 border-emerald-300 shadow-xs shrink-0 flex items-center justify-center p-1">
-                        <img
+                        <EcosystemImage
                           src={placedCard.image}
                           alt={placedCard.name}
                           className="w-full h-full object-cover rounded-xl"
-                          referrerPolicy="no-referrer"
                         />
                       </div>
 
@@ -581,11 +581,10 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
                     }`}
                   >
                     <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-stone-50 border border-stone-200 flex items-center justify-center mb-1">
-                      <img
+                      <EcosystemImage
                         src={card.image}
                         alt={card.name}
                         className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
                       />
                     </div>
 

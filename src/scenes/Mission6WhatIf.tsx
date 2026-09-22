@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { sound } from '../utils/audio';
+import { EcosystemImage } from '../components/EcosystemImage';
 
 interface Mission6Props {
   onComplete: (points: number) => void;
@@ -455,12 +456,10 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                           <span>🖐️ Tarik</span>
                         </div>
                         <div className="w-11 h-11 mb-1 flex items-center justify-center shrink-0">
-                          <img
+                          <EcosystemImage
                             src={item.image}
                             alt={item.name}
                             className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs pointer-events-none select-none"
-                            referrerPolicy="no-referrer"
-                            loading="eager"
                           />
                         </div>
                         <span className="font-display font-bold text-xs text-stone-900 leading-tight">
@@ -569,11 +568,10 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         className="px-3 py-1.5 bg-emerald-100 border border-emerald-300 rounded-xl flex items-center gap-2 shadow-xs"
                       >
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                          <img
+                          <EcosystemImage
                             src={item.image}
                             alt={item.name}
                             className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs select-none"
-                            referrerPolicy="no-referrer"
                           />
                         </div>
                         <div className="text-left">
@@ -659,11 +657,10 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                         className="px-3 py-1.5 bg-sky-100 border border-sky-300 rounded-xl flex items-center gap-2 shadow-xs"
                       >
                         <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                          <img
+                          <EcosystemImage
                             src={item.image}
                             alt={item.name}
                             className="max-w-full max-h-full w-auto h-auto object-contain drop-shadow-xs select-none"
-                            referrerPolicy="no-referrer"
                           />
                         </div>
                         <div className="text-left">
