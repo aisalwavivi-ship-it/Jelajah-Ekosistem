@@ -118,20 +118,6 @@ export default function App() {
     setHasSeenOpening(true);
   };
 
-  // Lock body & documentElement scroll while opening screen is active to eliminate double scroll
-  useEffect(() => {
-    if (!hasSeenOpening) {
-      const origOverflow = document.body.style.overflow;
-      const origHtmlOverflow = document.documentElement.style.overflow;
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = origOverflow;
-        document.documentElement.style.overflow = origHtmlOverflow;
-      };
-    }
-  }, [hasSeenOpening]);
-
   // Automatically persist active session whenever it changes
   useEffect(() => {
     saveActiveSessionToStorage(activeSession);
@@ -435,11 +421,7 @@ export default function App() {
   });
 
   return (
-    <div
-      className={`min-h-screen bg-stone-900 flex flex-col font-sans text-stone-900 selection:bg-emerald-200 selection:text-emerald-950 relative overflow-x-hidden ${
-        !hasSeenOpening ? 'h-screen max-h-screen overflow-hidden' : ''
-      }`}
-    >
+    <div className="min-h-screen bg-stone-900 flex flex-col font-sans text-stone-900 selection:bg-emerald-200 selection:text-emerald-950 relative overflow-x-hidden">
       {/* 
         0. MANDATED FULL-SCREEN RESPONSIVE WORLD BACKGROUND:
         - Covers the entire viewport

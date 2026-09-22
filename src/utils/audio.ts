@@ -45,10 +45,6 @@ class SoundEngine {
     // Graceful no-op or stop ambient sounds to avoid overlapping audio
   }
 
-  public playOpeningJingle(): void {
-  this.playFanfare();
-  }
-  
   public playClick() {
     if (!this.enabled) return;
     this.initCtx();
