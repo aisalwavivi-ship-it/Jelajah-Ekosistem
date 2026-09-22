@@ -157,20 +157,32 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
   };
 
   return (
-    <div className="min-h-[calc(100vh-115px)] w-full p-3 sm:p-6 flex flex-col justify-between relative z-10">
-      <div className="max-w-5xl mx-auto w-full space-y-4">
-        {/* Header */}
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-2 border-emerald-200/80 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div
+      className="relative w-full min-h-[calc(100vh-115px)] p-3 sm:p-6 flex flex-col justify-between rounded-3xl overflow-hidden shadow-2xl border-4 border-emerald-400/90 my-1 select-none"
+      style={{
+        backgroundImage: "url('/misi2-bg.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      {/* Background vignette & atmospheric depth overlay (Layer Belakang) */}
+      <div className="absolute inset-0 bg-stone-900/20 pointer-events-none z-0" />
+
+      {/* Main Content Area (Layer Tengah & Atas) */}
+      <div className="max-w-5xl mx-auto w-full space-y-4 relative z-10">
+        {/* Header Bar */}
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-2 border-emerald-300/80 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-sky-100 border border-sky-300 flex items-center justify-center text-2xl shrink-0">
-              🏞️
+            <div className="shrink-0 flex items-center justify-center p-1 bg-emerald-50 rounded-2xl border border-emerald-200 shadow-xs">
+              <CharacterAvatar size="sm" isWalking={false} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 bg-sky-100 text-sky-800 rounded-full">
+                <span className="text-xs font-bold px-2.5 py-0.5 bg-emerald-100 text-emerald-900 rounded-full border border-emerald-300">
                   Misi 2
                 </span>
-                <h2 className="font-display font-bold text-lg sm:text-xl text-stone-900">
+                <h2 className="font-display font-extrabold text-lg sm:text-xl text-stone-900">
                   Jelajah Jenis Ekosistem: Darat & Air
                 </h2>
               </div>
@@ -186,14 +198,14 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                   variant="pill"
                 />
               </div>
-              <p className="text-stone-600 text-xs mt-0.5">
-                Kelompokkan setiap lingkungan alam ke kotak <strong>🌳 Ekosistem Darat</strong> atau <strong>💧 Ekosistem Air</strong>!
+              <p className="text-stone-700 text-xs mt-0.5">
+                Amati foto lingkungan alam nyata di bawah, lalu kelompokkan ke kotak <strong>🌳 Ekosistem Darat</strong> atau <strong>💧 Ekosistem Air</strong>!
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            <div className="px-3.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-center">
+            <div className="px-3.5 py-1.5 bg-emerald-50/95 border border-emerald-300 rounded-2xl text-center shadow-xs">
               <span className="text-[10px] uppercase font-bold text-emerald-800 block">
                 Terkelompokkan
               </span>
@@ -211,17 +223,17 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className={`p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between gap-3 shadow-md ${
+              className={`p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between gap-3 shadow-md backdrop-blur-md ${
                 feedback.isCorrect
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                  : 'bg-amber-50 border-amber-300 text-amber-950'
+                  ? 'bg-emerald-50/95 border-emerald-400 text-emerald-950'
+                  : 'bg-amber-50/95 border-amber-400 text-amber-950'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <span className="text-2xl">{feedback.isCorrect ? '🌟' : '🤔'}</span>
                 <div>
                   <p className="font-bold text-xs sm:text-sm">
-                    {feedback.isCorrect ? 'Jawaban Tepat!' : 'Ayo Pikirkan Lagi:'}
+                    {feedback.isCorrect ? 'Jawaban Tepat!' : 'Ayo Amati Kembali:'}
                   </p>
                   <p className="text-xs sm:text-sm">{feedback.text}</p>
                 </div>
@@ -230,7 +242,7 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
               {!feedback.isCorrect && (
                 <button
                   onClick={() => setFeedback(null)}
-                  className="px-3 py-1 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-xl text-xs font-bold shrink-0"
+                  className="px-3 py-1 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-xl text-xs font-bold shrink-0 cursor-pointer"
                 >
                   Coba Lagi
                 </button>
@@ -255,10 +267,10 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
               const it = ITEMS.find((i) => i.id === itemId);
               if (it) handleClassify(it, 'darat');
             }}
-            className={`bg-emerald-50/90 border-3 rounded-3xl p-4 sm:p-5 transition-all shadow-md relative min-h-[200px] flex flex-col justify-between ${
+            className={`bg-white/85 backdrop-blur-md border-3 rounded-3xl p-4 sm:p-5 transition-all shadow-xl relative min-h-[220px] flex flex-col justify-between ${
               selectedItem
-                ? 'border-emerald-500 ring-4 ring-emerald-300/60 bg-emerald-100/90 cursor-pointer animate-pulse-subtle'
-                : 'border-emerald-300'
+                ? 'border-emerald-500 ring-4 ring-emerald-300/80 bg-emerald-50/95 cursor-pointer animate-pulse-subtle scale-[1.01]'
+                : 'border-emerald-300/90'
             }`}
           >
             <div>
@@ -272,48 +284,56 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                       </h3>
                       <AudioNarratorButton
                         id="audio-ekosistem-darat"
-                        audioText="Ekosistem darat adalah ekosistem yang lingkungan fisiknya berupa daratan. Contohnya seperti hutan, kebun, taman, dan padang rumput."
+                        audioText="Ekosistem darat adalah ekosistem yang lingkungan fisiknya berupa daratan. Contohnya seperti hutan hujan, kebun bunga, taman kota, dan padang rumput."
                         label="Dengarkan"
                         size="sm"
                         variant="compact"
                       />
                     </div>
-                    <p className="text-[11px] text-emerald-700 font-medium">
+                    <p className="text-[11px] text-emerald-800 font-medium">
                       Lingkungan utamanya daratan (hutan, kebun, taman, padang rumput)
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-bold px-2 py-0.5 bg-emerald-200 text-emerald-900 rounded-full">
+                <span className="text-xs font-bold px-2.5 py-0.5 bg-emerald-200 text-emerald-900 rounded-full border border-emerald-300 shadow-2xs">
                   {Object.values(placedItems).filter((v) => v === 'darat').length} Lingkungan
                 </span>
               </div>
 
-              {/* Items in this basket */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {/* Items placed in Ekosistem Darat */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {ITEMS.filter((item) => placedItems[item.id] === 'darat').map((item) => (
                   <motion.div
                     key={item.id}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="p-2 bg-white rounded-2xl border border-emerald-300 shadow-xs flex items-center gap-1.5"
+                    className="p-1.5 bg-white/95 rounded-2xl border border-emerald-300 shadow-xs flex items-center gap-2 overflow-hidden"
                   >
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-7 h-7 rounded-lg object-cover shrink-0 border border-emerald-200"
+                      className="w-9 h-9 rounded-xl object-cover shrink-0 border border-emerald-200 shadow-2xs"
                       referrerPolicy="no-referrer"
+                      loading="eager"
                     />
-                    <span className="text-xs font-bold text-emerald-900 truncate">
-                      {item.name}
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs font-bold text-emerald-950 block truncate">
+                        {item.name}
+                      </span>
+                      <span className="text-[10px] text-emerald-700 font-semibold block">
+                        Darat
+                      </span>
+                    </div>
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                      ✓
                     </span>
-                    <span className="ml-auto text-emerald-600 text-xs font-bold">✓</span>
                   </motion.div>
                 ))}
               </div>
             </div>
 
             {selectedItem && (
-              <div className="mt-3 text-center py-2 bg-emerald-200/80 rounded-xl text-xs font-bold text-emerald-900">
+              <div className="mt-3 text-center py-2 px-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer transition-colors">
                 👉 Klik di sini untuk memasukkan "{selectedItem.name}" ke Ekosistem Darat
               </div>
             )}
@@ -333,10 +353,10 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
               const it = ITEMS.find((i) => i.id === itemId);
               if (it) handleClassify(it, 'air');
             }}
-            className={`bg-sky-50/90 border-3 rounded-3xl p-4 sm:p-5 transition-all shadow-md relative min-h-[200px] flex flex-col justify-between ${
+            className={`bg-white/85 backdrop-blur-md border-3 rounded-3xl p-4 sm:p-5 transition-all shadow-xl relative min-h-[220px] flex flex-col justify-between ${
               selectedItem
-                ? 'border-sky-500 ring-4 ring-sky-300/60 bg-sky-100/90 cursor-pointer animate-pulse-subtle'
-                : 'border-sky-300'
+                ? 'border-sky-500 ring-4 ring-sky-300/80 bg-sky-50/95 cursor-pointer animate-pulse-subtle scale-[1.01]'
+                : 'border-sky-300/90'
             }`}
           >
             <div>
@@ -356,61 +376,69 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                         variant="compact"
                       />
                     </div>
-                    <p className="text-[11px] text-sky-700 font-medium">
+                    <p className="text-[11px] text-sky-800 font-medium">
                       Lingkungan utamanya perairan (sungai, kolam, danau, laut)
                     </p>
                   </div>
                 </div>
-                <span className="text-xs font-bold px-2 py-0.5 bg-sky-200 text-sky-900 rounded-full">
+                <span className="text-xs font-bold px-2.5 py-0.5 bg-sky-200 text-sky-900 rounded-full border border-sky-300 shadow-2xs">
                   {Object.values(placedItems).filter((v) => v === 'air').length} Lingkungan
                 </span>
               </div>
 
-              {/* Items in this basket */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {/* Items placed in Ekosistem Air */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {ITEMS.filter((item) => placedItems[item.id] === 'air').map((item) => (
                   <motion.div
                     key={item.id}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="p-2 bg-white rounded-2xl border border-sky-300 shadow-xs flex items-center gap-1.5"
+                    className="p-1.5 bg-white/95 rounded-2xl border border-sky-300 shadow-xs flex items-center gap-2 overflow-hidden"
                   >
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-7 h-7 rounded-lg object-cover shrink-0 border border-sky-200"
+                      className="w-9 h-9 rounded-xl object-cover shrink-0 border border-sky-200 shadow-2xs"
                       referrerPolicy="no-referrer"
+                      loading="eager"
                     />
-                    <span className="text-xs font-bold text-sky-900 truncate">
-                      {item.name}
+                    <div className="min-w-0 flex-1">
+                      <span className="text-xs font-bold text-sky-950 block truncate">
+                        {item.name}
+                      </span>
+                      <span className="text-[10px] text-sky-700 font-semibold block">
+                        Air
+                      </span>
+                    </div>
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
+                      ✓
                     </span>
-                    <span className="ml-auto text-sky-600 text-xs font-bold">✓</span>
                   </motion.div>
                 ))}
               </div>
             </div>
 
             {selectedItem && (
-              <div className="mt-3 text-center py-2 bg-sky-200/80 rounded-xl text-xs font-bold text-sky-900">
+              <div className="mt-3 text-center py-2 px-3 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer transition-colors">
                 👉 Klik di sini untuk memasukkan "{selectedItem.name}" ke Ekosistem Air
               </div>
             )}
           </div>
         </div>
 
-        {/* Source Items Tray with Trail Background */}
-        <div className="bg-white/95 rounded-3xl p-4 sm:p-5 border-2 border-amber-200 shadow-md relative overflow-hidden">
-          <div className="flex items-center justify-between mb-3 border-b border-stone-100 pb-2">
+        {/* Source Items Tray with Realistic Photographic Cards */}
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-2 border-amber-200/90 shadow-xl relative overflow-hidden">
+          <div className="flex items-center justify-between mb-3 border-b border-stone-200/70 pb-2">
             <div className="flex items-center gap-2">
               <span className="text-lg">🗺️</span>
-              <h4 className="font-display font-bold text-sm sm:text-base text-stone-800">
-                Kartu Lingkungan Alam (Pilih / Tarik ke Kotak yang Sesuai)
+              <h4 className="font-display font-bold text-sm sm:text-base text-stone-900">
+                Kartu Foto Lingkungan Alam (Pilih / Tarik ke Kotak yang Sesuai)
               </h4>
             </div>
 
             <button
               onClick={handleReset}
-              className="text-xs text-stone-500 hover:text-stone-800 flex items-center gap-1 p-1"
+              className="text-xs text-stone-600 hover:text-stone-900 flex items-center gap-1 px-2.5 py-1 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Mulai Ulang</span>
@@ -418,68 +446,127 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
           </div>
 
           {unplacedItems.length === 0 ? (
-            <div className="text-center py-6 bg-emerald-50 rounded-2xl border border-emerald-200">
+            <div className="text-center py-6 bg-emerald-50/95 backdrop-blur-sm rounded-2xl border-2 border-emerald-300 shadow-md">
               <span className="text-4xl">🎉</span>
-              <h4 className="font-display font-bold text-lg text-emerald-950 mt-1">
+              <h4 className="font-display font-extrabold text-lg text-emerald-950 mt-1">
                 Semua Lingkungan Berhasil Dikelompokkan!
               </h4>
-              <p className="text-stone-600 text-xs sm:text-sm mt-1">
-                Kamu telah memahami bahwa ekosistem dibagi menjadi <strong>Ekosistem Darat</strong> (hutan, kebun, taman, padang rumput) dan <strong>Ekosistem Air</strong> (sungai, kolam, danau, laut).
+              <p className="text-stone-700 text-xs sm:text-sm mt-1 max-w-xl mx-auto px-4">
+                Hebat! Kamu telah memahami bahwa ekosistem terbagi menjadi <strong>Ekosistem Darat</strong> (hutan hujan, kebun bunga, taman kota, padang rumput) dan <strong>Ekosistem Air</strong> (sungai berbatu, kolam ikan, danau alami, laut tropis).
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
-              {unplacedItems.map((item) => {
-                const isSelected = selectedItem?.id === item.id;
-                return (
-                  <motion.div
-                    key={item.id}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData('text/plain', item.id);
-                    }}
-                    onClick={() => {
-                      sound.playClick();
-                      setSelectedItem(isSelected ? null : item);
-                    }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-center text-center select-none shadow-xs ${
-                      isSelected
-                        ? 'bg-amber-300 border-amber-500 ring-3 ring-amber-300 shadow-md scale-105'
-                        : 'bg-amber-50/70 hover:bg-amber-100/90 border-amber-200'
-                    }`}
-                  >
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden mb-1.5 shadow-xs border border-amber-200/80 bg-stone-100 shrink-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                        loading="eager"
-                      />
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
+                {unplacedItems.map((item) => {
+                  const isSelected = selectedItem?.id === item.id;
+                  return (
+                    <motion.div
+                      key={item.id}
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('text/plain', item.id);
+                      }}
+                      onClick={() => {
+                        sound.playClick();
+                        setSelectedItem(isSelected ? null : item);
+                      }}
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`p-2.5 rounded-2xl border-2 cursor-pointer transition-all flex flex-col items-center justify-between text-center select-none shadow-sm ${
+                        isSelected
+                          ? 'bg-amber-100/95 border-amber-500 ring-4 ring-amber-300 shadow-lg scale-105'
+                          : 'bg-white/95 hover:bg-amber-50/90 border-stone-200 hover:border-amber-400'
+                      }`}
+                    >
+                      <div className="w-full aspect-square rounded-xl overflow-hidden mb-1.5 shadow-sm border border-stone-200 bg-stone-100 shrink-0 relative group">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                          referrerPolicy="no-referrer"
+                          loading="eager"
+                        />
+                      </div>
+                      <span className="font-bold text-xs text-stone-900 leading-tight block w-full truncate">
+                        {item.name}
+                      </span>
+                      <span
+                        className={`text-[10px] font-semibold mt-1 px-2 py-0.5 rounded-full ${
+                          isSelected
+                            ? 'bg-amber-400 text-amber-950 font-bold'
+                            : 'bg-stone-100 text-stone-600'
+                        }`}
+                      >
+                        {isSelected ? 'Pilih Wadah 👆' : 'Pilih / Tarik'}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Active Selection Quick Inspection & Classification Bar */}
+              {selectedItem && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-amber-50/95 backdrop-blur-md border-2 border-amber-400 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={selectedItem.image}
+                      alt={selectedItem.name}
+                      className="w-12 h-12 rounded-xl object-cover border-2 border-amber-300 shadow-sm shrink-0"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold px-2 py-0.5 bg-amber-200 text-amber-900 rounded-md">
+                          Sedang Dipilih
+                        </span>
+                        <h5 className="font-display font-bold text-sm sm:text-base text-stone-900">
+                          {selectedItem.name}
+                        </h5>
+                      </div>
+                      <p className="text-stone-600 text-xs mt-0.5">
+                        Termasuk kelompok manakah lingkungan ini? Klik wadah di atas atau tombol di samping:
+                      </p>
                     </div>
-                    <span className="font-bold text-xs text-stone-800 leading-tight">
-                      {item.name}
-                    </span>
-                    <span className="text-[9px] text-stone-500 mt-0.5">
-                      {isSelected ? 'Pilih Kotak 👆' : 'Klik / Tarik'}
-                    </span>
-                  </motion.div>
-                );
-              })}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handleClassify(selectedItem, 'darat')}
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                    >
+                      <span>🌳 Ekosistem Darat</span>
+                    </button>
+                    <button
+                      onClick={() => handleClassify(selectedItem, 'air')}
+                      className="px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                    >
+                      <span>💧 Ekosistem Air</span>
+                    </button>
+                    <button
+                      onClick={() => setSelectedItem(null)}
+                      className="px-2.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded-xl text-xs font-semibold cursor-pointer"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </motion.div>
+              )}
             </div>
           )}
         </div>
 
-        {/* Footer controls */}
+        {/* Footer Navigation Controls */}
         <div className="flex items-center justify-between pt-1">
           <button
             onClick={() => {
               sound.playClick();
               onGoToMap();
             }}
-            className="px-4 py-2 bg-white hover:bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-xs"
+            className="px-4 py-2 bg-white/95 hover:bg-stone-50 border border-stone-300 rounded-xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
           >
             <Map className="w-3.5 h-3.5" />
             <span>Peta Petualangan</span>
@@ -491,7 +578,7 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
                 sound.playFootstep();
                 onNextMission();
               }}
-              className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl font-display font-bold text-xs sm:text-sm flex items-center gap-2 shadow-md"
+              className="px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-2xl font-display font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer"
             >
               <span>Lanjut ke Misi 3: Individu</span>
               <ArrowRight className="w-4 h-4" />
