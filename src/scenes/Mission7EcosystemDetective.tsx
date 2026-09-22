@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, Map, Award, Eye, Search } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
-import { EcosystemImage } from '../components/EcosystemImage';
 
 interface Mission7Props {
   onComplete: (points: number) => void;
@@ -400,7 +399,7 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                 >
                   {/* Realistic object visual integrated directly into the environment */}
                   <div className="relative flex items-center justify-center">
-                    <EcosystemImage
+                    <img
                       src={getItemImage(item)}
                       alt={item.name}
                       className={`${getImageSizeClasses(item.id)} object-contain select-none transition-all duration-300 filter drop-shadow-md group-hover:scale-110 group-hover:drop-shadow-xl ${
@@ -408,6 +407,7 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
                           ? 'brightness-110 drop-shadow-[0_0_16px_rgba(251,191,36,0.9)] scale-105'
                           : ''
                       }`}
+                      referrerPolicy="no-referrer"
                     />
 
                     {/* Subtle status indicator checkmark when found */}
@@ -482,10 +482,11 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
               >
                 <div className="flex items-center justify-between mb-1 gap-2">
                   <div className="w-8 h-8 flex items-center justify-center">
-                    <EcosystemImage
+                    <img
                       src={getItemImage(recentFound)}
                       alt={recentFound.name}
                       className="max-w-full max-h-full object-contain select-none"
+                      referrerPolicy="no-referrer"
                     />
                   </div>
                   <span

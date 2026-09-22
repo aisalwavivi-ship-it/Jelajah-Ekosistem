@@ -5,7 +5,6 @@ import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
 import { BatuTamanImage } from '../components/BatuTamanImage';
-import { EcosystemImage } from '../components/EcosystemImage';
 
 interface Mission1Props {
   onComplete: (points: number) => void;
@@ -353,7 +352,7 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                   onClick={() => handleInspect(obj)}
                   className="relative flex flex-col items-center group cursor-pointer focus:outline-hidden select-none"
                 >
-                  <EcosystemImage
+                  <img
                     src={obj.image}
                     alt={obj.name}
                     className={`object-contain transition-all duration-200 pointer-events-auto ${
@@ -369,6 +368,8 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                         ? 'drop-shadow-md hover:brightness-110'
                         : 'drop-shadow-md animate-pulse-subtle hover:brightness-110'
                     }`}
+                    referrerPolicy="no-referrer"
+                    loading="eager"
                   />
                   <span className="text-[10px] sm:text-xs font-bold text-stone-800 mt-1 whitespace-nowrap bg-white/90 px-2 py-0.5 rounded-full shadow-xs border border-stone-200/60 pointer-events-none">
                     {obj.name}
@@ -396,10 +397,11 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
               >
                 <div className="flex items-start justify-between gap-2 border-b border-emerald-100 pb-2.5 mb-2.5">
                   <div className="flex items-center gap-2.5">
-                    <EcosystemImage
+                    <img
                       src={activeObject.image}
                       alt={activeObject.name}
                       className="w-10 h-10 object-contain drop-shadow-sm"
+                      referrerPolicy="no-referrer"
                     />
                     <div>
                       <h4 className="font-display font-bold text-stone-900 text-sm sm:text-base">

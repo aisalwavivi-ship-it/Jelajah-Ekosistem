@@ -5,7 +5,6 @@ import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
-import { EcosystemImage } from '../components/EcosystemImage';
 
 interface Mission5Props {
   onComplete: (points: number) => void;
@@ -314,17 +313,17 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
             <div className="p-3 rounded-2xl bg-emerald-50 border-2 border-emerald-400 flex items-center gap-3">
               <div className="flex items-center gap-1.5 shrink-0">
-                <EcosystemImage
+                <img
                   src="/misi4/satu-ikan-mas.png"
                   alt="Ikan Mas"
                   className="w-7 h-7 object-contain drop-shadow-xs"
                 />
-                <EcosystemImage
+                <img
                   src="/misi5/kodok.jpg"
                   alt="Kodok"
                   className="w-7 h-7 object-cover rounded-full border border-emerald-300 drop-shadow-xs"
                 />
-                <EcosystemImage
+                <img
                   src="/misi4/teratai.png"
                   alt="Bunga Teratai"
                   className="w-7 h-7 object-contain drop-shadow-xs"
@@ -340,7 +339,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
 
             <div className="p-3 rounded-2xl bg-sky-50 border-2 border-sky-300 flex items-center gap-3">
               <div className="w-12 h-8 shrink-0 flex items-center justify-center">
-                <EcosystemImage
+                <img
                   src="/misi4/tiga-ikan-mas.png"
                   alt="3 Ikan Mas"
                   className="w-full h-full object-contain drop-shadow-xs"
@@ -356,7 +355,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
 
             <div className="p-3 rounded-2xl bg-stone-50 border-2 border-stone-300 flex items-center gap-3">
               <div className="w-10 h-8 shrink-0 flex items-center justify-center">
-                <EcosystemImage
+                <img
                   src="/misi4/satu-ikan-mas.png"
                   alt="1 Ekor Ikan"
                   className="w-full h-full object-contain drop-shadow-xs"
@@ -586,7 +585,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                     className="filter drop-shadow-md cursor-default flex items-center justify-center"
                   >
                     {item.image ? (
-                      <EcosystemImage
+                      <img
                         src={item.image}
                         alt={item.name}
                         className={`${
@@ -713,7 +712,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
                     >
                       {item.image ? (
                         <div className="w-8 h-8 mb-1 flex items-center justify-center">
-                          <EcosystemImage
+                          <img
                             src={item.image}
                             alt={item.name}
                             className="w-full h-full object-contain drop-shadow-xs select-none pointer-events-none"

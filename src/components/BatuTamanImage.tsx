@@ -18,7 +18,7 @@ export const BatuTamanImage: React.FC<BatuTamanImageProps> = ({
     <img
       src="/batu-taman.png"
       alt={alt}
-      className={`${className} inline-block select-none drop-shadow-xs transition-transform`}
+      className={`${className} inline-block select-none mix-blend-multiply drop-shadow-xs transition-transform`}
       referrerPolicy="no-referrer"
       loading="eager"
     />
