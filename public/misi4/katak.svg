@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="100%" height="100%">
+  <defs>
+    <radialGradient id="frogSkin" cx="45%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#4ade80" />
+      <stop offset="50%" stop-color="#16a34a" />
+      <stop offset="85%" stop-color="#15803d" />
+      <stop offset="100%" stop-color="#14532d" />
+    </radialGradient>
+    <radialGradient id="frogBelly" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="70%" stop-color="#bef264" />
+      <stop offset="100%" stop-color="#84cc16" />
+    </radialGradient>
+    <radialGradient id="frogEye" cx="40%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="40%" stop-color="#d97706" />
+      <stop offset="80%" stop-color="#78350f" />
+      <stop offset="100%" stop-color="#1c1917" />
+    </radialGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <!-- Hind legs folded -->
+    <path d="M 30 115 C 20 95, 30 65, 60 70 C 75 72, 85 85, 80 105 C 75 125, 45 125, 30 115 Z" fill="url(#frogSkin)" />
+    <path d="M 170 115 C 180 95, 170 65, 140 70 C 125 72, 115 85, 120 105 C 125 125, 155 125, 170 115 Z" fill="url(#frogSkin)" />
+    
+    <!-- Hind feet webbed -->
+    <path d="M 25 125 C 15 128, 5 132, 10 138 C 15 142, 28 136, 35 132 C 42 136, 48 135, 45 128 Z" fill="#15803d" />
+    <path d="M 175 125 C 185 128, 195 132, 190 138 C 185 142, 172 136, 165 132 C 158 136, 152 135, 155 128 Z" fill="#15803d" />
+
+    <!-- Main Body -->
+    <ellipse cx="100" cy="95" rx="52" ry="42" fill="url(#frogSkin)" />
+    
+    <!-- Belly patch -->
+    <ellipse cx="100" cy="105" rx="32" ry="24" fill="url(#frogBelly)" opacity="0.9" />
+
+    <!-- Natural skin spots and textures -->
+    <circle cx="75" cy="85" r="4.5" fill="#14532d" opacity="0.6" />
+    <circle cx="88" cy="78" r="3" fill="#14532d" opacity="0.5" />
+    <circle cx="125" cy="85" r="4" fill="#14532d" opacity="0.6" />
+    <circle cx="112" cy="78" r="3.5" fill="#14532d" opacity="0.5" />
+    <circle cx="98" cy="82" r="2.5" fill="#14532d" opacity="0.4" />
+    <circle cx="65" cy="98" r="4" fill="#14532d" opacity="0.6" />
+    <circle cx="135" cy="98" r="4" fill="#14532d" opacity="0.6" />
+
+    <!-- Front Legs and Feet -->
+    <path d="M 68 100 C 65 115, 60 128, 55 138 C 52 142, 60 144, 65 140 C 70 135, 75 120, 78 105 Z" fill="url(#frogSkin)" />
+    <!-- Front Left Toes with pads -->
+    <circle cx="50" cy="142" r="3" fill="#15803d" />
+    <circle cx="58" cy="144" r="3" fill="#15803d" />
+    <circle cx="66" cy="143" r="3" fill="#15803d" />
+
+    <path d="M 132 100 C 135 115, 140 128, 145 138 C 148 142, 140 144, 135 140 C 130 135, 125 120, 122 105 Z" fill="url(#frogSkin)" />
+    <!-- Front Right Toes with pads -->
+    <circle cx="150" cy="142" r="3" fill="#15803d" />
+    <circle cx="142" cy="144" r="3" fill="#15803d" />
+    <circle cx="134" cy="143" r="3" fill="#15803d" />
+
+    <!-- Head & Snout -->
+    <path d="M 62 65 C 65 42, 135 42, 138 65 C 140 82, 60 82, 62 65 Z" fill="url(#frogSkin)" />
+    <!-- Mouth line subtle natural curve -->
+    <path d="M 66 72 Q 100 80 134 72" stroke="#14532d" stroke-width="2" fill="none" stroke-linecap="round" />
+    <!-- Nostrils -->
+    <ellipse cx="94" cy="58" rx="1.5" ry="1" fill="#14532d" />
+    <ellipse cx="106" cy="58" rx="1.5" ry="1" fill="#14532d" />
+
+    <!-- Eye Sockets Bulges -->
+    <ellipse cx="72" cy="46" rx="14" ry="13" fill="url(#frogSkin)" />
+    <ellipse cx="128" cy="46" rx="14" ry="13" fill="url(#frogSkin)" />
+
+    <!-- Eyeballs -->
+    <circle cx="72" cy="46" r="10" fill="url(#frogEye)" />
+    <circle cx="128" cy="46" r="10" fill="url(#frogEye)" />
+
+    <!-- Pupils (horizontal slit realistic) -->
+    <ellipse cx="72" cy="46" rx="6" ry="2.2" fill="#0f172a" />
+    <ellipse cx="128" cy="46" rx="6" ry="2.2" fill="#0f172a" />
+
+    <!-- Specular Eye Highlights -->
+    <circle cx="70" cy="43" r="2" fill="#ffffff" opacity="0.9" />
+    <circle cx="126" cy="43" r="2" fill="#ffffff" opacity="0.9" />
+    <circle cx="74" cy="48" r="1" fill="#ffffff" opacity="0.6" />
+    <circle cx="130" cy="48" r="1" fill="#ffffff" opacity="0.6" />
+  </g>
+</svg>

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, Wind, Droplets, Sun, Mountain, Layers } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
-import { BungaTerataiPopulasiImage } from '../components/BungaTerataiPopulasiImage';
 import { sound } from '../utils/audio';
 import { WeatherType, WEATHER_CONDITIONS } from '../utils/weather';
 
@@ -20,6 +19,7 @@ interface PopulationItem {
   speciesName: string;
   countDescription: string;
   icon: string;
+  imageSrc: string;
   x: number;
   y: number;
   explanation: string;
@@ -28,55 +28,60 @@ interface PopulationItem {
 const POPULATION_ITEMS: PopulationItem[] = [
   {
     id: 'fish_population',
-    name: 'Kumpulan Ikan Mas',
+    name: 'Ikan Mas',
     isPopulation: true,
     speciesName: 'Ikan Mas',
     countDescription: 'Kumpulan 7 ekor ikan mas sejenis',
     icon: '🐟🐟🐟',
-    x: 25,
-    y: 75,
+    imageSrc: '/misi4/tiga-ikan-mas.png',
+    x: 52,
+    y: 74,
     explanation: 'Tepat sekali! Kumpulan 7 ekor ikan mas sejenis di kolam air membentuk satu POPULASI ikan mas.',
   },
   {
     id: 'lotus_population',
-    name: 'Rumpun Bunga Teratai',
+    name: 'Bunga Teratai',
     isPopulation: true,
     speciesName: 'Bunga Teratai',
     countDescription: 'Sekelompok 5 tanaman teratai sejenis',
     icon: '🪷🪷🪷',
+    imageSrc: '/misi4/teratai.png',
     x: 40,
     y: 70,
     explanation: 'Benar! Kumpulan tanaman bunga teratai sejenis yang tumbuh bersama di kolam adalah POPULASI teratai.',
   },
   {
     id: 'bee_population',
-    name: 'Kawanan Lebah Madu',
+    name: 'Lebah Madu',
     isPopulation: true,
     speciesName: 'Lebah Madu',
     countDescription: 'Kawanan lebah pekerja sejenis',
     icon: '🐝🐝🐝',
+    imageSrc: '/misi4/kawanan-lebah.png',
     x: 65,
     y: 35,
     explanation: 'Hebat! Sekelompok lebah madu sejenis yang bersama-sama mencari nektar adalah contoh nyata POPULASI.',
   },
   {
     id: 'bird_population',
-    name: 'Sekawanan Burung Pipit',
+    name: 'Burung Pipit',
     isPopulation: true,
     speciesName: 'Burung Pipit',
     countDescription: 'Kumpulan 6 ekor burung pipit sejenis',
     icon: '🐦🐦🐦',
+    imageSrc: '/misi4/sekawanan-burung.png',
     x: 80,
     y: 22,
     explanation: 'Bagus! Kumpulan beberapa ekor burung pipit sejenis di dahan pohon merupakan POPULASI burung pipit.',
   },
   {
     id: 'pine_population',
-    name: 'Kumpulan Pohon Pinus',
+    name: 'Pohon Pinus',
     isPopulation: true,
     speciesName: 'Pohon Pinus',
     countDescription: 'Kelompok 6 pohon pinus sejenis',
     icon: '🌲🌲🌲',
+    imageSrc: '/misi4/pohon-pinus.svg',
     x: 85,
     y: 55,
     explanation: 'Tepat sekali! Sekelompok pohon pinus sejenis yang tumbuh di lereng bukit membentuk POPULASI pinus.',
@@ -84,22 +89,24 @@ const POPULATION_ITEMS: PopulationItem[] = [
   // Distractors
   {
     id: 'single_rabbit',
-    name: '1 Ekor Kelinci Sendirian',
+    name: 'Kelinci',
     isPopulation: false,
     speciesName: 'Kelinci',
     countDescription: 'Hanya 1 ekor',
     icon: '🐰',
-    x: 52,
-    y: 60,
+    imageSrc: '/misi4/kelinci.png',
+    x: 30,
+    y: 84,
     explanation: 'Ini hanya 1 ekor kelinci, jadi ini adalah INDIVIDU, bukan populasi!',
   },
   {
     id: 'single_turtle',
-    name: '1 Ekor Kura-kura',
+    name: 'Kura-kura',
     isPopulation: false,
     speciesName: 'Kura-kura',
     countDescription: 'Hanya 1 ekor',
     icon: '🐢',
+    imageSrc: '/misi4/kura-kura.png',
     x: 18,
     y: 60,
     explanation: 'Kura-kura ini sendirian, maka ia adalah satu INDIVIDU, belum membentuk populasi.',
@@ -113,6 +120,7 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
   activeWeather = 'sunny',
 }) => {
   const [discoveredIds, setDiscoveredIds] = useState<string[]>([]);
+  const [wrongClickedIds, setWrongClickedIds] = useState<string[]>([]);
   const [activeItem, setActiveItem] = useState<PopulationItem | null>(null);
   const [feedback, setFeedback] = useState<{
     text: string;
@@ -157,6 +165,9 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
         text: item.explanation,
         isCorrect: false,
       });
+      if (!wrongClickedIds.includes(item.id)) {
+        setWrongClickedIds((prev) => [...prev, item.id]);
+      }
     }
   };
 
@@ -175,8 +186,12 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
         {/* Header */}
         <div className="bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-5 border-2 border-sky-300/80 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-sky-100 border border-sky-300 flex items-center justify-center text-2xl shrink-0">
-              👥
+            <div className="w-12 h-12 rounded-2xl bg-sky-100 border border-sky-300 flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+              <img
+                src="/misi4/tiga-ikan-mas.png"
+                alt="3 Ekor Ikan Mas (Populasi)"
+                className="w-full h-full object-contain filter drop-shadow-xs"
+              />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -225,7 +240,13 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
             <div className="p-3 rounded-2xl bg-sky-50 border-2 border-sky-400 flex items-center gap-3">
-              <span className="text-3xl shrink-0">🐟🐟🐟</span>
+              <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+                <img
+                  src="/misi4/tiga-ikan-mas.png"
+                  alt="Populasi Ikan Mas"
+                  className="w-full h-full object-contain filter drop-shadow-xs"
+                />
+              </div>
               <div>
                 <span className="font-bold text-sky-950 block text-xs sm:text-sm">Populasi Ikan Mas</span>
                 <p className="text-[11px] text-sky-800 leading-snug">
@@ -235,7 +256,13 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-stone-50 border-2 border-stone-300 flex items-center gap-3">
-              <span className="text-3xl shrink-0">🐟</span>
+              <div className="w-12 h-12 shrink-0 flex items-center justify-center">
+                <img
+                  src="/misi4/satu-ikan-mas.png"
+                  alt="1 Ekor Ikan (Individu)"
+                  className="w-full h-full object-contain filter drop-shadow-xs"
+                />
+              </div>
               <div>
                 <span className="font-bold text-stone-900 block text-xs sm:text-sm">1 Ekor Ikan (Individu)</span>
                 <p className="text-[11px] text-stone-600 leading-snug">
@@ -245,7 +272,11 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
             </div>
 
             <div className="p-3 rounded-2xl bg-indigo-50 border-2 border-indigo-300 flex items-center gap-3">
-              <span className="text-3xl shrink-0">🐟🐸🪷</span>
+              <div className="w-14 h-12 shrink-0 flex items-center justify-center gap-1">
+                <img src="/misi4/satu-ikan-mas.png" alt="Ikan" className="w-4 h-4 object-contain" />
+                <img src="/misi4/katak.svg" alt="Katak" className="w-4 h-4 object-contain" />
+                <img src="/misi4/teratai.png" alt="Teratai" className="w-4 h-4 object-contain" />
+              </div>
               <div>
                 <span className="font-bold text-indigo-950 block text-xs sm:text-sm">Ikan + Katak + Teratai</span>
                 <p className="text-[11px] text-indigo-700 leading-snug">
@@ -305,52 +336,17 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
         </AnimatePresence>
 
         {/* Open Field Landscape Viewport */}
-        <div className="relative w-full min-h-[420px] sm:min-h-[480px] bg-gradient-to-b from-sky-300 via-sky-100 to-amber-100 rounded-3xl border-4 border-sky-300 shadow-xl overflow-hidden">
-          {/* Natural Vector Scenery & Winding Path */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            viewBox="0 0 1000 600"
-            preserveAspectRatio="none"
-          >
-            <polygon points="0,320 250,160 500,340" fill="#bae6fd" opacity="0.5" />
-            <polygon points="400,340 700,180 1000,350" fill="#7dd3fc" opacity="0.4" />
-
-            <path
-              d="M0 340 Q300 280 600 330 T1000 310 L1000 600 L0 600 Z"
-              fill="#86efac"
-              opacity="0.7"
-            />
-            <path
-              d="M0 380 Q400 320 750 370 T1000 360 L1000 600 L0 600 Z"
-              fill="#4ade80"
-            />
-
-            {/* River / Pond Water area */}
-            <path
-              d="M 160 380 C 220 440, 210 500, 250 600 L 450 600 C 420 510, 410 440, 360 380 Z"
-              fill="#0284c7"
-              opacity="0.8"
-            />
-            <path
-              d="M 180 400 C 240 450, 230 510, 270 600 L 430 600 C 400 510, 390 450, 340 400 Z"
-              fill="#38bdf8"
-              opacity="0.9"
-            />
-
-            {/* Winding soil path */}
-            <path
-              d="M 0 520 C 200 500, 350 530, 520 510 S 780 500, 1000 540 L 1000 600 L 0 600 Z"
-              fill="#92400e"
-              opacity="0.85"
-            />
-            <path
-              d="M 0 525 C 200 505, 350 535, 520 515 S 780 505, 1000 545 L 1000 595 L 0 595 Z"
-              fill="#d97706"
-            />
-          </svg>
-
+        <div
+          className="relative w-full min-h-[420px] sm:min-h-[480px] rounded-3xl border-4 border-sky-300 shadow-xl overflow-hidden"
+          style={{
+            backgroundImage: "url('/misi4-bg.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
           {/* Character standing on path */}
-          <div className="absolute left-6 sm:left-14 bottom-14 sm:bottom-20 z-10 flex flex-col items-center">
+          <div className="absolute left-6 sm:left-14 bottom-14 sm:bottom-20 z-30 flex flex-col items-center pointer-events-none select-none">
             <CharacterAvatar size="md" isWalking={false} />
             <span className="text-[10px] font-bold bg-white/90 px-2 py-0.5 rounded-full text-stone-700 shadow-xs mt-1">
               Dara mencari populasi
@@ -360,6 +356,7 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
           {/* Interactive Population Items */}
           {POPULATION_ITEMS.map((item) => {
             const isDiscovered = discoveredIds.includes(item.id);
+            const isWrong = wrongClickedIds.includes(item.id);
             const isSelected = activeItem?.id === item.id;
 
             return (
@@ -373,33 +370,45 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
                 <button
                   id={`btn-population-${item.id}`}
                   onClick={() => handleSelectItem(item)}
-                  className={`p-2.5 sm:p-3 rounded-2xl transition-all shadow-lg flex flex-col items-center cursor-pointer border-3 ${
-                    isSelected
-                      ? 'bg-amber-300 border-white ring-4 ring-amber-400 scale-110'
-                      : isDiscovered
-                      ? 'bg-white/95 border-emerald-500 text-emerald-950 ring-2 ring-emerald-200'
-                      : 'bg-white/85 hover:bg-white border-amber-300 animate-pulse-subtle'
-                  }`}
+                  className="bg-transparent border-0 p-1 shadow-none outline-none flex flex-col items-center cursor-pointer relative group transition-transform"
                 >
-                  {item.id === 'lotus_population' ? (
-                    <BungaTerataiPopulasiImage
-                      className="w-10 h-10 sm:w-11 sm:h-11 object-cover rounded-xl filter drop-shadow-xs"
+                  <div
+                    className={`relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-transform duration-200 ${
+                      isSelected ? 'scale-115' : 'group-hover:scale-108'
+                    }`}
+                  >
+                    <img
+                      src={item.imageSrc}
                       alt={item.name}
+                      className={`max-w-full max-h-full object-contain pointer-events-none transition-all duration-200 ${
+                        isSelected
+                          ? isWrong
+                            ? 'filter drop-shadow-[0_0_12px_rgba(239,68,68,0.95)]'
+                            : 'filter drop-shadow-[0_0_12px_rgba(251,191,36,0.95)]'
+                          : isDiscovered
+                          ? 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] drop-shadow-[0_0_8px_rgba(16,185,129,0.85)]'
+                          : isWrong
+                          ? 'filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] drop-shadow-[0_0_8px_rgba(239,68,68,0.85)]'
+                          : 'filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.45)] group-hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.9)]'
+                      }`}
                     />
-                  ) : (
-                    <span className="text-2xl sm:text-3xl filter drop-shadow-xs">
-                      {item.icon}
-                    </span>
-                  )}
-                  <span className="text-[10px] sm:text-xs font-bold mt-1 bg-white/95 px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap text-stone-800">
+
+                    {isDiscovered && (
+                      <span className="absolute -top-1 -right-1 bg-emerald-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] sm:text-xs shadow-md font-bold leading-none ring-2 ring-white">
+                        ✓
+                      </span>
+                    )}
+
+                    {isWrong && (
+                      <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] sm:text-xs shadow-md font-bold leading-none ring-2 ring-white">
+                        ✕
+                      </span>
+                    )}
+                  </div>
+
+                  <span className="text-[10px] sm:text-xs font-bold mt-1 bg-white/95 px-2 py-0.5 rounded-full shadow-xs whitespace-nowrap text-stone-800 pointer-events-none">
                     {item.name}
                   </span>
-
-                  {isDiscovered && (
-                    <span className="absolute -top-2 -right-2 bg-emerald-600 text-white rounded-full p-0.5 text-xs shadow-xs font-bold">
-                      ✓
-                    </span>
-                  )}
                 </button>
               </motion.div>
             );
@@ -432,7 +441,10 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
               }`}
             >
               <div className="font-bold mb-1 flex items-center justify-between">
-                <span>Pilihan A 🐰</span>
+                <span className="flex items-center gap-1.5">
+                  <span>Pilihan A</span>
+                  <img src="/misi4/kelinci.png" alt="Kelinci" className="w-5 h-5 object-contain inline-block" />
+                </span>
                 {verificationChoice === 'wrong1' && <span className="text-red-600 font-bold">✗ Ini Individu</span>}
               </div>
               <p className="text-[11px] text-stone-600">
@@ -449,7 +461,10 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
               }`}
             >
               <div className="font-bold mb-1 flex items-center justify-between text-sky-900">
-                <span>Pilihan B 🐟🐟🐟</span>
+                <span className="flex items-center gap-1.5">
+                  <span>Pilihan B</span>
+                  <img src="/misi4/tiga-ikan-mas.png" alt="Populasi Ikan Mas" className="w-7 h-5 object-contain inline-block" />
+                </span>
                 {verificationChoice === 'correct' && <span className="text-sky-700 font-bold">✓ Tepat Sekali!</span>}
               </div>
               <p className="text-[11px] text-stone-700">
@@ -466,7 +481,12 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
               }`}
             >
               <div className="font-bold mb-1 flex items-center justify-between">
-                <span>Pilihan C 🐟🐸🪷</span>
+                <span className="flex items-center gap-1">
+                  <span>Pilihan C</span>
+                  <img src="/misi4/satu-ikan-mas.png" alt="Ikan" className="w-4 h-4 object-contain inline-block" />
+                  <img src="/misi4/katak.svg" alt="Katak" className="w-4 h-4 object-contain inline-block" />
+                  <img src="/misi4/teratai.png" alt="Teratai" className="w-4 h-4 object-contain inline-block" />
+                </span>
                 {verificationChoice === 'wrong2' && <span className="text-red-600 font-bold">✗ Ini Komunitas</span>}
               </div>
               <p className="text-[11px] text-stone-600">

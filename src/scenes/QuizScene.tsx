@@ -6,7 +6,6 @@ import { QUIZ_QUESTIONS, BADGE_CRITERIA } from '../data/missions';
 import { sound } from '../utils/audio';
 import { triggerQuizFinishConfetti, triggerCertificateConfetti } from '../utils/confetti';
 import { getExplorerLevel } from '../utils/levels';
-import { scheduleSceneScrollReset } from '../utils/scrollHelper';
 
 interface ShuffledOption {
   id: string;
@@ -77,20 +76,6 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
       sound.stopSoundscape();
     };
   }, []);
-
-  // Scroll to top when quiz completes (Tantangan -> Finish) or when retaken
-  useEffect(() => {
-    const cleanup = scheduleSceneScrollReset();
-    return cleanup;
-  }, [isQuizCompleted]);
-
-  // Scroll to top when advancing to the next question in the challenge
-  useEffect(() => {
-    if (currentIndex > 0) {
-      const cleanup = scheduleSceneScrollReset();
-      return cleanup;
-    }
-  }, [currentIndex]);
 
   const currentQ = questions[currentIndex] || questions[0];
   const totalQuestions = questions.length;

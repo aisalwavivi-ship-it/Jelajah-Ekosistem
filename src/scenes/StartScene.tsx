@@ -44,14 +44,11 @@ export const StartScene: React.FC<StartSceneProps> = ({
     if (onUpdatePlayerName) {
       onUpdatePlayerName(finalName);
     }
-    try {
-      sound.playFootstep();
-    } catch (err) {
-      console.warn('Audio footstep error:', err);
-    }
+    sound.playFootstep();
     if (onStartAdventure) {
       onStartAdventure();
-    } else if (onStart) {
+    }
+    if (onStart) {
       onStart(finalName);
     }
   };
@@ -141,20 +138,20 @@ export const StartScene: React.FC<StartSceneProps> = ({
 
         {/* Primary Action Button: MULAI / LANJUTKAN PETUALANGAN */}
         <div className="space-y-2 pt-1">
-          <button
+          <motion.button
             id="btn-start-adventure"
-            type="button"
             onClick={handleStart}
-            onTouchEnd={handleStart}
-            className="w-full py-3.5 sm:py-4 px-6 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-95 text-white font-display font-black text-base sm:text-lg rounded-2xl shadow-lg shadow-emerald-800/25 border-2 border-emerald-400/50 flex items-center justify-center gap-2.5 transition-all cursor-pointer pointer-events-auto touch-manipulation select-none"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full py-3.5 sm:py-4 px-6 bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-display font-black text-base sm:text-lg rounded-2xl shadow-lg shadow-emerald-800/25 border-2 border-emerald-400/50 flex items-center justify-center gap-2.5 transition cursor-pointer"
           >
-            <Play className="w-5 h-5 fill-current shrink-0" />
+            <Play className="w-5 h-5 fill-current" />
             <span>
               {hasProgress
                 ? `LANJUTKAN PETUALANGAN (${completedCount}/8 Selesai)`
                 : 'MULAI PETUALANGAN'}
             </span>
-          </button>
+          </motion.button>
 
           {/* Secondary Navigation Buttons Row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
