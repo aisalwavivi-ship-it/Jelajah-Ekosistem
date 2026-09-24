@@ -441,10 +441,6 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
               const placedCardId = placedMap[tier.tierId];
               const placedCard = CARDS_DATA.find((c) => c.id === placedCardId);
               const isShaking = shakingTierId === tier.tierId;
-              const isSelectedTarget =
-                selectedCardId &&
-                selectedCardId === tier.expectedCardId &&
-                !placedCard;
 
               return (
                 <motion.div
@@ -462,8 +458,6 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
                   className={`relative ${tier.widthClass} transition-all duration-300 rounded-2xl sm:rounded-3xl border-2 p-3 sm:p-4 cursor-pointer select-none shadow-sm ${
                     placedCard
                       ? `${tier.filledBg} shadow-md`
-                      : isSelectedTarget
-                      ? `${tier.accentBg} ring-3 ring-amber-400 border-amber-500 shadow-md scale-[1.01]`
                       : `${tier.accentBg} border-dashed ${tier.accentBorder}`
                   }`}
                 >
@@ -527,7 +521,7 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
                         Letakkan <span className="text-emerald-800 underline underline-offset-2">{tier.category}</span> di sini
                       </p>
                       <p className="text-[11px] text-stone-500 mt-0.5 max-w-md">
-                        Contoh: {tier.example} — {tier.roleHint}
+                        {tier.roleHint}
                       </p>
                     </div>
                   )}
