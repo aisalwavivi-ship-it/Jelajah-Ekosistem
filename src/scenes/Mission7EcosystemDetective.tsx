@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, Map, Award, Eye, Search } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
+import { triggerSceneScrollReset } from '../utils/scrollHelper';
 
 interface Mission7Props {
   onComplete: (points: number) => void;
@@ -139,6 +140,10 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
   const [recentFound, setRecentFound] = useState<DetectiveObject | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
   const [showDiscoveryAnimation, setShowDiscoveryAnimation] = useState<boolean>(false);
+
+  useEffect(() => {
+    triggerSceneScrollReset();
+  }, [currentLocation]);
 
   useEffect(() => {
     if (currentLocation === 'kolam') {

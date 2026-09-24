@@ -14,7 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { sound } from '../utils/audio';
-import { scrollToPageTop } from '../utils/scrollToTop';
+import { triggerSceneScrollReset } from '../utils/scrollHelper';
 
 interface Mission6Props {
   onComplete: (points: number) => void;
@@ -184,6 +184,10 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'sorting' | 'whatif'>('sorting');
   
+  useEffect(() => {
+    triggerSceneScrollReset();
+  }, [activeTab]);
+  
   // Sorting Game state
   const [classifiedMap, setClassifiedMap] = useState<Record<string, 'biotik' | 'abiotik'>>({});
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -198,7 +202,6 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
 
   useEffect(() => {
     sound.startSoundscape('forest');
-    scrollToPageTop();
     return () => {
       sound.stopSoundscape();
     };
@@ -299,7 +302,6 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
             onClick={() => {
               sound.playClick();
               setActiveTab('sorting');
-              scrollToPageTop();
             }}
             className={`flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'sorting'
@@ -318,7 +320,6 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
             onClick={() => {
               sound.playClick();
               setActiveTab('whatif');
-              scrollToPageTop();
             }}
             className={`flex-1 py-2 px-3 rounded-xl text-xs sm:text-sm font-display font-bold transition flex items-center justify-center gap-2 cursor-pointer ${
               activeTab === 'whatif'
