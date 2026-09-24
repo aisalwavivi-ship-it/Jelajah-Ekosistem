@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, RotateCcw, Sparkles, Map, AlertCircle } from 
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
+import { scrollToPageTop } from '../utils/scrollToTop';
 
 interface Mission3Props {
   onComplete: (points: number) => void;
@@ -126,12 +127,24 @@ const CANDIDATE_ITEMS: ItemCard[] = [
   },
 ];
 
+// Fisher-Yates algorithm for unbiased card shuffling
+function shuffleCandidateItems(items: ItemCard[]): ItemCard[] {
+  const array = [...items];
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
 export const Mission3Biotic: React.FC<Mission3Props> = ({
   onComplete,
   onGoToMap,
   onNextMission,
 }) => {
+  const [shuffledCards, setShuffledCards] = useState<ItemCard[]>(() => shuffleCandidateItems(CANDIDATE_ITEMS));
   const [foundIndividualIds, setFoundIndividualIds] = useState<string[]>([]);
+  const [wrongIndividualIds, setWrongIndividualIds] = useState<string[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<{
     text: string;
     isCorrect: boolean;
@@ -142,6 +155,7 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
 
   useEffect(() => {
     sound.startSoundscape('grassland');
+    scrollToPageTop();
     return () => {
       sound.stopSoundscape();
     };
@@ -169,6 +183,9 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
       });
     } else {
       sound.playWrong();
+      if (!wrongIndividualIds.includes(item.id)) {
+        setWrongIndividualIds((prev) => [...prev, item.id]);
+      }
       setSelectedMessage({
         text: `⚠️ Perhatikan: ${item.explanation}`,
         isCorrect: false,
@@ -180,8 +197,10 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
   const handleReset = () => {
     sound.playClick();
     setFoundIndividualIds([]);
+    setWrongIndividualIds([]);
     setSelectedMessage(null);
     setHasCompleted(false);
+    setShuffledCards(shuffleCandidateItems(CANDIDATE_ITEMS));
   };
 
   const handleVerify = (choiceId: string) => {
@@ -357,8 +376,9 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            {CANDIDATE_ITEMS.map((item) => {
+            {shuffledCards.map((item) => {
               const isFound = foundIndividualIds.includes(item.id);
+              const isWrong = wrongIndividualIds.includes(item.id);
 
               return (
                 <motion.button
@@ -370,6 +390,8 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
                   className={`p-3.5 rounded-2xl border-2 text-left transition-all flex flex-col items-center justify-center text-center relative group cursor-pointer ${
                     isFound
                       ? 'bg-teal-100 border-teal-500 ring-2 ring-teal-300 shadow-sm'
+                      : isWrong
+                      ? 'bg-red-100 border-red-500 ring-2 ring-red-300 shadow-sm'
                       : 'bg-stone-50 hover:bg-teal-50/70 border-stone-200 hover:border-teal-300'
                   }`}
                 >
@@ -387,9 +409,23 @@ export const Mission3Biotic: React.FC<Mission3Props> = ({
                   </span>
 
                   {isFound && (
-                    <span className="absolute top-2 right-2 bg-teal-600 text-white rounded-full p-0.5 text-xs shadow-xs font-bold">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute top-2 right-2 bg-teal-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-xs font-bold"
+                    >
                       ✓
-                    </span>
+                    </motion.span>
+                  )}
+
+                  {isWrong && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute top-2 right-2 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-xs font-bold"
+                    >
+                      ✕
+                    </motion.span>
                   )}
                 </motion.button>
               );

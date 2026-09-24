@@ -258,6 +258,14 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
     setHasCompleted(false);
   };
 
+  const handleDismissWrongFeedback = () => {
+    sound.playClick();
+    setFeedback(null);
+    if (selectedOptionId && !currentScenario.options.find((o) => o.id === selectedOptionId)?.isCorrect) {
+      setSelectedOptionId(null);
+    }
+  };
+
   const currentScenario = SCENARIOS[scenarioIndex];
 
   return (
@@ -362,21 +370,17 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
               </div>
             </div>
 
-              {/* Immediate Feedback Banner */}
+            {/* Immediate Feedback Banner (Hanya untuk Jawaban Benar) */}
             <AnimatePresence mode="wait">
-              {feedback && (
+              {feedback && feedback.isCorrect && (
                 <motion.div
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  className={`p-3.5 rounded-2xl border-2 flex items-center justify-between gap-3 shadow-md ${
-                    feedback.isCorrect
-                      ? 'bg-emerald-50 border-emerald-400 text-emerald-950'
-                      : 'bg-red-50 border-red-300 text-red-950'
-                  }`}
+                  className="p-3.5 rounded-2xl border-2 border-emerald-400 bg-emerald-50 text-emerald-950 flex items-center justify-between gap-3 shadow-md"
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-xl">{feedback.isCorrect ? '🌟' : '💡'}</span>
+                    <span className="text-xl">🌟</span>
                     <span className="text-xs sm:text-sm font-medium">{feedback.text}</span>
                   </div>
                   <button
@@ -771,6 +775,11 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                           sound.playCorrect();
                         } else {
                           sound.playWrong();
+                          setFeedback({
+                            text: `Pilihan tersebut belum tepat. ${currentScenario.explanation}`,
+                            isCorrect: false,
+                            name: currentScenario.title,
+                          });
                         }
                       }}
                       className={`w-full p-3 rounded-2xl border-2 text-left font-medium text-xs sm:text-sm transition flex items-center justify-between gap-3 cursor-pointer ${
@@ -794,7 +803,7 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
                 })}
               </div>
 
-              {selectedOptionId && (
+              {selectedOptionId && currentScenario.options.find((o) => o.id === selectedOptionId)?.isCorrect && (
                 <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl text-xs text-emerald-950">
                   <p className="font-bold mb-0.5 flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
@@ -834,6 +843,68 @@ export const Mission6WhatIf: React.FC<Mission6Props> = ({
           )}
         </div>
       </div>
+
+      {/* Pop-up Modal Jawaban Salah (Square / Kotak Persegi di Tengah Layar) */}
+      <AnimatePresence>
+        {feedback && !feedback.isCorrect && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop Overlay Tipis */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={handleDismissWrongFeedback}
+              className="absolute inset-0 bg-stone-900/40 backdrop-blur-[2px]"
+            />
+
+            {/* Modal Card Berbentuk Kotak Persegi (Square) di Tengah Layar */}
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 320 }}
+              className="relative z-10 w-full max-w-[340px] sm:max-w-[360px] aspect-square bg-white rounded-3xl border-3 border-red-300 shadow-2xl p-5 sm:p-6 flex flex-col items-center justify-between text-center select-none"
+            >
+              {/* Tombol Tutup di Sudut Kanan Atas */}
+              <button
+                onClick={handleDismissWrongFeedback}
+                className="absolute top-3.5 right-3.5 p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition cursor-pointer"
+                aria-label="Tutup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Tanda Silang ✕ Berwarna Merah yang Jelas */}
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-100 border-2 border-red-300 flex items-center justify-center shadow-inner mt-1">
+                <span className="text-red-600 font-extrabold text-2xl sm:text-3xl leading-none">
+                  ✕
+                </span>
+              </div>
+
+              {/* Judul & Isi Pesan Feedback Jawaban Salah */}
+              <div className="flex-1 flex flex-col items-center justify-center px-1 py-2 my-auto">
+                <h4 className="font-display font-extrabold text-base sm:text-lg text-red-700 mb-1.5">
+                  Jawaban Belum Tepat
+                </h4>
+                <div className="max-h-[110px] overflow-y-auto px-1">
+                  <p className="text-xs sm:text-sm text-stone-700 font-medium leading-relaxed">
+                    {feedback.text}
+                  </p>
+                </div>
+              </div>
+
+              {/* Tombol Interaktif Coba Lagi */}
+              <button
+                onClick={handleDismissWrongFeedback}
+                className="w-full py-2.5 px-4 bg-red-600 hover:bg-red-700 text-white font-display font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Coba Lagi</span>
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
