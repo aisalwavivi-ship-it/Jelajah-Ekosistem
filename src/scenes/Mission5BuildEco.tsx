@@ -5,6 +5,7 @@ import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { BatuTamanImage, isBatuTaman } from '../components/BatuTamanImage';
 import { TanahSuburImage, isTanahSubur } from '../components/TanahSuburImage';
+import { scrollToPageTop } from '../utils/scrollToTop';
 
 interface Mission5Props {
   onComplete: (points: number) => void;
@@ -221,6 +222,10 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
   const [verificationChoice, setVerificationChoice] = useState<string | null>(null);
 
   useEffect(() => {
+    scrollToPageTop();
+  }, []);
+
+  useEffect(() => {
     if (selectedEco === 'taman') {
       sound.startSoundscape('grassland');
     } else {
@@ -269,6 +274,7 @@ export const Mission5BuildEco: React.FC<Mission5Props> = ({
     setActiveItems([]);
     setHasCompleted(false);
     setShowDiscoveryAnimation(false);
+    scrollToPageTop();
   };
 
   const selectedItemsData = currentAvailableItems.filter((i) => activeItems.includes(i.id));

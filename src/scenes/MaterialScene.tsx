@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   BookOpen, 
@@ -19,6 +19,7 @@ import {
 import { AppScene, MissionId } from '../types';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
+import { scrollToPageTop } from '../utils/scrollToTop';
 
 interface MaterialSceneProps {
   onGoToMap: () => void;
@@ -226,6 +227,10 @@ export const MaterialScene: React.FC<MaterialSceneProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>('ekosistem');
 
+  useEffect(() => {
+    scrollToPageTop();
+  }, []);
+
   const filteredMaterials = MATERIALS_LIST.filter((item) => {
     const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
     const matchesSearch =
@@ -308,6 +313,7 @@ export const MaterialScene: React.FC<MaterialSceneProps> = ({
                   onClick={() => {
                     sound.playClick();
                     setSelectedCategory(tab.key as any);
+                    scrollToPageTop();
                   }}
                   className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-display font-bold whitespace-nowrap transition-all duration-200 active:scale-95 cursor-pointer ${
                     isActive

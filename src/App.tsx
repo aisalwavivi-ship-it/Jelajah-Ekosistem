@@ -35,6 +35,7 @@ import { MissionVoicePromptGuide } from './components/MissionVoicePromptGuide';
 import { DynamicWeatherBackground } from './components/DynamicWeatherBackground';
 import { WeatherType, WeatherMode, resolveActiveWeather } from './utils/weather';
 import { playMissionVoicePrompt, stopCurrentVoicePrompt } from './utils/missionVoicePrompts';
+import { scrollToPageTop, triggerSceneScrollReset, initScrollRestoration } from './utils/scrollToTop';
 
 // Scenes
 import { StartScene } from './scenes/StartScene';
@@ -123,7 +124,19 @@ export default function App() {
       // ignore
     }
     setHasSeenOpening(true);
+    scrollToPageTop();
   };
+
+  // 1. Initialize browser scroll restoration to manual so refresh starts at top
+  useEffect(() => {
+    initScrollRestoration();
+  }, []);
+
+  // 2. Global Scroll-to-Top trigger: Resets scroll instantly whenever destination scene or view changes
+  useEffect(() => {
+    const cleanup = triggerSceneScrollReset();
+    return cleanup;
+  }, [currentScene, pendingWalkingScene, hasSeenOpening]);
 
   // Automatically persist active session whenever it changes
   useEffect(() => {
@@ -340,6 +353,7 @@ export default function App() {
   };
 
   const navigateWithWalkingTrail = (toScene: AppScene, fromScene?: AppScene) => {
+    scrollToPageTop();
     const from = fromScene || currentScene;
     if (from !== toScene) {
       setPendingWalkingScene({
@@ -355,6 +369,7 @@ export default function App() {
     sound.playFootstep();
     ambientMusic.start();
     setIsMusicPlaying(true);
+    scrollToPageTop();
 
     const safeArgName = typeof name === 'string' ? name.trim() : '';
     const safeCurrentName =
@@ -377,6 +392,7 @@ export default function App() {
 
   const handleSelectMission = (scene: AppScene) => {
     sound.playFootstep();
+    scrollToPageTop();
     if (scene !== currentScene && (scene.startsWith('mission-') || scene === 'quiz')) {
       navigateWithWalkingTrail(scene, currentScene);
     } else {
@@ -386,6 +402,7 @@ export default function App() {
 
   const handleFinishQuiz = (finalScore: number) => {
     triggerQuizFinishConfetti();
+    scrollToPageTop();
 
     const earnedBadge =
       BADGES.find((b) => finalScore >= b.minScore) || BADGES[BADGES.length - 1];
@@ -429,6 +446,7 @@ export default function App() {
 
     // Smoothly return to the Map Scene with Checkpoint M1 active
     setCurrentScene('map');
+    scrollToPageTop();
   };
 
   const completedCount = Object.values(activeSession.completedMissions).filter(Boolean).length;
@@ -500,16 +518,20 @@ export default function App() {
         onGoToStart={() => {
           sound.playClick();
           setCurrentScene('start');
+          scrollToPageTop();
         }}
         onGoToMap={() => {
           sound.playClick();
           setCurrentScene('map');
+          scrollToPageTop();
         }}
         onGoToMaterial={() => {
           sound.playClick();
           setCurrentScene('material');
+          scrollToPageTop();
         }}
         onGoToMissions={(targetMissionId) => {
+          scrollToPageTop();
           if (targetMissionId) {
             handleSelectMission(`mission-${targetMissionId}` as AppScene);
           } else {
@@ -525,6 +547,7 @@ export default function App() {
         onGoToQuiz={() => {
           sound.playStarEarned();
           setCurrentScene('quiz');
+          scrollToPageTop();
         }}
         onOpenCertificate={() => {
           sound.playStarEarned();
@@ -594,6 +617,12 @@ export default function App() {
             transition={{
               duration: 0.32,
               ease: [0.22, 1, 0.36, 1],
+            }}
+            onAnimationStart={() => {
+              scrollToPageTop();
+            }}
+            onAnimationComplete={() => {
+              scrollToPageTop();
             }}
             className="flex-1 w-full flex flex-col"
           >
@@ -757,10 +786,12 @@ export default function App() {
           onFinish={() => {
             setCurrentScene(pendingWalkingScene.toScene);
             setPendingWalkingScene(null);
+            scrollToPageTop();
           }}
           onSkip={() => {
             setCurrentScene(pendingWalkingScene.toScene);
             setPendingWalkingScene(null);
+            scrollToPageTop();
           }}
         />
       )}
@@ -807,6 +838,7 @@ export default function App() {
         lastCompletedMissionId={lastCompletedMissionId}
         onNavigateToMission={(missionId) => {
           setIsJournalOpen(false);
+          scrollToPageTop();
           navigateWithWalkingTrail(`mission-${missionId}` as AppScene);
         }}
         onOpenHistory={() => {
@@ -854,6 +886,7 @@ export default function App() {
           setIsRestartConfirmOpen(true);
         }}
         onGoToMap={() => {
+          scrollToPageTop();
           setCurrentScene('map');
         }}
       />

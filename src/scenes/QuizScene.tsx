@@ -6,6 +6,7 @@ import { QUIZ_QUESTIONS, BADGE_CRITERIA } from '../data/missions';
 import { sound } from '../utils/audio';
 import { triggerQuizFinishConfetti, triggerCertificateConfetti } from '../utils/confetti';
 import { getExplorerLevel } from '../utils/levels';
+import { scrollToPageTop } from '../utils/scrollToTop';
 
 interface ShuffledOption {
   id: string;
@@ -72,6 +73,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
 
   useEffect(() => {
     sound.startSoundscape('grassland');
+    scrollToPageTop();
     return () => {
       sound.stopSoundscape();
     };
@@ -101,6 +103,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
       setCurrentIndex(currentIndex + 1);
       setSelectedOptionId(null);
       setIsAnswerSubmitted(false);
+      scrollToPageTop();
     } else {
       // Finished
       const finalPercentage = Math.round((correctAnswersCount / totalQuestions) * 100);
@@ -108,6 +111,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
       sound.playFanfare();
       triggerQuizFinishConfetti();
       onFinishQuiz(finalPercentage);
+      scrollToPageTop();
     }
   };
 
@@ -122,6 +126,7 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
     setIsAnswerSubmitted(false);
     setCorrectAnswersCount(0);
     setIsQuizCompleted(false);
+    scrollToPageTop();
   };
 
   return (
