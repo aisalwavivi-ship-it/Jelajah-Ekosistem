@@ -337,10 +337,14 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
         </div>
 
         {/* Scenic Panoramic Road Canvas with Background Landscape */}
-        <div
-          className="relative w-full h-64 sm:h-76 bg-cover bg-center overflow-hidden border-b-2 border-amber-200"
-          style={{ backgroundImage: "url('/jelajah-ekosistem-bg.jpg')" }}
-        >
+        <div className="relative w-full h-64 sm:h-76 overflow-hidden border-b-2 border-amber-200">
+          {/* Main Realistic Background Image with object-cover */}
+          <img
+            src="/peta/jalan-setapak-transisi.jpg"
+            alt="Pemandangan Jalan Setapak Petualangan Ekosistem"
+            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none z-0"
+            referrerPolicy="no-referrer"
+          />
           {/* Ambient Lighting / Glow Layer */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent pointer-events-none" />
 
