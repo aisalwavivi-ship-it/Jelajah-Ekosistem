@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle2, RotateCcw, AlertCircle, Sparkles, Map } from 'lucide-react';
+import { ArrowRight, CheckCircle2, RotateCcw, AlertCircle, Sparkles, Map, X } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 import { AudioNarratorButton } from '../components/AudioNarratorButton';
@@ -204,37 +204,24 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
           </div>
         </div>
 
-        {/* Feedback Alert Banner */}
+        {/* Correct Answer Feedback Banner */}
         <AnimatePresence>
-          {feedback && (
+          {feedback && feedback.isCorrect && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className={`p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between gap-3 shadow-md ${
-                feedback.isCorrect
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-950'
-                  : 'bg-amber-50 border-amber-300 text-amber-950'
-              }`}
+              className="p-3.5 sm:p-4 rounded-2xl border-2 flex items-center justify-between gap-3 shadow-md bg-emerald-50 border-emerald-300 text-emerald-950"
             >
               <div className="flex items-center gap-2.5">
-                <span className="text-2xl">{feedback.isCorrect ? '🌟' : '🤔'}</span>
+                <span className="text-2xl">🌟</span>
                 <div>
                   <p className="font-bold text-xs sm:text-sm">
-                    {feedback.isCorrect ? 'Jawaban Tepat!' : 'Ayo Pikirkan Lagi:'}
+                    Jawaban Tepat!
                   </p>
                   <p className="text-xs sm:text-sm">{feedback.text}</p>
                 </div>
               </div>
-
-              {!feedback.isCorrect && (
-                <button
-                  onClick={() => setFeedback(null)}
-                  className="px-3 py-1 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-xl text-xs font-bold shrink-0"
-                >
-                  Coba Lagi
-                </button>
-              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -499,6 +486,62 @@ export const Mission2Detective: React.FC<Mission2Props> = ({
           )}
         </div>
       </div>
+
+      {/* Pop-up Modal Pesan Kesalahan Jawaban */}
+      <AnimatePresence>
+        {feedback && !feedback.isCorrect && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="relative w-full max-w-md bg-gradient-to-b from-rose-50 via-red-50 to-pink-100 rounded-3xl p-5 sm:p-6 border-3 border-rose-300 shadow-2xl text-stone-800"
+            >
+              {/* Tombol Silang (✕) di pojok kanan atas */}
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  setFeedback(null);
+                }}
+                className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-rose-200/80 hover:bg-rose-300 text-rose-800 flex items-center justify-center transition active:scale-90 cursor-pointer shadow-xs"
+                title="Tutup"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Ikon & Judul Pop-up */}
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl sm:text-4xl select-none">😕</span>
+                <h3 className="font-display font-extrabold text-base sm:text-lg text-rose-900 leading-tight">
+                  Ayo Pikirkan Lagi!
+                </h3>
+              </div>
+
+              {/* Isi Pesan Edukatif */}
+              <div className="bg-white/80 rounded-2xl p-3.5 sm:p-4 border border-rose-200/70 shadow-xs mb-4">
+                <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium">
+                  {feedback.text}
+                </p>
+              </div>
+
+              {/* Tombol Coba Lagi di bagian bawah */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => {
+                    sound.playClick();
+                    setFeedback(null);
+                  }}
+                  className="w-full sm:w-auto px-6 py-2.5 bg-rose-500 hover:bg-rose-600 active:scale-95 text-white font-display font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-rose-500/20 transition cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Coba Lagi</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
