@@ -214,23 +214,12 @@ export const MapScene: React.FC<MapSceneProps> = ({
 
         {/* The Illustrated Panoramic Map Canvas */}
         <div className="relative w-full bg-stone-900/10 rounded-3xl border-4 border-amber-300/90 shadow-2xl overflow-hidden min-h-[480px] sm:min-h-[540px] md:min-h-[580px] aspect-[16/9] max-h-[640px]">
-          {/* Debug text */}
-          <div
-            className="absolute top-2 left-2 px-2 py-1 bg-red-600 text-white font-bold text-xs rounded select-none pointer-events-none"
-            style={{ zIndex: 999 }}
-          >
-            BACKGROUND TEST V2
-          </div>
-
           {/* Main Natural Landscape Background Image */}
-          <div
-            className="absolute inset-0 bg-red-500 z-0"
-          />
-
           <img
             src="/peta/padang-rumput-v3.png"
-            alt="test"
-            className="absolute inset-0 w-full h-full object-cover z-50"
+            alt="Lansekap Peta Petualangan Ekosistem"
+            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none z-0"
+            referrerPolicy="no-referrer"
           />
 
           {/* Subtle natural atmosphere gradient overlay for contrast */}
