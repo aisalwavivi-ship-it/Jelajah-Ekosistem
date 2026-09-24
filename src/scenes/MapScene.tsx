@@ -223,11 +223,14 @@ export const MapScene: React.FC<MapSceneProps> = ({
           </div>
 
           {/* Main Natural Landscape Background Image */}
+          <div
+            className="absolute inset-0 bg-red-500 z-0"
+          />
+
           <img
-            src="/peta/padang-rumput-v2.png"
-            alt="Lansekap Peta Petualangan Ekosistem"
-            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none z-0"
-            referrerPolicy="no-referrer"
+            src="/peta/padang-rumput-v3.png"
+            alt="test"
+            className="absolute inset-0 w-full h-full object-cover z-50"
           />
 
           {/* Subtle natural atmosphere gradient overlay for contrast */}
