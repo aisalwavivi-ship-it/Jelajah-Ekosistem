@@ -467,8 +467,8 @@ export const Mission4Abiotic: React.FC<Mission4Props> = ({
                 </span>
                 {verificationChoice === 'correct' && <span className="text-sky-700 font-bold">✓ Tepat Sekali!</span>}
               </div>
-              <p className="text-[11px] text-stone-700">
-                <strong>Sekumpulan 15 ekor ikan mas sejenis</strong> yang hidup bersama di dalam kolam.
+              <p className="text-[11px] text-stone-700 font-normal">
+                Sekumpulan 15 ekor ikan mas sejenis yang hidup bersama di dalam kolam.
               </p>
             </button>
 

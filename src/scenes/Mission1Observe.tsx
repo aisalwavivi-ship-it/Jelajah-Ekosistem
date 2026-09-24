@@ -503,8 +503,8 @@ export const Mission1Observe: React.FC<Mission1Props> = ({
                 <span>Pilihan B</span>
                 {selectedDefinition === 'correct' && <span className="text-emerald-700 font-bold">✓ Tepat Sekali!</span>}
               </div>
-              <p className="text-[11px] text-stone-700">
-                <strong>Kesatuan antara makhluk hidup dan lingkungan tak hidup yang terdapat dalam suatu tempat.</strong>
+              <p className="text-[11px] text-stone-700 font-normal">
+                Kesatuan antara makhluk hidup dan lingkungan tak hidup yang terdapat dalam suatu tempat.
               </p>
             </button>
 
