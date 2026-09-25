@@ -508,6 +508,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🐢',
           description: '1 ekor kura-kura air tawar tunggal yang sedang beristirahat sendirian.',
+          imageUrl: '/tantangan/individu_kurakura.jpg',
         },
         {
           badgeId: 'B',
@@ -515,6 +516,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐟',
           description: 'Kumpulan puluhan kecebong sejenis yang berenang lincah di tepian kolam.',
+          imageUrl: '/tantangan/populasi_kecebong.jpg',
         },
         {
           badgeId: 'C',
@@ -522,6 +524,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🐢🪷🐟🌿',
           description: 'Kumpulan populasi kura-kura, kecebong, ikan kecil, dan tanaman teratai.',
+          imageUrl: '/tantangan/komunitas_kolam.jpg',
         },
         {
           badgeId: 'D',
@@ -529,6 +532,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💧🪨',
           description: 'Lingkungan fisik air tenang dan lumpur dasar kolam.',
+          imageUrl: '/tantangan/abiotik_kolam.jpg',
         },
       ],
     },
