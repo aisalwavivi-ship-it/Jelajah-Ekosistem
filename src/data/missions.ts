@@ -402,6 +402,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🦅',
           description: '1 ekor burung rajawali tunggal bertengger di dahan pinus pinggir danau.',
+          imageUrl: '/tantangan/individu_rajawali.jpg',
         },
         {
           badgeId: 'B',
@@ -409,6 +410,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐟',
           description: 'Sekelompok 12 ekor ikan mas sejenis yang berenang bersama di dalam air danau.',
+          imageUrl: '/tantangan/populasi_ikan_mas.jpg',
         },
         {
           badgeId: 'C',
@@ -416,6 +418,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🌲🦅🐟🌿',
           description: 'Seluruh populasi ikan mas, rajawali, pohon pinus, dan lumut air di danau.',
+          imageUrl: '/tantangan/komunitas_danau.jpg',
         },
         {
           badgeId: 'D',
@@ -423,6 +426,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💧🪨',
           description: 'Faktor abiotik air jernih dan batuan penopang habitat danau.',
+          imageUrl: '/tantangan/abiotik_danau.jpg',
         },
       ],
     },
