@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, CheckCircle2, Sparkles, Map, Award, Eye, Search } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
@@ -140,10 +140,39 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
   const [recentFound, setRecentFound] = useState<DetectiveObject | null>(null);
   const [hasCompleted, setHasCompleted] = useState<boolean>(false);
   const [showDiscoveryAnimation, setShowDiscoveryAnimation] = useState<boolean>(false);
+  const [isDiscoveryDismissed, setIsDiscoveryDismissed] = useState<boolean>(false);
+
+  // 10-second auto-dismiss timer for element information box
+  const infoBoxTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const resetInfoBoxTimer = () => {
+    if (infoBoxTimeoutRef.current) {
+      clearTimeout(infoBoxTimeoutRef.current);
+      infoBoxTimeoutRef.current = null;
+    }
+    infoBoxTimeoutRef.current = setTimeout(() => {
+      setRecentFound(null);
+      infoBoxTimeoutRef.current = null;
+    }, 10000);
+  };
 
   useEffect(() => {
     triggerSceneScrollReset();
+    setRecentFound(null);
+    if (infoBoxTimeoutRef.current) {
+      clearTimeout(infoBoxTimeoutRef.current);
+      infoBoxTimeoutRef.current = null;
+    }
   }, [currentLocation]);
+
+  useEffect(() => {
+    return () => {
+      if (infoBoxTimeoutRef.current) {
+        clearTimeout(infoBoxTimeoutRef.current);
+        infoBoxTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (currentLocation === 'kolam') {
@@ -167,6 +196,7 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
   const handleInspect = (item: DetectiveObject) => {
     sound.playClick();
     setRecentFound(item);
+    resetInfoBoxTimer();
 
     if (!foundItemIds.includes(item.id)) {
       const nextList = [...foundItemIds, item.id];
@@ -453,13 +483,28 @@ export const Mission7EcosystemDetective: React.FC<Mission7Props> = ({
 
           {/* Discovery Animation Popup Overlay */}
           <AnimatePresence>
-            {showDiscoveryAnimation && (
+            {showDiscoveryAnimation && !isDiscoveryDismissed && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.8, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="absolute top-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 bg-gradient-to-r from-amber-400 to-amber-500 text-stone-900 p-4 rounded-3xl border-3 border-white shadow-2xl z-30 flex items-center gap-3.5"
+                className="absolute top-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 bg-gradient-to-r from-amber-400 to-amber-500 text-stone-900 p-4 pr-10 rounded-3xl border-3 border-white shadow-2xl z-30 flex items-center gap-3.5 relative"
               >
+                {/* Tombol silang '✕' di pojok kanan atas di dalam kotak kuning */}
+                <button
+                  type="button"
+                  id="btn-close-discovery"
+                  aria-label="Tutup notifikasi Penemuan Berhasil"
+                  onClick={() => {
+                    sound.playClick();
+                    setIsDiscoveryDismissed(true);
+                    setShowDiscoveryAnimation(false);
+                  }}
+                  className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full bg-amber-900/15 hover:bg-amber-900/30 text-amber-950 font-bold text-xs transition cursor-pointer select-none border border-amber-950/20"
+                >
+                  ✕
+                </button>
+
                 <div className="w-10 h-10 rounded-2xl bg-amber-100/90 border border-amber-300 flex items-center justify-center shrink-0 shadow-xs">
                   <Sparkles className="w-6 h-6 text-amber-900" />
                 </div>
