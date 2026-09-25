@@ -100,7 +100,7 @@ const SCENE_TIPS: Record<AppScene, SceneTip> = {
   quiz: {
     title: 'Ujian Evaluasi Akhir',
     badge: 'Tantangan Pengetahuan',
-    tip: 'Baca 10 pertanyaan dengan cermat. Nilai tinggi akan membuka Lencana Kehormatan dan Sertifikat Resmi!',
+    tip: 'Baca 12 pertanyaan dengan cermat. Nilai tinggi akan membuka Lencana Kehormatan dan Sertifikat Resmi!',
     funFact: 'Soal kuis dirancang sesuai kurikulum IPAS Kelas 5 tentang Harmoni dalam Ekosistem.',
     mood: 'celebrate',
   },
