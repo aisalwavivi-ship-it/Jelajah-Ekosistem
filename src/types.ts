@@ -34,6 +34,7 @@ export interface EcosystemIllustration {
     level: 'individu' | 'populasi' | 'komunitas' | 'abiotik';
     icon: string;
     description: string;
+    imageUrl?: string;
   }[];
 }
 

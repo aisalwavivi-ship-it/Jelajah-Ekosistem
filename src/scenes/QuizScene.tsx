@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge } from 'lucide-react';
+import { ArrowRight, CheckCircle2, RotateCcw, Award, Star, Map, Trophy, FileBadge, ZoomIn, X } from 'lucide-react';
 import { CharacterAvatar } from '../components/illustrations/CharacterAvatar';
 import { QUIZ_QUESTIONS, BADGE_CRITERIA } from '../data/missions';
 import { sound } from '../utils/audio';
@@ -70,6 +70,13 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState<boolean>(false);
   const [correctAnswersCount, setCorrectAnswersCount] = useState<number>(0);
   const [isQuizCompleted, setIsQuizCompleted] = useState<boolean>(false);
+  const [zoomedImage, setZoomedImage] = useState<{
+    src: string;
+    title: string;
+    badgeId: string;
+    level: string;
+    desc: string;
+  } | null>(null);
 
   // Global scroll-to-top whenever moving to the next question or finishing to the results view
   useEffect(() => {
@@ -215,42 +222,112 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
                       </div>
 
                       {/* Labeled visual grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         {currentQ.illustration.labels.map((lbl) => {
                           const badgeColor =
                             lbl.badgeId === 'A'
-                              ? 'bg-amber-500 text-white'
+                              ? 'bg-amber-500 text-white border-amber-300'
                               : lbl.badgeId === 'B'
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-blue-600 text-white border-blue-300'
                               : lbl.badgeId === 'C'
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-stone-700 text-white';
+                              ? 'bg-purple-600 text-white border-purple-300'
+                              : 'bg-emerald-600 text-white border-emerald-300';
+
+                          const tagBg =
+                            lbl.badgeId === 'A'
+                              ? 'bg-amber-100 text-amber-900 border-amber-300'
+                              : lbl.badgeId === 'B'
+                              ? 'bg-blue-100 text-blue-900 border-blue-300'
+                              : lbl.badgeId === 'C'
+                              ? 'bg-purple-100 text-purple-900 border-purple-300'
+                              : 'bg-emerald-100 text-emerald-900 border-emerald-300';
 
                           const cardBg =
                             lbl.badgeId === 'A'
-                              ? 'bg-amber-50/90 border-amber-300'
+                              ? 'bg-gradient-to-b from-amber-50/95 to-amber-100/35 border-amber-300 hover:border-amber-400'
                               : lbl.badgeId === 'B'
-                              ? 'bg-blue-50/90 border-blue-300'
+                              ? 'bg-gradient-to-b from-blue-50/95 to-blue-100/35 border-blue-300 hover:border-blue-400'
                               : lbl.badgeId === 'C'
-                              ? 'bg-purple-50/90 border-purple-300'
-                              : 'bg-stone-50 border-stone-300';
+                              ? 'bg-gradient-to-b from-purple-50/95 to-purple-100/35 border-purple-300 hover:border-purple-400'
+                              : 'bg-gradient-to-b from-emerald-50/95 to-emerald-100/35 border-emerald-300 hover:border-emerald-400';
+
+                          const levelLabel =
+                            lbl.badgeId === 'A'
+                              ? 'INDIVIDU'
+                              : lbl.badgeId === 'B'
+                              ? 'POPULASI'
+                              : lbl.badgeId === 'C'
+                              ? 'KOMUNITAS'
+                              : 'EKOSISTEM';
 
                           return (
                             <div
                               key={lbl.badgeId}
-                              className={`p-2.5 sm:p-3 rounded-xl border-2 flex items-start gap-2.5 shadow-2xs transition hover:shadow-sm ${cardBg}`}
+                              className={`p-3 rounded-2xl border-2 flex flex-col gap-2.5 shadow-2xs transition hover:shadow-md ${cardBg}`}
                             >
-                              <span
-                                className={`w-6 h-6 rounded-lg font-display font-black text-xs flex items-center justify-center shrink-0 shadow-xs ${badgeColor}`}
+                              {/* Visual Illustration Area */}
+                              <div
+                                onClick={() => {
+                                  if (lbl.imageUrl) {
+                                    sound.playClick();
+                                    setZoomedImage({
+                                      src: lbl.imageUrl,
+                                      title: lbl.name,
+                                      badgeId: lbl.badgeId,
+                                      level: levelLabel,
+                                      desc: lbl.description,
+                                    });
+                                  }
+                                }}
+                                className={`relative w-full aspect-[4/3] rounded-xl overflow-hidden border border-stone-200/90 shadow-xs bg-stone-100 ${
+                                  lbl.imageUrl ? 'cursor-pointer group' : ''
+                                }`}
                               >
-                                {lbl.badgeId}
-                              </span>
+                                {lbl.imageUrl ? (
+                                  <>
+                                    <img
+                                      src={lbl.imageUrl}
+                                      alt={`Ilustrasi Kartu [${lbl.badgeId}] - ${lbl.name}`}
+                                      className="w-full h-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                    {/* Hover overlay hint */}
+                                    <div className="absolute inset-0 bg-black/15 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                      <span className="px-2.5 py-1 bg-black/65 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 backdrop-blur-xs shadow-md">
+                                        <ZoomIn className="w-3.5 h-3.5" />
+                                        Perbesar Gambar
+                                      </span>
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-100 p-4 text-center">
+                                    <span className="text-4xl mb-1">{lbl.icon}</span>
+                                    <span className="text-xs font-semibold text-stone-700">{lbl.name}</span>
+                                  </div>
+                                )}
+
+                                {/* Prominent Label [A] / [B] / [C] / [D] Overlay */}
+                                <div className="absolute top-2 left-2 flex items-center gap-1.5 z-10 pointer-events-none drop-shadow-md">
+                                  <span
+                                    className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl font-display font-black text-xs sm:text-sm flex items-center justify-center shadow-md border-2 ${badgeColor}`}
+                                  >
+                                    {lbl.badgeId}
+                                  </span>
+                                  <span
+                                    className={`px-2 py-0.5 rounded-lg text-[10px] font-display font-black uppercase tracking-wider shadow-sm border ${tagBg}`}
+                                  >
+                                    {levelLabel}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Supporting Text Details */}
                               <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-1.5 font-display font-bold text-xs text-stone-900">
+                                <div className="flex items-center gap-1.5 font-display font-bold text-xs sm:text-sm text-stone-900">
                                   <span className="text-base">{lbl.icon}</span>
                                   <span>{lbl.name}</span>
                                 </div>
-                                <p className="text-[11px] text-stone-600 leading-snug mt-0.5">
+                                <p className="text-[11px] sm:text-xs text-stone-600 leading-relaxed mt-1 font-medium">
                                   {lbl.description}
                                 </p>
                               </div>
@@ -529,6 +606,59 @@ export const QuizScene: React.FC<QuizSceneProps> = ({
             Mulai Dari Awal Gerbang Sekolah
           </button>
         </div>
+
+        {/* Detailed Image Observation Zoom Modal */}
+        <AnimatePresence>
+          {zoomedImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setZoomedImage(null)}
+              className="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 cursor-pointer"
+            >
+              <motion.div
+                initial={{ scale: 0.9, y: 16 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 16 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-xl w-full border-4 border-amber-300 relative cursor-default"
+              >
+                <div className="relative aspect-[4/3] w-full bg-stone-900">
+                  <img
+                    src={zoomedImage.src}
+                    alt={zoomedImage.title}
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  <button
+                    onClick={() => setZoomedImage(null)}
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white flex items-center justify-center transition cursor-pointer shadow-md"
+                    title="Tutup Pratinjau"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="absolute top-3 left-3 flex items-center gap-2 drop-shadow-md">
+                    <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-500 text-white font-display font-black text-sm sm:text-base flex items-center justify-center shadow-lg border-2 border-white">
+                      {zoomedImage.badgeId}
+                    </span>
+                    <span className="px-2.5 py-1 bg-white/95 text-stone-900 rounded-lg text-xs font-display font-black uppercase tracking-wider shadow-md">
+                      {zoomedImage.level}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4 sm:p-5 bg-gradient-to-b from-amber-50/50 to-white">
+                  <h3 className="font-display font-bold text-sm sm:text-base text-stone-900">
+                    Label [{zoomedImage.badgeId}]: {zoomedImage.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed mt-1 font-medium">
+                    {zoomedImage.desc}
+                  </p>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
