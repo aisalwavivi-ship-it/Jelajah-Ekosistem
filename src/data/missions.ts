@@ -455,6 +455,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🌹',
           description: '1 batang tanaman mawar tunggal yang sedang mekar di sudut kebun.',
+          imageUrl: '/tantangan/individu_mawar.jpg',
         },
         {
           badgeId: 'B',
@@ -462,6 +463,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐝',
           description: 'Kawanan 10 ekor lebah madu sejenis yang sedang menghisap nektar bersama.',
+          imageUrl: '/tantangan/populasi_lebah.jpg',
         },
         {
           badgeId: 'C',
@@ -469,6 +471,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🌹🐝🦋🪴',
           description: 'Gabungan populasi lebah, kupu-kupu, semut, dan tanaman bunga di kebun.',
+          imageUrl: '/tantangan/komunitas_kebun.jpg',
         },
         {
           badgeId: 'D',
@@ -476,6 +479,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💨🪴',
           description: 'Faktor abiotik berupa tanah gembur dan hembusan angin segar.',
+          imageUrl: '/tantangan/abiotik_kebun.jpg',
         },
       ],
     },
