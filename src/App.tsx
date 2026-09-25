@@ -781,6 +781,7 @@ export default function App() {
         <TrailWalkingTransition
           fromScene={pendingWalkingScene.fromScene}
           toScene={pendingWalkingScene.toScene}
+          studentName={activeSession.studentName}
           onFinish={() => {
             triggerSceneScrollReset();
             setCurrentScene(pendingWalkingScene.toScene);
@@ -836,7 +837,7 @@ export default function App() {
         lastCompletedMissionId={lastCompletedMissionId}
         onNavigateToMission={(missionId) => {
           setIsJournalOpen(false);
-          navigateWithWalkingTrail(`mission-${missionId}` as AppScene);
+          navigateWithWalkingTrail(`mission-${missionId}` as AppScene, currentScene);
         }}
         onOpenHistory={() => {
           setIsJournalOpen(false);

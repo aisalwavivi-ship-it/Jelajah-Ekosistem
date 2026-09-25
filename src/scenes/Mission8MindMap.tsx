@@ -97,7 +97,7 @@ const PYRAMID_TIERS: PyramidTier[] = [
 ];
 
 const CARDS_DATA: PyramidCard[] = [
-  // 4 Kartu Tingkat Trofik
+  // 8 Kartu Tingkat Trofik (Produsen, Konsumen I, Konsumen II, Konsumen III)
   {
     id: 'card_tumbuhan',
     name: 'Tumbuhan Hijau',
@@ -107,6 +107,16 @@ const CARDS_DATA: PyramidCard[] = [
     icon: '🌿',
     role: 'PRODUSEN',
     desc: 'Menghasilkan energi dari sinar matahari untuk seluruh rantai makanan.'
+  },
+  {
+    id: 'card_rumput',
+    name: 'Rumput',
+    type: 'trofik',
+    tier: 1,
+    image: '/misi8/rumput.jpg',
+    icon: '🌱',
+    role: 'PRODUSEN',
+    desc: 'Menghasilkan makanan sendiri melalui proses fotosintesis.'
   },
   {
     id: 'card_belalang',
@@ -119,6 +129,16 @@ const CARDS_DATA: PyramidCard[] = [
     desc: 'Herbivora yang memakan daun dan rerumputan hijau.'
   },
   {
+    id: 'card_ulat',
+    name: 'Ulat',
+    type: 'trofik',
+    tier: 2,
+    image: '/misi8/ulat.jpg',
+    icon: '🐛',
+    role: 'KONSUMEN I',
+    desc: 'Herbivora pemakan tumbuhan atau dedaunan hijau.'
+  },
+  {
     id: 'card_katak',
     name: 'Katak',
     type: 'trofik',
@@ -129,6 +149,16 @@ const CARDS_DATA: PyramidCard[] = [
     desc: 'Karnivora kecil pemakan serangga seperti belalang.'
   },
   {
+    id: 'card_burung',
+    name: 'Burung',
+    type: 'trofik',
+    tier: 3,
+    image: '/misi8/burung.jpg',
+    icon: '🐦',
+    role: 'KONSUMEN II',
+    desc: 'Karnivora kecil pemakan ulat atau serangga.'
+  },
+  {
     id: 'card_elang',
     name: 'Elang',
     type: 'trofik',
@@ -137,6 +167,16 @@ const CARDS_DATA: PyramidCard[] = [
     icon: '🦅',
     role: 'KONSUMEN III',
     desc: 'Predator puncak pemangsa katak, tikus, atau ular.'
+  },
+  {
+    id: 'card_ular',
+    name: 'Ular',
+    type: 'trofik',
+    tier: 4,
+    image: '/misi8/ular.jpg',
+    icon: '🐍',
+    role: 'KONSUMEN III',
+    desc: 'Predator pemangsa burung atau hewan kecil lainnya.'
   },
 
   // 4 Kartu Pengecoh (Komponen Abiotik)
@@ -215,6 +255,7 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
 
   // Process a card placement on a tier
   const handleAttemptPlacement = (tierId: number, cardId: string) => {
+    if (placedMap[tierId]) return;
     const tier = PYRAMID_TIERS.find((t) => t.tierId === tierId);
     const card = CARDS_DATA.find((c) => c.id === cardId);
 
@@ -238,7 +279,7 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
     }
 
     // Check if card matches this tier
-    if (card.id === tier.expectedCardId) {
+    if (card.tier === tier.tierId) {
       sound.playCorrect();
       const updated = { ...placedMap, [tierId]: card.id };
       setPlacedMap(updated);
@@ -543,7 +584,7 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
             </div>
 
             {/* Cards Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-2.5">
               {CARDS_DATA.map((card) => {
                 const isPlaced = Object.values(placedMap).includes(card.id);
                 const isSelected = selectedCardId === card.id;
@@ -631,7 +672,7 @@ export const Mission8MindMap: React.FC<Mission8Props> = ({
                     Hebat! Piramida ekosistemmu sudah lengkap! 🌿🦗🐸🦅
                   </h3>
                   <p className="text-xs sm:text-sm text-emerald-100 mt-1 leading-relaxed">
-                    Kamu berhasil menyusun tingkat trofik dari Produsen (Tumbuhan hijau) di dasar, Konsumen I (Belalang), Konsumen II (Katak), hingga Konsumen III (Elang) di puncak piramida!
+                    Kamu berhasil menyusun seluruh tingkat trofik dari Produsen di dasar hingga Konsumen Tingkat Puncak di piramida makanan!
                   </p>
                 </div>
               </div>

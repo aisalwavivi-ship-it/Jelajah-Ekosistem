@@ -58,11 +58,178 @@ export const MISSIONS: MissionTransitionData[] = [
   },
   {
     id: 8,
-    title: 'Peta Konsep Interaktif',
+    title: 'Piramida Ekosistem',
     subtitle: 'Puncak Rangkuman Ekosistem',
-    description: 'Buka dan jelajahi rangkuman konsep ekosistem secara utuh dari tingkat individu hingga pelestarian alam.',
+    description: 'Susun tingkat trofik dari Produsen hingga Konsumen Puncak untuk memahami keseimbangan dan aliran energi ekosistem.',
   },
 ];
+
+export interface SceneTransitionInfo {
+  sceneId: AppScene;
+  stepNumber: number;
+  primaryBoardText: string;
+  secondaryBoardText: string;
+  headerTitle: string;
+  badgeLabel: string;
+  badgeSubtitle: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  speechGreeting: (studentName: string) => string;
+  speechArrived: string;
+  progressPercent: number;
+}
+
+export function getSceneTransitionInfo(scene?: AppScene): SceneTransitionInfo {
+  if (!scene || scene === 'start') {
+    return {
+      sceneId: 'start',
+      stepNumber: 0,
+      primaryBoardText: 'Gerbang Sekolah',
+      secondaryBoardText: 'Asal',
+      headerTitle: 'Gerbang Sekolah Asal',
+      badgeLabel: 'Gerbang Sekolah',
+      badgeSubtitle: 'Titik Awal',
+      title: 'Gerbang Sekolah Asal',
+      subtitle: 'Memulai Petualangan',
+      description: 'Gerbang awal sebelum melangkah menyusuri jejak ekosistem alam di sekitar kita.',
+      speechGreeting: (name) => `Halo ${name}! Siap memulai petualangan?`,
+      speechArrived: '✨ Tiba di Gerbang Sekolah!',
+      progressPercent: 0,
+    };
+  }
+
+  if (scene === 'quiz') {
+    return {
+      sceneId: 'quiz',
+      stepNumber: 9,
+      primaryBoardText: 'Tantangan',
+      secondaryBoardText: 'Evaluasi Ekosistem',
+      headerTitle: 'Menuju Tantangan: Evaluasi Ekosistem',
+      badgeLabel: 'Tantangan',
+      badgeSubtitle: 'Puncak Petualangan',
+      title: 'Tantangan: Evaluasi Ekosistem',
+      subtitle: 'Uji Pemahaman & Raih Bintang',
+      description: 'Saatnya tantangan akhir! Ayo uji semua pengetahuan ekosistemmu dari Misi 1 sampai Misi 8 dan raih bintang penjelajah!',
+      speechGreeting: (name) => `Halo ${name}! Siap menghadapi Tantangan?`,
+      speechArrived: '✨ Tiba di Tantangan Ekosistem!',
+      progressPercent: 100,
+    };
+  }
+
+  if (scene === 'map') {
+    return {
+      sceneId: 'map',
+      stepNumber: 0,
+      primaryBoardText: 'Peta Petualangan',
+      secondaryBoardText: 'Jalan Setapak',
+      headerTitle: 'Menuju Peta Petualangan',
+      badgeLabel: 'Peta',
+      badgeSubtitle: 'Penjelajahan',
+      title: 'Peta Petualangan Ekosistem',
+      subtitle: 'Jalan Setapak Alam',
+      description: 'Lihat seluruh rute perjalanan dan stasiun pengamatan ekosistem.',
+      speechGreeting: (name) => `Halo ${name}! Mari lihat peta petualangan!`,
+      speechArrived: '✨ Tiba di Peta Petualangan!',
+      progressPercent: 0,
+    };
+  }
+
+  if (scene === 'material') {
+    return {
+      sceneId: 'material',
+      stepNumber: 0,
+      primaryBoardText: 'Buku Materi',
+      secondaryBoardText: 'Pusat Ilmu',
+      headerTitle: 'Menuju Buku Materi Ekosistem',
+      badgeLabel: 'Materi',
+      badgeSubtitle: 'Pusat Referensi',
+      title: 'Buku Materi Ekosistem',
+      subtitle: 'Panduan Penjelajah',
+      description: 'Pelajari konsep biotik, abiotik, individu, populasi, komunitas, dan ekosistem secara menyeluruh.',
+      speechGreeting: (name) => `Halo ${name}! Mari buka materi pembelajaran!`,
+      speechArrived: '✨ Tiba di Buku Materi!',
+      progressPercent: 0,
+    };
+  }
+
+  if (scene.startsWith('mission-')) {
+    const mid = parseInt(scene.replace('mission-', ''), 10);
+    const validMid = mid >= 1 && mid <= MISSIONS.length ? mid : 1;
+    const missionData = MISSIONS[validMid - 1];
+    const progressPercent = Math.round((validMid / MISSIONS.length) * 100);
+
+    return {
+      sceneId: `mission-${validMid}` as AppScene,
+      stepNumber: validMid,
+      primaryBoardText: `Misi ${validMid}`,
+      secondaryBoardText: missionData.title,
+      headerTitle: `Menuju Misi ${validMid}: ${missionData.title}`,
+      badgeLabel: `Misi ${validMid}`,
+      badgeSubtitle: 'Pemberhentian Selanjutnya',
+      title: `Misi ${validMid}: ${missionData.title}`,
+      subtitle: missionData.subtitle,
+      description: missionData.description,
+      speechGreeting: (name) => `Halo ${name}! Siap ke Misi ${validMid}?`,
+      speechArrived: `✨ Tiba di Misi ${validMid}!`,
+      progressPercent,
+    };
+  }
+
+  return {
+    sceneId: scene,
+    stepNumber: 1,
+    primaryBoardText: 'Petualangan',
+    secondaryBoardText: 'Jalan Setapak',
+    headerTitle: 'Menuju Langkah Selanjutnya',
+    badgeLabel: 'Petualangan',
+    badgeSubtitle: 'Langkah Baru',
+    title: 'Langkah Penjelajahan',
+    subtitle: 'Menyusuri Alam',
+    description: 'Lanjutkan langkah perjalanan menyusuri alam.',
+    speechGreeting: (name) => `Halo ${name}! Siap melangkah?`,
+    speechArrived: '✨ Tiba di tujuan!',
+    progressPercent: 50,
+  };
+}
+
+export function resolveTransitionContext(
+  fromScene?: AppScene,
+  toScene?: AppScene,
+  initialMission?: number
+): { fromInfo: SceneTransitionInfo; toInfo: SceneTransitionInfo } {
+  // 1. Resolve destination
+  let resolvedToScene: AppScene = 'mission-1';
+  if (toScene) {
+    resolvedToScene = toScene;
+  } else if (initialMission && initialMission >= 1 && initialMission <= MISSIONS.length) {
+    resolvedToScene = `mission-${initialMission}` as AppScene;
+  }
+
+  const toInfo = getSceneTransitionInfo(resolvedToScene);
+
+  // 2. Resolve origin dynamically (Context-based, strictly avoiding hardcoded Misi 1 fallback)
+  let resolvedFromScene: AppScene;
+  if (fromScene) {
+    resolvedFromScene = fromScene;
+  } else {
+    // Dynamic contextual fallback based on destination
+    if (resolvedToScene === 'mission-1') {
+      resolvedFromScene = 'start';
+    } else if (resolvedToScene.startsWith('mission-')) {
+      const currentMid = toInfo.stepNumber;
+      resolvedFromScene = currentMid > 1 ? (`mission-${currentMid - 1}` as AppScene) : 'start';
+    } else if (resolvedToScene === 'quiz') {
+      resolvedFromScene = 'mission-8';
+    } else {
+      resolvedFromScene = 'start';
+    }
+  }
+
+  const fromInfo = getSceneTransitionInfo(resolvedFromScene);
+
+  return { fromInfo, toInfo };
+}
 
 interface TrailWalkingTransitionProps {
   fromScene?: AppScene;
@@ -173,27 +340,15 @@ function getPathCoordinates(progress: number): { xPercent: number; yPercent: num
 }
 
 export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
+  fromScene,
   toScene,
   studentName = 'Penjelajah Muda',
   initialMission,
   onFinish,
   onSkip,
 }) => {
-  // Determine initial mission from props if provided, defaulting to 1
-  const initialIndex = (() => {
-    if (initialMission && initialMission >= 1 && initialMission <= MISSIONS.length) {
-      return initialMission;
-    }
-    if (toScene && toScene.startsWith('mission-')) {
-      const mid = parseInt(toScene.replace('mission-', ''), 10);
-      if (mid >= 1 && mid <= MISSIONS.length) return mid;
-    }
-    return 1;
-  })();
-
-  // Core single source of truth state
-  const [currentMission, setCurrentMission] = useState<number>(initialIndex);
-  const totalMission = MISSIONS.length;
+  // Resolve dynamic context for origin and destination
+  const { fromInfo, toInfo } = resolveTransitionContext(fromScene, toScene, initialMission);
 
   // Character walking animation state
   const [walkProgress, setWalkProgress] = useState<number>(0);
@@ -202,6 +357,18 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
   const [footsteps, setFootsteps] = useState<{ id: number; x: number; y: number }[]>([]);
   const footstepCounterRef = useRef<number>(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Reset animation states whenever destination or origin changes
+  useEffect(() => {
+    setWalkProgress(0);
+    setIsWalking(false);
+    setHasArrived(false);
+    setFootsteps([]);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, [fromScene, toScene]);
 
   useEffect(() => {
     return () => {
@@ -212,23 +379,30 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
     };
   }, []);
 
-  // Current mission data slice
-  const activeMissionIndex = Math.max(0, Math.min(totalMission - 1, currentMission - 1));
-  const activeMission = MISSIONS[activeMissionIndex];
-
-  // Automated board texts
-  const leftBoardPrimary = currentMission === 1 ? 'Gerbang Sekolah' : `Misi ${currentMission - 1}`;
-  const leftBoardSecondary = currentMission === 1 ? 'Asal' : MISSIONS[currentMission - 2]?.title || '';
-
-  const rightBoardPrimary = `Misi ${currentMission}`;
-  const rightBoardSecondary = activeMission.title;
-
   // Compute character position along the motion path
   const characterCoords = getPathCoordinates(walkProgress);
+
+  const handleEnterOrSkip = () => {
+    sound.playClick();
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (onFinish) {
+      onFinish();
+    } else if (onSkip) {
+      onSkip();
+    }
+  };
 
   // Trigger automated walking step animation when button is clicked
   const handleAdvanceStep = () => {
     if (isWalking) return;
+
+    if (hasArrived) {
+      handleEnterOrSkip();
+      return;
+    }
 
     sound.playClick();
     sound.playWalkingSteps(6, 200);
@@ -267,34 +441,11 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
         setHasArrived(true);
         sound.playStarEarned();
 
-        // After journey completes, advance mission state and reset character
         setTimeout(() => {
-          if (currentMission < totalMission) {
-            setCurrentMission((prev) => prev + 1);
-            setWalkProgress(0);
-            setIsWalking(false);
-            setHasArrived(false);
-            setFootsteps([]);
-          } else {
-            // Arrived at the final mission milestone
-            setIsWalking(false);
-          }
-        }, 550);
+          setIsWalking(false);
+        }, 300);
       }
     }, 40);
-  };
-
-  const handleEnterOrSkip = () => {
-    sound.playClick();
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    if (onFinish) {
-      onFinish();
-    } else if (onSkip) {
-      onSkip();
-    }
   };
 
   return (
@@ -321,7 +472,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
                 Perjalanan Menyusuri Jalan Setapak
               </span>
               <h3 className="font-display font-bold text-sm sm:text-base text-white">
-                Menuju Misi {currentMission}: {activeMission.title}
+                {toInfo.headerTitle}
               </h3>
             </div>
           </div>
@@ -375,19 +526,19 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
             🌿
           </div>
 
-          {/* Reusable Automated Direction Sign Boards */}
-          {/* Papan Kiri: Asal */}
+          {/* Reusable Direction Sign Boards Driven By Dynamic Context */}
+          {/* Papan Kiri: Asal (Current Origin) */}
           <SignBoard
             position="left"
-            primaryText={leftBoardPrimary}
-            secondaryText={leftBoardSecondary}
+            primaryText={fromInfo.primaryBoardText}
+            secondaryText={fromInfo.secondaryBoardText}
           />
 
-          {/* Papan Kanan: Tujuan */}
+          {/* Papan Kanan: Tujuan (Destination Target) */}
           <SignBoard
             position="right"
-            primaryText={rightBoardPrimary}
-            secondaryText={rightBoardSecondary}
+            primaryText={toInfo.primaryBoardText}
+            secondaryText={toInfo.secondaryBoardText}
             highlight={hasArrived}
           />
 
@@ -419,7 +570,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
             {/* Thought / Speech Bubble above Character */}
             <AnimatePresence mode="wait">
               <motion.div
-                key={hasArrived ? 'arrived' : isWalking ? 'walking' : `idle-${currentMission}`}
+                key={hasArrived ? 'arrived' : isWalking ? 'walking' : `idle-${toInfo.sceneId}`}
                 initial={{ opacity: 0, y: 6, scale: 0.92 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -427,10 +578,10 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
               >
                 <p className="text-[10px] sm:text-[11px] font-semibold leading-tight text-stone-800">
                   {hasArrived
-                    ? `✨ Tiba di Misi ${currentMission}!`
+                    ? toInfo.speechArrived
                     : isWalking
-                    ? `Menyusuri jalan setapak...`
-                    : `Halo ${studentName}! Siap ke Misi ${currentMission}?`}
+                    ? 'Menyusuri jalan setapak...'
+                    : toInfo.speechGreeting(studentName)}
                 </p>
                 <div className="w-2 h-2 bg-white rotate-45 mx-auto -mb-1.5 border-r border-b border-amber-300" />
               </motion.div>
@@ -478,21 +629,21 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
             {/* Breadcrumb */}
             <div className="flex items-center justify-center sm:justify-start gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] tracking-wide">
-                Misi {currentMission}
+                {toInfo.badgeLabel}
               </span>
               <span className="text-xs font-semibold text-stone-500">
-                Pemberhentian Selanjutnya
+                {toInfo.badgeSubtitle}
               </span>
             </div>
 
             {/* Judul Besar Otomatis */}
             <h4 className="font-display font-extrabold text-base sm:text-lg text-emerald-950 transition-colors">
-              Misi {currentMission}: {activeMission.title}
+              {toInfo.title}
             </h4>
 
             {/* Deskripsi Otomatis */}
             <p className="text-xs text-stone-600 leading-relaxed font-medium max-w-xl">
-              {activeMission.description}
+              {toInfo.description}
             </p>
           </div>
 
@@ -511,14 +662,14 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
                   <span>Progress Jalan Setapak</span>
                 </span>
                 <span className="font-mono text-emerald-700">
-                  {Math.round((currentMission / totalMission) * 100)}%
+                  {toInfo.progressPercent}%
                 </span>
               </div>
               <div className="w-full h-3 bg-stone-200 rounded-full overflow-hidden border border-stone-300 shadow-inner">
                 <motion.div
                   className="h-full bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 rounded-full shadow-sm"
                   initial={false}
-                  animate={{ width: `${(currentMission / totalMission) * 100}%` }}
+                  animate={{ width: `${toInfo.progressPercent}%` }}
                   transition={{ duration: 0.7, ease: 'easeOut' }}
                 />
               </div>
@@ -532,25 +683,29 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
                 className={`flex-1 py-2.5 px-4 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition transform active:scale-95 cursor-pointer ${
                   isWalking
                     ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                    : hasArrived && currentMission >= totalMission
-                    ? 'bg-amber-500 hover:bg-amber-600 text-white'
+                    : hasArrived
+                    ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30'
                     : 'bg-amber-500 hover:bg-amber-600 text-white hover:shadow-amber-500/25'
                 }`}
               >
-                <span>{isWalking ? 'Melangkah...' : 'Lanjutkan Langkah →'}</span>
+                <span>
+                  {isWalking
+                    ? 'Melangkah...'
+                    : hasArrived
+                    ? (toInfo.sceneId === 'quiz' ? 'Masuk ke Tantangan →' : 'Masuk ke Misi →')
+                    : 'Lanjutkan Langkah →'}
+                </span>
               </button>
 
               {/* Direct entry button if student wants to begin mission right away */}
-              {(hasArrived || currentMission > 1 || onFinish) && (
-                <button
-                  onClick={handleEnterOrSkip}
-                  className="py-2.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-md transition active:scale-95 cursor-pointer"
-                  title="Mulai Misi Ini Sekarang"
-                >
-                  <span>Mulai</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              )}
+              <button
+                onClick={handleEnterOrSkip}
+                className="py-2.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-md transition active:scale-95 cursor-pointer"
+                title={toInfo.sceneId === 'quiz' ? 'Mulai Tantangan Sekarang' : 'Mulai Misi Ini Sekarang'}
+              >
+                <span>{toInfo.sceneId === 'quiz' ? 'Mulai Tantangan' : 'Mulai'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
         </div>
