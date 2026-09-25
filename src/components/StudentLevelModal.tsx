@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Star, Sparkles, CheckCircle2, Lock, ChevronRight, Award } from 'lucide-react';
 import { EXPLORER_LEVELS, getNextLevelProgress } from '../utils/levels';
@@ -21,16 +22,25 @@ export const StudentLevelModal: React.FC<StudentLevelModalProps> = ({
 
   const { currentLevel, nextLevel, progressPercent, starsNeeded } = getNextLevelProgress(stars);
 
-  return (
+  const modalContent = (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs">
+      <div
+        id="modal-student-level-backdrop"
+        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-stone-950/75 backdrop-blur-xs overflow-y-auto"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            sound.playClick();
+            onClose();
+          }
+        }}
+      >
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 12 }}
+          id="modal-student-level"
+          initial={{ opacity: 0, scale: 0.94, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border-2 border-emerald-200 overflow-hidden flex flex-col max-h-[90vh]"
-          id="modal-student-level"
+          transition={{ duration: 0.24, ease: 'easeOut' }}
+          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border-2 border-emerald-200 overflow-hidden flex flex-col max-h-[85vh] sm:max-h-[88vh] my-auto"
         >
           {/* Top Header Card */}
           <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white p-5 sm:p-6 relative overflow-hidden shrink-0">
@@ -235,4 +245,6 @@ export const StudentLevelModal: React.FC<StudentLevelModalProps> = ({
       </div>
     </AnimatePresence>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 };
