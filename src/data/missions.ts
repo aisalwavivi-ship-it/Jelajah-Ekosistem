@@ -667,6 +667,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🐸',
           description: '1 ekor katak tunggal di daun.',
+          imageUrl: '/tantangan/individu_katak_pohon.jpg',
         },
         {
           badgeId: 'B',
@@ -674,6 +675,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐟',
           description: 'Sekelompok ikan nila sejenis.',
+          imageUrl: '/tantangan/populasi_ikan_nila.jpg',
         },
         {
           badgeId: 'C',
@@ -681,6 +683,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🪷🐸🐟',
           description: 'Gabungan populasi ikan nila, populasi katak pohon, dan populasi tanaman teratai.',
+          imageUrl: '/tantangan/komunitas_kolam_nila.jpg',
         },
         {
           badgeId: 'D',
@@ -688,6 +691,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💧',
           description: 'Lingkungan fisik perairan tak hidup.',
+          imageUrl: '/tantangan/abiotik_kolam_kerikil.jpg',
         },
       ],
     },
