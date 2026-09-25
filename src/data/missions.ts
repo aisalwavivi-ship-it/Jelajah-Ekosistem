@@ -561,6 +561,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🐸',
           description: '1 ekor katak sedang berdiam sendirian di atas satu daun teratai.',
+          imageUrl: '/tantangan/individu_katak_pohon.jpg',
         },
         {
           badgeId: 'B',
@@ -568,6 +569,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐟',
           description: 'Sekelompok 8 ekor ikan nila yang sejenis berenang bersama di dalam air.',
+          imageUrl: '/tantangan/populasi_ikan_nila.jpg',
         },
         {
           badgeId: 'C',
@@ -575,6 +577,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🪷🐸🐟',
           description: 'Seluruh makhluk hidup (ikan nila + katak + tanaman teratai) yang hidup di kolam.',
+          imageUrl: '/tantangan/komunitas_kolam_nila.jpg',
         },
         {
           badgeId: 'D',
@@ -582,6 +585,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💧🪨',
           description: 'Air jernih dan batu kerikil di dasar kolam penyokong kehidupan.',
+          imageUrl: '/tantangan/abiotik_kolam_kerikil.jpg',
         },
       ],
     },
