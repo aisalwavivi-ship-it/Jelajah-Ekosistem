@@ -826,6 +826,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🐠',
           description: '1 ekor kuda laut mandiri berpegangan pada tanaman laut.',
+          imageUrl: '/tantangan/individu_kudalaut.jpg',
         },
         {
           badgeId: 'B',
@@ -833,6 +834,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐟',
           description: 'Sekelompok 15 ekor ikan badut sejenis yang berenang bersama di sekitar anemon.',
+          imageUrl: '/tantangan/populasi_ikan_badut.jpg',
         },
         {
           badgeId: 'C',
@@ -840,6 +842,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🐠🐟⭐🪸',
           description: 'Gabungan populasi ikan badut, kuda laut, anemon, dan bintang laut yang hidup berdampingan.',
+          imageUrl: '/tantangan/komunitas_terumbu_karang.jpg',
         },
         {
           badgeId: 'D',
@@ -847,6 +850,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💧🏖️',
           description: 'Faktor abiotik berupa cairan air laut bergaram dan pasir putih dasar laut.',
+          imageUrl: '/tantangan/abiotik_laut_pasir.jpg',
         },
       ],
     },
