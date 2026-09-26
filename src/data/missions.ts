@@ -720,6 +720,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🌳',
           description: '1 batang pohon akasia tunggal menjulang di padang.',
+          imageUrl: '/tantangan/individu_akasia.jpg',
         },
         {
           badgeId: 'B',
@@ -727,6 +728,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🦓',
           description: 'Kawanan 6 ekor zebra sejenis sedang memakan rumput bersama.',
+          imageUrl: '/tantangan/populasi_zebra.jpg',
         },
         {
           badgeId: 'C',
@@ -734,6 +736,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🦓🦒🦌',
           description: 'Berbagai jenis populasi hewan pemakan rumput yang hidup berdampingan.',
+          imageUrl: '/tantangan/komunitas_savana.jpg',
         },
         {
           badgeId: 'D',
@@ -741,6 +744,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '☀️🪴',
           description: 'Tanah savana berdebu dan pancaran sinar matahari terik.',
+          imageUrl: '/tantangan/abiotik_savana.jpg',
         },
       ],
     },
