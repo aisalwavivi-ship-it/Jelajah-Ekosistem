@@ -932,6 +932,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🐯',
           description: 'Satuan tunggal: seekor harimau mandiri (Individu).',
+          imageUrl: '/tantangan/individu_harimau.jpg',
         },
         {
           badgeId: 'B',
@@ -939,6 +940,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐯🐾',
           description: 'Kumpulan sejenis: sekawanan harimau yang hidup bersama (Populasi).',
+          imageUrl: '/tantangan/populasi_harimau.jpg',
         },
         {
           badgeId: 'C',
@@ -946,6 +948,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🐯🦌🐒🌳',
           description: 'Berbagai ragam populasi berbeda jenis yang hidup berdampingan (Komunitas).',
+          imageUrl: '/tantangan/komunitas_rimba.jpg',
         },
         {
           badgeId: 'D',
@@ -953,6 +956,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '🏞️💧☀️',
           description: 'Kesatuan komunitas makhluk hidup dengan lingkungan fisik abiotik (Ekosistem).',
+          imageUrl: '/tantangan/ekosistem_rimba.jpg',
         },
       ],
     },
