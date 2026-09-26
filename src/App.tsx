@@ -125,6 +125,75 @@ export default function App() {
     }
   });
 
+  // Track missions where the explorer guide has actually arrived at the post
+  const [arrivedMissions, setArrivedMissions] = useState<Record<number, boolean>>(() => {
+    try {
+      const saved = sessionStorage.getItem('jelajah_arrived_missions');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // ignore
+    }
+    const initial: Record<number, boolean> = {};
+    for (let i = 1; i <= 8; i++) {
+      if (initialData.activeSession.completedMissions[i as MissionId]) {
+        initial[i] = true;
+      }
+    }
+    return initial;
+  });
+
+  const [arrivedQuiz, setArrivedQuiz] = useState<boolean>(() => {
+    try {
+      return (
+        sessionStorage.getItem('jelajah_arrived_quiz') === 'true' ||
+        initialData.activeSession.quizScore !== null
+      );
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('jelajah_arrived_missions', JSON.stringify(arrivedMissions));
+      sessionStorage.setItem('jelajah_arrived_quiz', String(arrivedQuiz));
+    } catch {
+      // ignore
+    }
+  }, [arrivedMissions, arrivedQuiz]);
+
+  const isMissionUnlocked = (mid: number): boolean => {
+    if (mid === 1) return true;
+    return Boolean(
+      activeSession.completedMissions[(mid - 1) as MissionId] ||
+      activeSession.completedMissions[mid as MissionId]
+    );
+  };
+
+  const isQuizUnlocked = (): boolean => {
+    return Object.values(activeSession.completedMissions).filter(Boolean).length === 8;
+  };
+
+  // Rule: UNLOCKED !== READY TO START. Both unlocked AND arrived are required to start!
+  const canStartMission = (mid: number): boolean => {
+    return isMissionUnlocked(mid) && Boolean(arrivedMissions[mid]);
+  };
+
+  const canStartQuiz = (): boolean => {
+    return isQuizUnlocked() && Boolean(arrivedQuiz);
+  };
+
+  const handleMarkArrived = (targetScene: AppScene) => {
+    if (targetScene.startsWith('mission-')) {
+      const mid = parseInt(targetScene.replace('mission-', ''), 10);
+      setArrivedMissions((prev) => ({ ...prev, [mid]: true }));
+    } else if (targetScene === 'quiz') {
+      setArrivedQuiz(true);
+    }
+  };
+
   const handleFinishOpening = () => {
     try {
       sessionStorage.setItem('jelajah_has_seen_opening', 'true');
@@ -300,6 +369,7 @@ export default function App() {
   const handleCompleteMission = (missionId: MissionId, earnedStars: number) => {
     triggerMissionSuccessConfetti();
     setLastCompletedMissionId(missionId);
+    setArrivedMissions((prev) => ({ ...prev, [missionId]: true }));
 
     const now = new Date().toISOString();
     const meta = MISSIONS_DATA.find((m) => m.id === missionId);
@@ -403,6 +473,18 @@ export default function App() {
     if (scene !== currentScene && (scene.startsWith('mission-') || scene === 'quiz')) {
       navigateWithWalkingTrail(scene, currentScene);
     } else {
+      if (scene.startsWith('mission-')) {
+        const mid = parseInt(scene.replace('mission-', ''), 10);
+        if (!canStartMission(mid)) {
+          navigateWithWalkingTrail(scene, currentScene);
+          return;
+        }
+      } else if (scene === 'quiz') {
+        if (!canStartQuiz()) {
+          navigateWithWalkingTrail(scene, currentScene);
+          return;
+        }
+      }
       setCurrentScene(scene);
     }
   };
@@ -448,6 +530,14 @@ export default function App() {
     const { newSession, updatedHistory } = startNewSession(activeSession, history);
     setActiveSession(newSession);
     setHistory(updatedHistory);
+    setArrivedMissions({});
+    setArrivedQuiz(false);
+    try {
+      sessionStorage.removeItem('jelajah_arrived_missions');
+      sessionStorage.removeItem('jelajah_arrived_quiz');
+    } catch {
+      // ignore
+    }
     setIsRestartConfirmOpen(false);
 
     // Smoothly return to the Map Scene with Checkpoint M1 active
@@ -782,14 +872,34 @@ export default function App() {
           fromScene={pendingWalkingScene.fromScene}
           toScene={pendingWalkingScene.toScene}
           studentName={activeSession.studentName}
+          completedMissions={activeSession.completedMissions}
+          isAlreadyArrived={
+            pendingWalkingScene.toScene.startsWith('mission-')
+              ? Boolean(arrivedMissions[parseInt(pendingWalkingScene.toScene.replace('mission-', ''), 10)])
+              : pendingWalkingScene.toScene === 'quiz'
+              ? Boolean(arrivedQuiz)
+              : false
+          }
+          onArrived={() => handleMarkArrived(pendingWalkingScene.toScene)}
           onFinish={() => {
+            const targetScene = pendingWalkingScene.toScene;
+            if (targetScene.startsWith('mission-')) {
+              const mid = parseInt(targetScene.replace('mission-', ''), 10);
+              if (!canStartMission(mid)) {
+                return;
+              }
+            } else if (targetScene === 'quiz') {
+              if (!canStartQuiz()) {
+                return;
+              }
+            }
             triggerSceneScrollReset();
             setCurrentScene(pendingWalkingScene.toScene);
             setPendingWalkingScene(null);
           }}
-          onSkip={() => {
+          onCancel={() => {
             triggerSceneScrollReset();
-            setCurrentScene(pendingWalkingScene.toScene);
+            setCurrentScene('map');
             setPendingWalkingScene(null);
           }}
         />

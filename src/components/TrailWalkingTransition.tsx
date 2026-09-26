@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Sparkles, Compass, Footprints } from 'lucide-react';
-import { AppScene } from '../types';
+import { ArrowRight, Sparkles, Compass, Footprints, Lock, Map } from 'lucide-react';
+import { AppScene, MissionId } from '../types';
 import { CharacterAvatar } from './illustrations/CharacterAvatar';
 import { sound } from '../utils/audio';
 
@@ -93,7 +93,7 @@ export function getSceneTransitionInfo(scene?: AppScene): SceneTransitionInfo {
       title: 'Gerbang Sekolah Asal',
       subtitle: 'Memulai Petualangan',
       description: 'Gerbang awal sebelum melangkah menyusuri jejak ekosistem alam di sekitar kita.',
-      speechGreeting: (name) => `Halo ${name}! Siap memulai petualangan?`,
+      speechGreeting: (name) => `Halo ${name}! Tekan "Lanjutkan Perjalanan" untuk melangkah ke pos berikutnya!`,
       speechArrived: '✨ Tiba di Gerbang Sekolah!',
       progressPercent: 0,
     };
@@ -111,8 +111,8 @@ export function getSceneTransitionInfo(scene?: AppScene): SceneTransitionInfo {
       title: 'Tantangan: Evaluasi Ekosistem',
       subtitle: 'Uji Pemahaman & Raih Bintang',
       description: 'Saatnya tantangan akhir! Ayo uji semua pengetahuan ekosistemmu dari Misi 1 sampai Misi 8 dan raih bintang penjelajah!',
-      speechGreeting: (name) => `Halo ${name}! Siap menghadapi Tantangan?`,
-      speechArrived: '✨ Tiba di Tantangan Ekosistem!',
+      speechGreeting: (name) => `Halo ${name}! Tekan "Lanjutkan Perjalanan" untuk menuju Puncak Tantangan!`,
+      speechArrived: '✨ Tiba di Pos Tantangan! Ayo mulai evaluasi!',
       progressPercent: 100,
     };
   }
@@ -170,8 +170,8 @@ export function getSceneTransitionInfo(scene?: AppScene): SceneTransitionInfo {
       title: `Misi ${validMid}: ${missionData.title}`,
       subtitle: missionData.subtitle,
       description: missionData.description,
-      speechGreeting: (name) => `Halo ${name}! Siap ke Misi ${validMid}?`,
-      speechArrived: `✨ Tiba di Misi ${validMid}!`,
+      speechGreeting: (name) => `Halo ${name}! Pemandu siap melangkah. Tekan "Lanjutkan Perjalanan" menuju pos Misi ${validMid}!`,
+      speechArrived: `✨ Tiba di pos Misi ${validMid}! Tekan tombol "Mulai Misi ${validMid}" untuk memulai penyelidikan!`,
       progressPercent,
     };
   }
@@ -187,7 +187,7 @@ export function getSceneTransitionInfo(scene?: AppScene): SceneTransitionInfo {
     title: 'Langkah Penjelajahan',
     subtitle: 'Menyusuri Alam',
     description: 'Lanjutkan langkah perjalanan menyusuri alam.',
-    speechGreeting: (name) => `Halo ${name}! Siap melangkah?`,
+    speechGreeting: (name) => `Halo ${name}! Tekan "Lanjutkan Perjalanan" untuk melangkah!`,
     speechArrived: '✨ Tiba di tujuan!',
     progressPercent: 50,
   };
@@ -236,7 +236,11 @@ interface TrailWalkingTransitionProps {
   toScene?: AppScene;
   studentName?: string;
   initialMission?: number;
+  completedMissions?: Record<MissionId, boolean>;
+  isAlreadyArrived?: boolean;
+  onArrived?: () => void;
   onFinish?: () => void;
+  onCancel?: () => void;
   onSkip?: () => void;
 }
 
@@ -344,31 +348,35 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
   toScene,
   studentName = 'Penjelajah Muda',
   initialMission,
+  completedMissions = {},
+  isAlreadyArrived = false,
+  onArrived,
   onFinish,
-  onSkip,
+  onCancel,
 }) => {
   // Resolve dynamic context for origin and destination
   const { fromInfo, toInfo } = resolveTransitionContext(fromScene, toScene, initialMission);
 
   // Character walking animation state
-  const [walkProgress, setWalkProgress] = useState<number>(0);
+  const [walkProgress, setWalkProgress] = useState<number>(isAlreadyArrived ? 1 : 0);
   const [isWalking, setIsWalking] = useState<boolean>(false);
-  const [hasArrived, setHasArrived] = useState<boolean>(false);
+  const [hasArrived, setHasArrived] = useState<boolean>(Boolean(isAlreadyArrived));
   const [footsteps, setFootsteps] = useState<{ id: number; x: number; y: number }[]>([]);
   const footstepCounterRef = useRef<number>(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Reset animation states whenever destination or origin changes
+  // Sync state whenever fromScene, toScene, or isAlreadyArrived changes
   useEffect(() => {
-    setWalkProgress(0);
+    const arrived = Boolean(isAlreadyArrived);
+    setWalkProgress(arrived ? 1 : 0);
     setIsWalking(false);
-    setHasArrived(false);
+    setHasArrived(arrived);
     setFootsteps([]);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }, [fromScene, toScene]);
+  }, [fromScene, toScene, isAlreadyArrived]);
 
   useEffect(() => {
     return () => {
@@ -382,7 +390,43 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
   // Compute character position along the motion path
   const characterCoords = getPathCoordinates(walkProgress);
 
-  const handleEnterOrSkip = () => {
+  // 1. STATUS MISI TERBUKA (UNLOCKED)
+  const isMission = toInfo.sceneId.startsWith('mission-');
+  const targetStepNumber = toInfo.stepNumber;
+  const targetMissionId = isMission ? targetStepNumber : toInfo.sceneId === 'quiz' ? 9 : 0;
+
+  const isUnlocked: boolean =
+    !isMission && toInfo.sceneId !== 'quiz'
+      ? true
+      : targetMissionId === 1
+      ? true
+      : isMission
+      ? Boolean(
+          completedMissions[(targetMissionId - 1) as MissionId] ||
+          completedMissions[targetMissionId as MissionId]
+        )
+      : Boolean(Object.values(completedMissions).filter(Boolean).length === 8);
+
+  // 2. STATUS PEMANDU SUDAH TIBA DI POS
+  const arrivedAtMission = hasArrived;
+
+  // 3. STATUS MISI DAPAT DIMULAI (Keduanya harus TRUE: Unlocked AND Arrived)
+  const canStart: boolean = isUnlocked && arrivedAtMission;
+
+  // Label button Mulai Misi X
+  const startMissionActionText =
+    toInfo.sceneId === 'quiz'
+      ? 'Mulai Tantangan →'
+      : isMission
+      ? `Mulai Misi ${targetMissionId} →`
+      : 'Mulai Petualangan →';
+
+  // Handler for starting the mission: STRICTLY BLOCKED if pemandu has not arrived
+  const handleStartMission = () => {
+    if (!canStart) {
+      sound.playWrong();
+      return;
+    }
     sound.playClick();
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -390,19 +434,12 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
     }
     if (onFinish) {
       onFinish();
-    } else if (onSkip) {
-      onSkip();
     }
   };
 
-  // Trigger automated walking step animation when button is clicked
+  // Trigger walking step animation along the road when "Lanjutkan Perjalanan" is clicked
   const handleAdvanceStep = () => {
-    if (isWalking) return;
-
-    if (hasArrived) {
-      handleEnterOrSkip();
-      return;
-    }
+    if (isWalking || hasArrived) return;
 
     sound.playClick();
     sound.playWalkingSteps(6, 200);
@@ -440,6 +477,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
         setWalkProgress(1);
         setHasArrived(true);
         sound.playStarEarned();
+        onArrived?.();
 
         setTimeout(() => {
           setIsWalking(false);
@@ -477,13 +515,19 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
             </div>
           </div>
 
-          {/* Skip / Close Button */}
+          {/* Return to Map Button (Never bypasses unarrived mission) */}
           <button
-            onClick={handleEnterOrSkip}
+            onClick={() => {
+              sound.playClick();
+              if (onCancel) {
+                onCancel();
+              }
+            }}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-white/15 hover:bg-white/25 text-amber-100 rounded-xl text-xs font-semibold border border-white/20 transition active:scale-95 cursor-pointer"
+            title="Kembali ke Peta Petualangan"
           >
-            <span>Lewati Jalan</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <Map className="w-3.5 h-3.5" />
+            <span>Peta Petualangan</span>
           </button>
         </div>
 
@@ -580,7 +624,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
                   {hasArrived
                     ? toInfo.speechArrived
                     : isWalking
-                    ? 'Menyusuri jalan setapak...'
+                    ? 'Sedang melangkah menyusuri jalan setapak... 🌿'
                     : toInfo.speechGreeting(studentName)}
                 </p>
                 <div className="w-2 h-2 bg-white rotate-45 mx-auto -mb-1.5 border-r border-b border-amber-300" />
@@ -648,7 +692,7 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
           </div>
 
           {/* Action / Progress Area */}
-          <div className="w-full sm:w-68 flex flex-col items-center sm:items-end gap-2.5 shrink-0">
+          <div className="w-full sm:w-76 flex flex-col items-center sm:items-end gap-2.5 shrink-0">
             {/* Animated Walking Progress Bar */}
             <div className="w-full">
               <div className="flex justify-between text-[11px] font-bold text-stone-600 mb-1">
@@ -675,37 +719,75 @@ export const TrailWalkingTransition: React.FC<TrailWalkingTransitionProps> = ({
               </div>
             </div>
 
-            {/* Action Buttons: Lanjutkan Langkah & Masuk Misi */}
-            <div className="w-full flex items-center gap-2">
+            {/* Two Action Buttons: 🟡 Lanjutkan Perjalanan & 🟢 Mulai Misi X */}
+            <div className="w-full flex flex-col sm:flex-row items-center gap-2">
+              {/* Tombol 1: 🟡 Lanjutkan Perjalanan (Menjalankan langkah pemandu) */}
               <button
+                type="button"
+                id="btn-trail-continue-walk"
                 onClick={handleAdvanceStep}
-                disabled={isWalking}
-                className={`flex-1 py-2.5 px-4 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition transform active:scale-95 cursor-pointer ${
-                  isWalking
-                    ? 'bg-stone-300 text-stone-500 cursor-not-allowed'
-                    : hasArrived
-                    ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30'
-                    : 'bg-amber-500 hover:bg-amber-600 text-white hover:shadow-amber-500/25'
+                disabled={isWalking || hasArrived}
+                className={`w-full sm:flex-1 py-2.5 px-3 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition transform active:scale-95 ${
+                  hasArrived
+                    ? 'bg-emerald-50 border border-emerald-300 text-emerald-800 cursor-default opacity-90'
+                    : isWalking
+                    ? 'bg-amber-400 text-amber-950 cursor-wait animate-pulse'
+                    : 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/25 cursor-pointer ring-2 ring-amber-300'
                 }`}
               >
-                <span>
+                <Footprints className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">
                   {isWalking
                     ? 'Melangkah...'
                     : hasArrived
-                    ? (toInfo.sceneId === 'quiz' ? 'Masuk ke Tantangan →' : 'Masuk ke Misi →')
-                    : 'Lanjutkan Langkah →'}
+                    ? 'Tiba di Pos ✓'
+                    : 'Lanjutkan Perjalanan →'}
                 </span>
               </button>
 
-              {/* Direct entry button if student wants to begin mission right away */}
+              {/* Tombol 2: 🟢 Mulai Misi X (Hanya aktif jika pemandu sudah tiba di pos) */}
               <button
-                onClick={handleEnterOrSkip}
-                className="py-2.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1 shadow-md transition active:scale-95 cursor-pointer"
-                title={toInfo.sceneId === 'quiz' ? 'Mulai Tantangan Sekarang' : 'Mulai Misi Ini Sekarang'}
+                type="button"
+                id="btn-trail-start-mission"
+                onClick={handleStartMission}
+                disabled={!canStart}
+                className={`w-full sm:flex-1 py-2.5 px-3.5 rounded-xl font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition transform ${
+                  canStart
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30 active:scale-95 cursor-pointer ring-2 ring-emerald-300 animate-pulse'
+                    : 'bg-stone-200 border border-stone-300 text-stone-400 cursor-not-allowed opacity-75'
+                }`}
+                title={
+                  canStart
+                    ? 'Pemandu sudah tiba di pos! Klik untuk membuka misi.'
+                    : `Pemandu belum tiba di pos ${toInfo.primaryBoardText}. Selesaikan perjalanan terlebih dahulu.`
+                }
               >
-                <span>{toInfo.sceneId === 'quiz' ? 'Mulai Tantangan' : 'Mulai'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                {canStart ? (
+                  <>
+                    <span className="truncate">{startMissionActionText}</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3.5 h-3.5 shrink-0 text-stone-400" />
+                    <span className="truncate">
+                      {isMission ? `Mulai Misi ${targetMissionId}` : 'Mulai'} (Terkunci)
+                    </span>
+                  </>
+                )}
               </button>
+            </div>
+
+            {/* Helper Status Note below buttons */}
+            <div className="w-full text-center">
+              {!canStart ? (
+                <span className="text-[10px] text-amber-800 font-semibold inline-block">
+                  🔒 Pemandu belum tiba di pos. Tekan <strong>"Lanjutkan Perjalanan"</strong> terlebih dahulu.
+                </span>
+              ) : (
+                <span className="text-[10px] text-emerald-800 font-bold inline-block animate-pulse">
+                  ✨ Pemandu sudah tiba di pos! Tekan <strong>"{isMission ? `Mulai Misi ${targetMissionId}` : 'Mulai'}"</strong> untuk menjelajah.
+                </span>
+              )}
             </div>
           </div>
         </div>
