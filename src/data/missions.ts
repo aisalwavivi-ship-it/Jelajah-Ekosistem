@@ -773,6 +773,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'individu',
           icon: '🦅',
           description: '1 ekor burung berparuh besar sendirian di dahan pohon.',
+          imageUrl: '/tantangan/individu_enggang.jpg',
         },
         {
           badgeId: 'B',
@@ -780,6 +781,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'populasi',
           icon: '🐒',
           description: 'Sekelompok monyet ekor panjang sejenis yang sedang berayun bersama.',
+          imageUrl: '/tantangan/populasi_monyet.jpg',
         },
         {
           badgeId: 'C',
@@ -787,6 +789,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'komunitas',
           icon: '🐒🦅🦌🌳',
           description: 'Seluruh makhluk hidup beraneka ragam jenis yang menghuni rimba.',
+          imageUrl: '/tantangan/komunitas_hutan.jpg',
         },
         {
           badgeId: 'D',
@@ -794,6 +797,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
           level: 'abiotik',
           icon: '💧⛰️',
           description: 'Lingkungan fisik alam tak hidup penopang kehidupan hutan.',
+          imageUrl: '/tantangan/abiotik_hutan.jpg',
         },
       ],
     },
